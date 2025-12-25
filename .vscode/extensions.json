@@ -1,0 +1,22 @@
+{
+  "recommendations": [
+    "denoland.vscode-deno",
+    "pkief.material-icon-theme",
+    "biomejs.biome",
+    // "esbenp.prettier-vscode",
+    "dejmedus.tailwind-sorter",
+    "openai.chatgpt",
+    "rooveterinaryinc.roo-cline",
+    "saoudrizwan.claude-dev",
+    "kilocode.kilo-code",
+    "golang.go",
+    "ms-python.python",
+    "tradesdontlie.pinescript-v6-vscode",
+    // "coderabbit.coderabbit-vscode",
+    "mechatroner.rainbow-csv",
+    "idleberg.applescript",
+    "dotjoshjohnson.xml",
+    "svelte.svelte-vscode",
+    "augment.vscode-augment"
+  ]
+}

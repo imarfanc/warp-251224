@@ -1,0 +1,192 @@
+{
+  // ╭─────────────────────────── UI Layout ────────────────────────────╮
+  //"window.zoomLevel": 1,    // Scale entire UI (including explorer font)
+  //"workbench.editor.showTabs": "none",
+  "window.commandCenter": true,
+  "workbench.sideBar.location": "right",
+  // "workbench.statusBar.visible": false,
+  // "workbench.activityBar.visible": false,
+  // "workbench.panel.defaultLocation": "top",
+  "workbench.activityBar.location": "top",
+  "explorer.showHiddenFiles": true,
+  "explorer.confirmDelete": false,
+  "explorer.confirmPasteNative": false,
+  "explorer.confirmDragAndDrop": false,
+
+  // ╭────────── Icons ──────────╮
+  "workbench.iconTheme": "material-icon-theme",
+  "material-icon-theme.activeIconPack": "none",
+  "material-icon-theme.folders.associations": {
+    "html_Apps": "App",
+    "chat": "",
+    "websim": "App"
+  },
+
+  // ╭──────────────────────── Editor Configuration ────────────────────╮
+  "editor.fontSize": 11,
+  // "editor.fontSize": 14,
+  "editor.fontFamily": "Hack Nerd Font Mono",
+  "editor.accessibilitySupport": "off",
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.configPath": ".prettierrc.json",
+  "prettier.enableDebugLogs": true,
+  "prettier.resolveGlobalModules": false,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "diffEditor.hideUnchangedRegions.enabled": true,
+  "files.eol": "\n",
+  "deno.enable": true,
+  "deno.lint": true,
+  "deno.format": true,
+
+  // ╭──────────────────────── Terminal Configuration ────────────────────╮
+  "terminal.integrated.lineHeight": 1.5,
+  // "terminal.integrated.fontSize": 14
+  "terminal.integrated.fontSize": 16,
+  "terminal.integrated.cursorStyle": "line",
+  "terminal.integrated.fontFamily": "Hack Nerd Font Mono",
+
+  // ╭──────────────────────── Language & Tools ────────────────────╮
+  "python.defaultInterpreterPath": "/Users/arfan/miniconda3/bin/python",
+  "go.toolsManagement.autoUpdate": true,
+  "svelte.enable-ts-plugin": true,
+  "cursor.cpp.enablePartialAccepts": true,
+  "cursor.cpp.disabledLanguages": ["plaintext"],
+
+  // ╭──────────────────────── Git Configuration ────────────────────╮
+  "git.enableSmartCommit": false,
+
+  // ╭────────── Markdown Preview ──────────╮
+  "markdown-preview-enhanced.previewTheme": "one-dark.css",
+
+  // ╭──────────────────────── Markdown Configuration ────────────────────╮
+  "[markdown]": {
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.wordWrap": "on",
+    "editor.defaultFormatter": "denoland.vscode-deno",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    }
+  },
+  "markdownlint.config": {
+    "MD033": {
+      "allowed_elements": [
+        "a",
+        "img",
+        "strong",
+        "table",
+        "tr",
+        "th",
+        "td",
+        "style",
+        "em",
+        "p",
+        "ul",
+        "ol",
+        "li",
+        "blockquote",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6"
+      ]
+    }
+  },
+  "markdownlint.focusMode": false,
+
+  // ╭──────────────────────── Miscellaneous ────────────────────╮
+  "liveServer.settings.donotShowInfoMsg": true,
+  "prettier.requireConfig": true,
+  "update.releaseTrack": "prerelease",
+  "roo-cline.allowedCommands": ["npm test", "npm install", "tsc", "git log", "git diff", "git show"],
+
+  // ╭──────────────────────── Remote Development ────────────────────╮
+  "remote.SSH.remotePlatform": {
+    "sandbox.fzrjrx.csb": "linux"
+  },
+  // "security.promptForRemoteFileProtocolHandling": false,
+  // "cursor.composer.shouldChimeAfterChatFinishes": true,
+
+  // ╭──────────────────────── Customizations ────────────────────╮
+  "workbench.colorCustomizations": {},
+  "[html]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "denoland.vscode-deno",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    ".yoyo": true
+  },
+  // "workbench.colorTheme": "Default High Contrast"
+  "workbench.colorTheme": "Red",
+  // "workbench.colorTheme": "Kimbie Dark",
+  "prettier.bracketSameLine": true,
+  "git.autofetch": true,
+  "roo-cline.deniedCommands": [],
+  "workbench.secondarySideBar.showLabels": false,
+  "chat.commandCenter.enabled": false,
+  "workbench.panel.showLabels": false,
+  "mcp": {
+    "mcpServers": {
+      "chrome-devtools": {
+        "command": "npx",
+        "args": ["-y", "chrome-devtools-mcp@latest"]
+      }
+    }
+  }
+}
+// ╰───────────────────────────────────────────────────────────────────╯
