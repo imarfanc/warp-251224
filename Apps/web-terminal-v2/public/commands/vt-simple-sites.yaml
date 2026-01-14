@@ -1,0 +1,36 @@
+# VT CLI commands
+commands:
+  - id: "cd_simple_sites"
+    label: "📂 cd simple-sites"
+    command: "cd /Users/arfan/Developer/vt/simple-sites"
+  - id: "open_in_cursor"
+    label: "🖥️ open in cursor"
+    command: "cursor ."
+  - id: "vt_status"
+    label: "📊 status"
+    command: "vt status"
+  - id: "vt_clone"
+    label: "🐑 clone simple-sites"
+    command: "vt clone simple-sites"
+  - id: "vt_push"
+    label: "🚀 vt push"
+    command: "vt push"
+  - id: "vt_pull"
+    label: "📥 vt pull"
+    command: "vt pull"
+  - id: "vt_push_sleep_push"
+    label: "🚀 push, sleep 2, push"
+    command:
+      - "vt push"
+      - "sleep 2"
+      - "vt push"
+  - id: "vt_repush"
+    label: "🔁 vt repush (wait 2s)"
+    command: |
+      vt push && {
+        for i in 2 1; do
+          printf "\r%s" "$(gum style --bold --foreground 212 "Re-pushing in ${i}s…")"
+          sleep 1
+        done
+        echo
+      } && vt push
