@@ -39,15 +39,28 @@ app.get('/api/commands', (req, res) => {
 wss.on('connection', (ws) => {
     console.log('Client connected');
     let currentCwd = process.cwd();
+    let activeProcess = null;
 
     ws.on('message', async (message) => {
         let msgData;
         try {
-            // Try to parse as JSON for array of commands
+            // Try to parse as JSON for array of commands or stdin objects
             msgData = JSON.parse(message.toString());
         } catch (e) {
             // Fallback to string if not JSON
             msgData = message.toString().trim();
+        }
+
+        // Handle stdin for active process
+        // Handle "stdin" messages, which send input to the standard input of the active shell process, 
+        // allowing the client to interactively provide input (such as for programs expecting user input) 
+        // to the running command in the terminal.
+        if (msgData && msgData.type === 'stdin') {
+            console.log(`Stdin: ${msgData.data.trim()}`);
+            if (activeProcess && activeProcess.stdin.writable) {
+                activeProcess.stdin.write(msgData.data);
+            }
+            return;
         }
 
         const commands = Array.isArray(msgData) ? msgData : [msgData];
@@ -95,6 +108,8 @@ wss.on('connection', (ws) => {
                     env: { ...process.env, FORCE_COLOR: '1' }
                 });
 
+                activeProcess = child;
+
                 child.stdout.on('data', (data) => {
                     ws.send(JSON.stringify({ type: 'output', data: data.toString() }));
                 });
@@ -108,6 +123,7 @@ wss.on('connection', (ws) => {
                 });
 
                 child.on('close', (code) => {
+                    activeProcess = null;
                     if (!isBatch) {
                         ws.send(JSON.stringify({ type: 'status', data: 'finished', code, command, isBatch }));
                     }

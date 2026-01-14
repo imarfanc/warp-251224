@@ -2,6 +2,7 @@ let ws;
 let term;
 let currentPath = "~";
 let allGroupsExpanded = true;
+let isProcessRunning = false;
 const groupStates = new Map();
 
 function updatePrompt(path) {
@@ -29,13 +30,13 @@ function connect() {
       updatePrompt(currentPath);
     } else if (message.type === "status") {
       if (message.data === "running") {
-        term.pause();
+        isProcessRunning = true;
         if (message.command && message.isBatch) {
           const prompt = term.get_prompt();
           term.echo(`${prompt}${message.command}`, { class: "terminal-command-line" });
         }
       } else if (message.data === "finished") {
-        term.resume();
+        isProcessRunning = false;
       }
     } else if (message.type === "output") {
       let data = message.data.replace(/\x1b\[\?25[lh]/g, "");
@@ -48,14 +49,14 @@ function connect() {
           return;
         }
 
-        const terminal = $("#terminal").terminal();
-        const lastEcho = terminal.last();
+            const terminal = $("#terminal").terminal();
+            const lastEcho = terminal.last();
 
-        if (lastEcho && !data.includes("\n")) {
-          lastEcho.html($.terminal.ansi_to_formatting(lastPart));
-        } else {
-          terminal.echo($.terminal.ansi_to_formatting(lastPart));
-        }
+            if (lastEcho && !data.includes("\n")) {
+              lastEcho.html($.terminal.format_ansi(lastPart));
+            } else {
+              terminal.echo(lastPart);
+            }
       } else {
         term.echo(data);
       }
@@ -224,7 +225,11 @@ $(function () {
   term = $("#terminal").terminal(
     function (command) {
       if (command !== "") {
-        ws.send(command);
+        if (isProcessRunning) {
+          ws.send(JSON.stringify({ type: "stdin", data: command + "\n" }));
+        } else {
+          ws.send(command);
+        }
       }
     },
     {
