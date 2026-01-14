@@ -3,7 +3,7 @@
   //"window.zoomLevel": 1,    // Scale entire UI (including explorer font)
   //"workbench.editor.showTabs": "none",
   "window.commandCenter": true,
-  "workbench.sideBar.location": "right",
+  // "workbench.sideBar.location": "right",
   // "workbench.statusBar.visible": false,
   // "workbench.activityBar.visible": false,
   // "workbench.panel.defaultLocation": "top",
