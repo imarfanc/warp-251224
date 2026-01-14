@@ -1,0 +1,442 @@
+[
+    {
+        "transactionId": "320253580814793877",
+        "date": "Dec 24",
+        "amount": 16.96,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 24\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253560750572706",
+        "date": "Dec 22",
+        "amount": 32.28,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 22\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253540706126714",
+        "date": "Dec 20",
+        "amount": 31.29,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 20\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253510607057829",
+        "date": "Dec 17",
+        "amount": 184.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 17\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253510606717915",
+        "date": "Dec 17",
+        "amount": 199,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 17\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253510590299061",
+        "date": "Dec 17",
+        "amount": 154.22,
+        "description": "AMAZON MARKETPLACE PAMZN.COM/BILL WA",
+        "status": null,
+        "tag": null
+    },
+    {
+        "transactionId": "320253510614780583",
+        "date": "Dec 17",
+        "amount": -154.22,
+        "description": "AMAZON SHOP WITH POINTS CREDIT",
+        "status": "Dec 17\tCredit",
+        "tag": null
+    },
+    {
+        "transactionId": "320253510588299027",
+        "date": "Dec 17",
+        "amount": -2593.14,
+        "description": "ONLINE PAYMENT - THANK YOU",
+        "status": "Dec 17\tCredit",
+        "tag": null
+    },
+    {
+        "transactionId": "320253500563443479",
+        "date": "Dec 16",
+        "amount": 29.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 16\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253500571091400",
+        "date": "Dec 16",
+        "amount": 11.87,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 16\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253500563442992",
+        "date": "Dec 16",
+        "amount": 45.73,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 16\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253470487192796",
+        "date": "Dec 13",
+        "amount": 29.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 13\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253470477460651",
+        "date": "Dec 13",
+        "amount": 15.64,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 13\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253450404612966",
+        "date": "Dec 12",
+        "amount": 15.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 12\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253450404612468",
+        "date": "Dec 12",
+        "amount": 19.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 12\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253450424564264",
+        "date": "Dec 11",
+        "amount": 29.74,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 11\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253440388815399",
+        "date": "Dec 10",
+        "amount": 24.08,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 10\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253430344492184",
+        "date": "Dec 10",
+        "amount": 39.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 10\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253430340591742",
+        "date": "Dec 9",
+        "amount": -35,
+        "description": "AUTOPAY PAYMENT - THANK YOU",
+        "status": "Dec 9\tCredit",
+        "tag": null
+    },
+    {
+        "transactionId": "320253430343598332",
+        "date": "Dec 9",
+        "amount": 13.13,
+        "description": "KINDLE UNLTD*JA0QT7Z888-802-3080 WA",
+        "status": "Dec 9\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253400258639230",
+        "date": "Dec 6",
+        "amount": 15.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 6\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253390239286691",
+        "date": "Dec 5",
+        "amount": 54.96,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 5\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253390247251057",
+        "date": "Dec 5",
+        "amount": -30.99,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 5\tCredit",
+        "tag": null
+    },
+    {
+        "transactionId": "320253380199498264",
+        "date": "Dec 4",
+        "amount": -9.99,
+        "description": "AMAZON MARKETPLACE NAMZN.COM/BILL WA",
+        "status": "Dec 4\tCredit",
+        "tag": null
+    },
+    {
+        "transactionId": "320253380199509581",
+        "date": "Dec 4",
+        "amount": -9.99,
+        "description": "AMAZON MARKETPLACE NAMZN.COM/BILL WA",
+        "status": "Dec 4\tCredit",
+        "tag": null
+    },
+    {
+        "transactionId": "320253370161176224",
+        "date": "Dec 4",
+        "amount": 45.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 4\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253380211484317",
+        "date": "Dec 4",
+        "amount": 213.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 4\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253380210740138",
+        "date": "Dec 4",
+        "amount": 14.98,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 4\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253380212659226",
+        "date": "Dec 4",
+        "amount": 38.98,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 4\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253370186336748",
+        "date": "Dec 4",
+        "amount": 115.97,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 4\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253380210861809",
+        "date": "Dec 4",
+        "amount": 185.89,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 4\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253380210858767",
+        "date": "Dec 4",
+        "amount": 247.86,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 4\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253370166625645",
+        "date": "Dec 3",
+        "amount": 7.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 3\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253370183906299",
+        "date": "Dec 3",
+        "amount": 22.09,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 3\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253370177646249",
+        "date": "Dec 3",
+        "amount": 80.83,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 3\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253370164547807",
+        "date": "Dec 3",
+        "amount": 83.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 3\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253370166625543",
+        "date": "Dec 3",
+        "amount": 94.04,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 3\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253370175211565",
+        "date": "Dec 3",
+        "amount": 177.97,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 3\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253370183639658",
+        "date": "Dec 3",
+        "amount": 84,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 3\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253370173003648",
+        "date": "Dec 3",
+        "amount": 679.99,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 3\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253360132219632",
+        "date": "Dec 2",
+        "amount": 7.59,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 2\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253360146089325",
+        "date": "Dec 2",
+        "amount": 68.22,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 2\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253360149907874",
+        "date": "Dec 2",
+        "amount": 72.98,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 2\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253350095647467",
+        "date": "Dec 1",
+        "amount": 85.19,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Dec 1\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253350094123488",
+        "date": "Dec 1",
+        "amount": 299.95,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Dec 1\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253340059280769",
+        "date": "Nov 30",
+        "amount": 8.84,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Nov 30\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253320011495983",
+        "date": "Nov 29",
+        "amount": 7.1,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Nov 29\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253320011496437",
+        "date": "Nov 29",
+        "amount": 28.5,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Nov 29\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253320018751596",
+        "date": "Nov 28",
+        "amount": 8.27,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Nov 28\t5X Points",
+        "tag": null
+    },
+    {
+        "transactionId": "320253310977196869",
+        "date": "Nov 27",
+        "amount": -33.99,
+        "description": "AMAZON MARKETPLACE NAMZN.COM/BILL WA",
+        "status": "Nov 27\tCredit",
+        "tag": null
+    },
+    {
+        "transactionId": "320253300967315336",
+        "date": "Nov 26",
+        "amount": -20.35,
+        "description": "AMAZON MARKETPLACE NAMZN.COM/BILL WA",
+        "status": "Nov 26\tCredit",
+        "tag": null
+    },
+    {
+        "transactionId": "320253290937668175",
+        "date": "Nov 26",
+        "amount": -14.58,
+        "description": "AMAZON MARKETPLACE NAMZN.COM/BILL WA",
+        "status": "Nov 26\tCredit",
+        "tag": null
+    },
+    {
+        "transactionId": "320253300949207005",
+        "date": "Nov 26",
+        "amount": -478.45,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Nov 26\tCredit",
+        "tag": null
+    },
+    {
+        "transactionId": "320253300949204111",
+        "date": "Nov 26",
+        "amount": -271.54,
+        "description": "AMAZON.COM AMZN.COM/BILL WA",
+        "status": "Nov 26\tCredit",
+        "tag": null
+    },
+    {
+        "transactionId": "320253290927097364",
+        "date": "Nov 25",
+        "amount": 9.99,
+        "description": "AMAZON MARKEPLACE NA PA",
+        "status": "Nov 25\t5X Points",
+        "tag": null
+    }
+]
