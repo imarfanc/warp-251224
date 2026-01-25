@@ -97,8 +97,8 @@ def create_gradio_interface():
                         tts_text = gr.Textbox(label="Text to Generate", placeholder="Enter text here...", lines=3)
                         with gr.Row():
                             tts_lang = gr.Dropdown(
-                                choices=["English", "Chinese", "Japanese", "Korean", "Spanish", "French", "German"],
-                                value="English", label="Language"
+                                choices=["Auto", "English", "Chinese", "Japanese", "Korean", "Spanish", "French", "German", "Italian", "Portuguese", "Russian"],
+                                value="Auto", label="Language"
                             )
                             tts_speaker = gr.Textbox(label="Speaker", value="Ryan")
                         tts_btn = gr.Button("Generate Audio", variant="primary")
@@ -118,8 +118,8 @@ def create_gradio_interface():
                         )
                         vd_text = gr.Textbox(label="Target Text", placeholder="What should the voice say?", lines=2)
                         vd_lang = gr.Dropdown(
-                            choices=["English", "Chinese", "Japanese", "Korean", "Spanish", "French", "German"],
-                            value="English", label="Language"
+                            choices=["Auto", "English", "Chinese", "Japanese", "Korean", "Spanish", "French", "German", "Italian", "Portuguese", "Russian"],
+                            value="Auto", label="Language"
                         )
                         vd_btn = gr.Button("Design & Generate", variant="primary")
                     with gr.Column():
@@ -135,8 +135,8 @@ def create_gradio_interface():
                         vc_ref_text = gr.Textbox(label="Reference Text (Optional)", placeholder="Full transcript of the reference audio for better quality")
                         vc_text = gr.Textbox(label="Target Text", placeholder="Content to synthesize in the cloned voice", lines=2)
                         vc_lang = gr.Dropdown(
-                            choices=["English", "Chinese", "Japanese", "Korean", "Spanish", "French", "German"],
-                            value="English", label="Language"
+                            choices=["Auto", "English", "Chinese", "Japanese", "Korean", "Spanish", "French", "German", "Italian", "Portuguese", "Russian"],
+                            value="Auto", label="Language"
                         )
                         vc_btn = gr.Button("Clone & Generate", variant="primary")
                     with gr.Column():
