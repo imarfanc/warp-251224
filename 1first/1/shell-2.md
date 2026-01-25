@@ -4,7 +4,7 @@
 
 ### Homebrew
 
-https://brew.sh/
+<https://brew.sh/>
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -12,11 +12,11 @@ https://brew.sh/
 
 ### Github Desktop
 
-https://github.com/apps/desktop
+<https://github.com/apps/desktop>
 
 ### Git
 
-https://git-scm.com/
+<https://git-scm.com/>
 
 ```bash
 brew install git
@@ -24,7 +24,7 @@ brew install git
 
 ### GitHub CLI
 
-https://cli.github.com/
+<https://cli.github.com/>
 
 ```bash
 brew install gh
@@ -52,15 +52,15 @@ printf "%-10s | %-15s\n" "Bun" "$(bun --version 2>/dev/null || echo 'Not install
 
 ### Go
 
-https://go.dev/dl/
+<https://go.dev/dl/>
 
 ### Python
 
-https://www.python.org/downloads/
+<https://www.python.org/downloads/>
 
 ### uv
 
-https://docs.astral.sh/uv/getting-started/installation/
+<https://docs.astral.sh/uv/getting-started/installation/>
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -71,7 +71,7 @@ source $HOME/.local/bin/env
 
 ### node.js
 
-https://nodejs.org/en/download/current
+<https://nodejs.org/en/download/current>
 
 ```bash
 # Download and install nvm:
@@ -92,7 +92,7 @@ npm -v # Should print "11.6.2".
 
 ### Deno
 
-https://docs.deno.com/runtime/
+<https://docs.deno.com/runtime/>
 
 ```bash
 curl -fsSL https://deno.land/install.sh | sh
@@ -100,7 +100,7 @@ curl -fsSL https://deno.land/install.sh | sh
 
 ### Val Town CLI
 
-https://github.com/val-town/vt
+<https://github.com/val-town/vt>
 
 ```bash
 deno install -grAf jsr:@valtown/vt
@@ -114,7 +114,7 @@ vt clone https://www.val.town/x/arfan/neoApps-2511
 
 ### Bun
 
-https://bun.sh/
+<https://bun.sh/>
 
 ```bash
 curl -fsSL https://bun.sh/install | bash
