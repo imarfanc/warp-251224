@@ -1,8 +1,0 @@
-# List of terminal commands in YAML format
-commands:
-  - id: "df"
-    label: "💾 df -h"
-    command: "df -h"
-  - id: "ps"
-    label: "📊 ps aux"
-    command: "ps aux | head -10"
