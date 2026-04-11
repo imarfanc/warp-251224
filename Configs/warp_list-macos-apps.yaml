@@ -1,0 +1,11 @@
+---
+name: list-macos-apps
+windows:
+  - tabs:
+      - title: tab1
+        color: red
+        layout:
+          cwd: /Users/arfan2
+          commands:
+            - exec: cd "$HOME/Developer/gh/warp-251224"
+            - exec: claude --model haiku "list all open apps in a nice table"
