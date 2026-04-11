@@ -1,0 +1,1276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797605866.60718906</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionColor</key>
+						<string>Aqua</string>
+						<key>ActionUID</key>
+						<integer>2027</integer>
+						<key>AllWindows</key>
+						<true/>
+						<key>AlreadyActivatedActionType</key>
+						<string>Normal</string>
+						<key>Application</key>
+						<dict>
+							<key>BundleIdentifier</key>
+							<string>dev.warp.Warp-Stable</string>
+							<key>Name</key>
+							<string>Warp</string>
+							<key>NewFile</key>
+							<string>/Applications/Warp.app</string>
+						</dict>
+						<key>MacroActionType</key>
+						<string>ActivateApplication</string>
+						<key>ReopenWindows</key>
+						<false/>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionColor</key>
+						<string>Yellow</string>
+						<key>ActionUID</key>
+						<integer>814</integer>
+						<key>MacroActionType</key>
+						<string>Pause</string>
+						<key>Time</key>
+						<string>.8</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionColor</key>
+						<string>Purple</string>
+						<key>ActionUID</key>
+						<integer>816</integer>
+						<key>KeyCode</key>
+						<integer>9</integer>
+						<key>MacroActionType</key>
+						<string>SimulateKeystroke</string>
+						<key>Modifiers</key>
+						<integer>256</integer>
+						<key>ReleaseAll</key>
+						<false/>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+					</dict>
+					<dict>
+						<key>ActionColor</key>
+						<string>Purple</string>
+						<key>ActionUID</key>
+						<integer>821</integer>
+						<key>IsActive</key>
+						<false/>
+						<key>KeyCode</key>
+						<integer>51</integer>
+						<key>MacroActionType</key>
+						<string>SimulateKeystroke</string>
+						<key>Modifiers</key>
+						<integer>0</integer>
+						<key>ReleaseAll</key>
+						<false/>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797605885.55472398</real>
+				<key>ModificationDate</key>
+				<real>797605902.37363899</real>
+				<key>Name</key>
+				<string>web_2_terminal</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>E718C1EA-0C84-4B31-A716-8914AC29969C</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>URL_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>3A19E624-17C9-4D94-AE32-CB8BA4B93D04</string>
+		<key>UID</key>
+		<string>222D49FF-1C71-4E2D-939A-B91A15CC46FC</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1634</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>aazad.hoon2@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797084951.38818097</real>
+				<key>ModificationDate</key>
+				<real>797596951.78534198</real>
+				<key>Name</key>
+				<string>aazad.hoon2</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>aaz </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>1EEA30AC-1FBA-4957-9859-DB2C69D563FB</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1636</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>shepherdoil.DBW.highfillmart@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797597346.12018394</real>
+				<key>ModificationDate</key>
+				<real>797597359.36924803</real>
+				<key>Name</key>
+				<string>shepherdoil.DBW.highfillmart</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>shep </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>EC1D9C4D-8BC9-4385-AE19-81D92EF9F8D2</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1631</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>highfillmart@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797084951.38818097</real>
+				<key>ModificationDate</key>
+				<real>797596907.10688996</real>
+				<key>Name</key>
+				<string>highfillmart</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>hig </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>56D23FEF-931B-455E-9370-5690C0123D2E</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>1238</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteSwift</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>import AppKit
+
+let appNames = [
+    "Obsidian",
+    "Google Chrome Beta",
+    "GitHub Desktop",
+    "Brave Browser",
+    "Comet",
+    "WhatsApp",
+    "Warp",
+    "System Settings",
+    "Preview"
+]
+
+var closedApps: [String] = []
+var notRunning: [String] = []
+
+for appName in appNames {
+    let matchingApps = NSWorkspace.shared.runningApplications.filter {
+        $0.localizedName == appName
+    }
+    
+    if matchingApps.isEmpty {
+        notRunning.append(appName)
+        continue
+    }
+    
+    for app in matchingApps {
+        if app.terminate() || app.forceTerminate() {
+            closedApps.append(appName)
+        }
+    }
+}
+
+print("Closed:")
+for name in closedApps {
+    print("  • \(name)")
+}
+
+if !notRunning.isEmpty {
+    print("\nNot running:")
+    for name in notRunning {
+        print("  • \(name)")
+    }
+}</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797054243.28411698</real>
+				<key>ModificationDate</key>
+				<real>797054421.29618597</real>
+				<key>Name</key>
+				<string>quit all apps</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>84D2F409-5FBE-477F-857F-DAF01D33A7CD</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1629</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>imarfanc@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797084951.38818097</real>
+				<key>ModificationDate</key>
+				<real>797084987.94866097</real>
+				<key>Name</key>
+				<string>imarfanc</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>ima </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>E56960E6-10FF-49C4-A0E8-07D0E198ABF7</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1633</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>tosifac@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797084951.38818097</real>
+				<key>ModificationDate</key>
+				<real>797596937.43538201</real>
+				<key>Name</key>
+				<string>tosifac</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>tos </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>8A6B818E-6C12-4370-9978-6D550BD31D8F</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>1637</integer>
+						<key>IsDefaultApplication</key>
+						<true/>
+						<key>MacroActionType</key>
+						<string>OpenURL</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>URL</key>
+						<string>warp://launch/list-macos-apps</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797597237.94598103</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/Applications/Warp.app</string>
+				<key>ModificationDate</key>
+				<real>797599345.88263297</real>
+				<key>Name</key>
+				<string>warp:py_quit</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>DAD9C8AC-BC91-488A-BF42-4382A0F1F496</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>CenterWindow</string>
+						<key>ActionUID</key>
+						<integer>1630</integer>
+						<key>HeightExpression</key>
+						<string>300</string>
+						<key>HorizontalExpression</key>
+						<string>125</string>
+						<key>MacroActionType</key>
+						<string>ManipulateWindow</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>Targeting</key>
+						<string>FrontWindow</string>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>VerticalExpression</key>
+						<string>125</string>
+						<key>WidthExpression</key>
+						<string>300</string>
+						<key>WindowIndexExpression</key>
+						<string>2</string>
+						<key>WindowName</key>
+						<string></string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>795113871.13560605</real>
+				<key>CustomIconData</key>
+				<string>KMEP-MarkedBadge</string>
+				<key>ModificationDate</key>
+				<real>795113928.97301495</real>
+				<key>Name</key>
+				<string>center</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>896B42F3-4933-4613-A7A3-5E6F2D3D0D97</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>1635</integer>
+						<key>IsDefaultApplication</key>
+						<true/>
+						<key>MacroActionType</key>
+						<string>OpenURL</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>URL</key>
+						<string>warp://launch/test1</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797597237.94598103</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/Applications/Warp.app</string>
+				<key>ModificationDate</key>
+				<real>797597394.91684306</real>
+				<key>Name</key>
+				<string>warp:test1</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>FFA97DFB-F851-4AA5-8DD8-46A12FA9CAA4</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>847</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteSwift</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>import Foundation
+import Cocoa
+import ApplicationServices
+
+func copyAttribute(_ element: AXUIElement, _ name: String) -&gt; AnyObject? {
+    var value: CFTypeRef?
+    let result = AXUIElementCopyAttributeValue(element, name as CFString, &amp;value)
+    guard result == .success, let value else { return nil }
+    return value
+}
+
+func axPoint(_ obj: AnyObject?) -&gt; CGPoint? {
+    guard let value = obj else { return nil }
+    let ax = value as! AXValue
+    var point = CGPoint.zero
+    guard AXValueGetValue(ax, .cgPoint, &amp;point) else { return nil }
+    return point
+}
+
+func axSize(_ obj: AnyObject?) -&gt; CGSize? {
+    guard let value = obj else { return nil }
+    let ax = value as! AXValue
+    var size = CGSize.zero
+    guard AXValueGetValue(ax, .cgSize, &amp;size) else { return nil }
+    return size
+}
+
+func pad(_ label: String, _ width: Int = 12) -&gt; String {
+    let s = label + ":"
+    if s.count &gt;= width { return s + " " }
+    return s + String(repeating: " ", count: width - s.count)
+}
+
+guard AXIsProcessTrusted() else {
+    fputs("Accessibility permission is not enabled.\n", stderr)
+    exit(1)
+}
+
+guard let app = NSWorkspace.shared.frontmostApplication else {
+    fputs("Could not get frontmost application.\n", stderr)
+    exit(1)
+}
+
+let appName = app.localizedName ?? "(unknown)"
+let axApp = AXUIElementCreateApplication(app.processIdentifier)
+
+guard let focusedObj = copyAttribute(axApp, kAXFocusedWindowAttribute) else {
+    fputs("Could not get focused window.\n", stderr)
+    exit(1)
+}
+
+let win = focusedObj as! AXUIElement
+
+let title = (copyAttribute(win, kAXTitleAttribute) as? String) ?? "(untitled)"
+let role = (copyAttribute(win, kAXRoleAttribute) as? String) ?? "(unknown)"
+let subrole = (copyAttribute(win, kAXSubroleAttribute) as? String) ?? "(unknown)"
+let minimized = (copyAttribute(win, kAXMinimizedAttribute) as? Bool) ?? false
+let focused = (copyAttribute(win, kAXFocusedAttribute) as? Bool) ?? true
+
+let pos = axPoint(copyAttribute(win, kAXPositionAttribute))
+let size = axSize(copyAttribute(win, kAXSizeAttribute))
+
+let x = Int(pos?.x ?? 0)
+let y = Int(pos?.y ?? 0)
+let w = Int(size?.width ?? 0)
+let h = Int(size?.height ?? 0)
+
+let textOutput = """
+\(pad("App"))\(appName)
+\(pad("Title"))\(title)
+\(pad("Role"))\(role)
+\(pad("Subrole"))\(subrole)
+\(pad("Focused"))\(focused)
+\(pad("Minimized"))\(minimized)
+\(pad("Position"))X=\(x)  Y=\(y)
+\(pad("Size"))W=\(w)  H=\(h)
+\(pad("Bounds"))\(x),\(y) \(w)x\(h)
+"""
+
+let json = """
+{
+  "app": "\(appName.replacingOccurrences(of: "\"", with: "\\\""))",
+  "title": "\(title.replacingOccurrences(of: "\"", with: "\\\""))",
+  "role": "\(role)",
+  "subrole": "\(subrole)",
+  "focused": \(focused),
+  "minimized": \(minimized),
+  "x": \(x),
+  "y": \(y),
+  "width": \(w),
+  "height": \(h)
+}
+"""
+
+print(textOutput + "\nJSON:\n" + json)</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>796432624.24225903</real>
+				<key>ModificationDate</key>
+				<real>796432663.26457</real>
+				<key>Name</key>
+				<string>window-get_Size-swift</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>5FBC96F8-C477-46EC-B131-CF42D1483B2C</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>846</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteSwift</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>import Foundation
+import Cocoa
+import ApplicationServices
+
+// ======================================================
+// SETTINGS
+// Edit only this section
+// ======================================================
+
+struct SingleWindowRule {
+    let appNames: [String]
+    let frame: CGRect
+    let label: String
+}
+
+struct IndexedWindowRule {
+    let appNames: [String]
+    let windowIndex: Int   // 0-based: 0 = first window, 1 = second window
+    let frame: CGRect
+    let label: String
+}
+
+// Apps that usually have one relevant window
+let singleWindowRules: [SingleWindowRule] = [
+    SingleWindowRule(
+        appNames: ["Keyboard Maestro", "Keyboard Maestro Editor"],
+        frame: CGRect(x: 210, y: 200, width: 1000, height: 650),
+        label: "Keyboard Maestro"
+    ),
+    SingleWindowRule(
+        appNames: ["Finder"],
+        frame: CGRect(x: 70, y: 100, width: 920, height: 580),
+        label: "Finder"
+    ),
+    SingleWindowRule(
+        appNames: ["Helium"],
+        frame: CGRect(x: 60, y: 60, width: 1200, height: 880),
+        label: "Helium"
+    ),
+    SingleWindowRule(
+        appNames: ["Zen", "Zen Browser"],
+        frame: CGRect(x: 63, y: 40, width: 1343, height: 908),
+        label: "Zen"
+    ),
+    SingleWindowRule(
+        appNames: ["Zed"],
+        frame: CGRect(x: 80, y: 70, width: 1200, height: 860),
+        label: "Zed"
+    )
+]
+
+// Apps where you want windows by order, not title
+let indexedWindowRules: [IndexedWindowRule] = [
+    IndexedWindowRule(
+        appNames: ["Cursor"],
+        windowIndex: 0,
+        frame: CGRect(x: 60, y: 40, width: 1250, height: 900),
+        label: "Cursor 1"
+    ),
+    IndexedWindowRule(
+        appNames: ["Cursor"],
+        windowIndex: 1,
+        frame: CGRect(x: 112, y: 77, width: 1263, height: 878),
+        label: "Cursor 2"
+    ),
+    IndexedWindowRule(
+        appNames: ["Google Chrome", "Chrome"],
+        windowIndex: 0,
+        frame: CGRect(x: 60, y: 40, width: 1250, height: 900),
+        label: "Chrome 1"
+    ),
+    IndexedWindowRule(
+        appNames: ["Google Chrome", "Chrome"],
+        windowIndex: 1,
+        frame: CGRect(x: 112, y: 77, width: 1263, height: 878),
+        label: "Chrome 2"
+    )
+]
+
+
+// ======================================================
+// HELPERS
+// ======================================================
+
+func copyAttribute(_ element: AXUIElement, _ name: String) -&gt; AnyObject? {
+    var value: CFTypeRef?
+    let result = AXUIElementCopyAttributeValue(element, name as CFString, &amp;value)
+    guard result == .success, let value else { return nil }
+    return value
+}
+
+func setAttribute(_ element: AXUIElement, _ name: String, _ value: CFTypeRef) -&gt; Bool {
+    AXUIElementSetAttributeValue(element, name as CFString, value) == .success
+}
+
+func makeAXValue(_ point: CGPoint) -&gt; AXValue {
+    var p = point
+    return AXValueCreate(.cgPoint, &amp;p)!
+}
+
+func makeAXValue(_ size: CGSize) -&gt; AXValue {
+    var s = size
+    return AXValueCreate(.cgSize, &amp;s)!
+}
+
+func isStandardWindow(_ window: AXUIElement) -&gt; Bool {
+    let role = copyAttribute(window, kAXRoleAttribute) as? String
+    let subrole = copyAttribute(window, kAXSubroleAttribute) as? String
+    return role == kAXWindowRole &amp;&amp; subrole == kAXStandardWindowSubrole
+}
+
+func isMinimized(_ window: AXUIElement) -&gt; Bool {
+    (copyAttribute(window, kAXMinimizedAttribute) as? Bool) ?? false
+}
+
+func windowTitle(_ window: AXUIElement) -&gt; String {
+    (copyAttribute(window, kAXTitleAttribute) as? String) ?? "(untitled)"
+}
+
+func setWindowFrame(_ window: AXUIElement, _ frame: CGRect) -&gt; Bool {
+    let okPos = setAttribute(window, kAXPositionAttribute, makeAXValue(frame.origin))
+    let okSize = setAttribute(window, kAXSizeAttribute, makeAXValue(frame.size))
+    return okPos &amp;&amp; okSize
+}
+
+func findRunningApp(namedAnyOf names: [String]) -&gt; NSRunningApplication? {
+    let apps = NSWorkspace.shared.runningApplications
+    for candidate in names {
+        if let app = apps.first(where: { $0.localizedName == candidate }) {
+            return app
+        }
+    }
+    return nil
+}
+
+func standardWindows(for app: NSRunningApplication) -&gt; [AXUIElement] {
+    let axApp = AXUIElementCreateApplication(app.processIdentifier)
+
+    guard let raw = copyAttribute(axApp, kAXWindowsAttribute) as? [AnyObject] else {
+        return []
+    }
+
+    return raw
+        .map { $0 as! AXUIElement }
+        .filter { isStandardWindow($0) &amp;&amp; !isMinimized($0) }
+}
+
+func firstWindow(forAppNames appNames: [String]) -&gt; AXUIElement? {
+    guard let app = findRunningApp(namedAnyOf: appNames) else { return nil }
+    let windows = standardWindows(for: app)
+    return windows.first
+}
+
+func indexedWindow(forAppNames appNames: [String], index: Int) -&gt; AXUIElement? {
+    guard let app = findRunningApp(namedAnyOf: appNames) else { return nil }
+    let windows = standardWindows(for: app)
+    guard index &gt;= 0 &amp;&amp; index &lt; windows.count else { return nil }
+    return windows[index]
+}
+
+func describeFrame(_ frame: CGRect) -&gt; String {
+    "\(Int(frame.origin.x)),\(Int(frame.origin.y)) \(Int(frame.size.width))x\(Int(frame.size.height))"
+}
+
+
+// ======================================================
+// MAIN
+// ======================================================
+
+guard AXIsProcessTrusted() else {
+    fputs("Accessibility permission is not enabled.\n", stderr)
+    exit(1)
+}
+
+var lines: [String] = []
+
+// Single-window apps
+for rule in singleWindowRules {
+    guard let win = firstWindow(forAppNames: rule.appNames) else {
+        lines.append("\(rule.label): window not found")
+        continue
+    }
+
+    let title = windowTitle(win)
+    let ok = setWindowFrame(win, rule.frame)
+
+    if ok {
+        lines.append("\(rule.label): resized → \(title) → \(describeFrame(rule.frame))")
+    } else {
+        lines.append("\(rule.label): failed → \(title)")
+    }
+}
+
+// Indexed windows
+for rule in indexedWindowRules {
+    guard let win = indexedWindow(forAppNames: rule.appNames, index: rule.windowIndex) else {
+        lines.append("\(rule.label): window not found")
+        continue
+    }
+
+    let title = windowTitle(win)
+    let ok = setWindowFrame(win, rule.frame)
+
+    if ok {
+        lines.append("\(rule.label): resized → \(title) → \(describeFrame(rule.frame))")
+    } else {
+        lines.append("\(rule.label): failed → \(title)")
+    }
+}
+
+print(lines.joined(separator: "\n"))</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>796432056.37381101</real>
+				<key>ModificationDate</key>
+				<real>796433639.55267894</real>
+				<key>Name</key>
+				<string>window-reSize-swift</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>8C90F8A8-8B43-4AC2-8F9A-1708F88163DA</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>848</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteShellScript</string>
+						<key>Path</key>
+						<string></string>
+						<key>Source</key>
+						<string>Nothing</string>
+						<key>Text</key>
+						<string>open "$HOME/Library/Logs/Keyboard Maestro/Engine.log"</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>796429506.48301995</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/System/Applications/Utilities/Console.app</string>
+				<key>ModificationDate</key>
+				<real>796607315.18229103</real>
+				<key>Name</key>
+				<string>open-Engine.log</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>9086075F-B662-4BB5-8604-954591EA6839</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1632</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>cgshaq@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797084951.38818097</real>
+				<key>ModificationDate</key>
+				<real>797596921.33639002</real>
+				<key>Name</key>
+				<string>cgshaq</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>cgs </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>9676A9BC-3B2B-4FB4-828C-A44562E586C1</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+</array>
+</plist>
