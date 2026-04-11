@@ -80,11 +80,21 @@ const handler = async (req: Request): Promise<Response> => {
   if (path.startsWith("/api/content/")) {
     const fileName = decodeURIComponent(path.replace("/api/content/", ""));
     try {
-      const content = await Deno.readTextFile(`${MDS_DIR}/${fileName}`);
+      const fullPath = join(MDS_DIR, fileName);
+      const content = await Deno.readTextFile(fullPath);
       const html = await marked.parse(content);
-      return new Response(JSON.stringify({ html, title: fileName }), {
-        headers: { "content-type": "application/json" },
-      });
+      let absolutePath = fullPath;
+      try {
+        absolutePath = await Deno.realPath(fullPath);
+      } catch {
+        // keep resolved join path
+      }
+      return new Response(
+        JSON.stringify({ html, title: fileName, absolutePath }),
+        {
+          headers: { "content-type": "application/json" },
+        },
+      );
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       return new Response(JSON.stringify({ error: message }), { status: 404 });

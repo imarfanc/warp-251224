@@ -629,14 +629,37 @@ function renderContentFetchFailed(container) {
 }
 
 // deno-md-server/static/doc-path.ts
-function setDocPathDisplay(docPathEl2, path) {
-  docPathEl2.textContent = "";
+function hrefOpenInCursor(absolutePath) {
+  const normalized = absolutePath.replace(/\\/g, "/");
+  return `cursor://file${encodeURI(normalized)}`;
+}
+function appendOpenInCursorButton(docPathEl2, absolutePath) {
+  const a = document.createElement("a");
+  a.className = "doc-path__cursor-btn";
+  a.href = hrefOpenInCursor(absolutePath);
+  a.setAttribute("aria-label", "Open file in Cursor");
+  a.title = "Open in Cursor";
+  a.rel = "noopener noreferrer";
+  const icon = document.createElement("span");
+  icon.className = "iconify";
+  icon.setAttribute("data-icon", "simple-icons:cursor");
+  icon.setAttribute("aria-hidden", "true");
+  a.appendChild(icon);
+  docPathEl2.appendChild(a);
+  Iconify.scan(a);
+}
+function setDocPathDisplay(docPathEl2, path, options) {
+  docPathEl2.replaceChildren();
+  const absolutePath = options?.absolutePath;
   const parts = path.split("/").filter((p) => p.length > 0);
   if (parts.length === 0) {
     const fallback = document.createElement("span");
     fallback.className = "doc-path__leaf";
     fallback.textContent = path;
     docPathEl2.appendChild(fallback);
+    if (absolutePath) {
+      appendOpenInCursorButton(docPathEl2, absolutePath);
+    }
     docPathEl2.classList.remove("hidden");
     return;
   }
@@ -654,6 +677,10 @@ function setDocPathDisplay(docPathEl2, path) {
     span.className = i === parts.length - 1 ? "doc-path__leaf" : "doc-path__crumb";
     span.textContent = parts[i];
     docPathEl2.appendChild(span);
+    const isLeaf = i === parts.length - 1;
+    if (isLeaf && absolutePath) {
+      appendOpenInCursorButton(docPathEl2, absolutePath);
+    }
   }
   docPathEl2.classList.remove("hidden");
 }
@@ -706,7 +733,9 @@ async function loadContent(dom2, file, opts = {}) {
       return;
     }
     syncFileToUrl(file, syncUrl);
-    setDocPathDisplay(docPathEl2, data.title);
+    setDocPathDisplay(docPathEl2, data.title, {
+      absolutePath: data.absolutePath
+    });
     const prose = document.createElement("div");
     prose.className = "prose prose-slate max-w-none";
     prose.innerHTML = data.html;

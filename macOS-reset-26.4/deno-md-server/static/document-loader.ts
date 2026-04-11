@@ -20,7 +20,7 @@ import { getFileFromUrl, syncFileToUrl, type UrlSyncMode } from "./file-url.ts";
 const DEFAULT_TITLE = "Markdown Viewer";
 
 export type ContentResponse =
-    | { html: string; title: string; error?: undefined }
+    | { html: string; title: string; absolutePath?: string; error?: undefined }
     | { error: string; html?: undefined; title?: undefined };
 
 export type ViewerDom = {
@@ -69,7 +69,9 @@ export async function loadContent(
 
         syncFileToUrl(file, syncUrl);
 
-        setDocPathDisplay(docPathEl, data.title);
+        setDocPathDisplay(docPathEl, data.title, {
+            absolutePath: data.absolutePath,
+        });
 
         const prose = document.createElement("div");
         prose.className = "prose prose-slate max-w-none";

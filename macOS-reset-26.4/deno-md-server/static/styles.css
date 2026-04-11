@@ -10,6 +10,11 @@ body {
 }
 
 .doc-path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.35rem;
+    row-gap: 0.25rem;
     margin: 0;
     padding: 0.55rem 0.9rem;
     font-family: inherit;
@@ -21,6 +26,46 @@ body {
     border-radius: 0.5rem;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
     word-break: break-all;
+}
+
+.doc-path__cursor-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-left: 0.1rem;
+    padding: 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.35rem;
+    background: #fff;
+    color: #475569;
+    text-decoration: none;
+    transition:
+        background 0.12s ease,
+        border-color 0.12s ease,
+        color 0.12s ease;
+}
+
+.doc-path__cursor-btn:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+
+.doc-path__cursor-btn:focus {
+    outline: none;
+}
+
+.doc-path__cursor-btn:focus-visible {
+    outline: 2px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+.doc-path__cursor-btn .iconify {
+    width: 1rem;
+    height: 1rem;
 }
 
 .doc-path__crumb {
