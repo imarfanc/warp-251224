@@ -1,5 +1,9 @@
 /// <reference path="./iconify-global.d.ts" />
 import { enhanceProseCodeCopy } from "./code-copy.ts";
+import {
+    enhanceHeadingSections,
+    storageKeyForFile,
+} from "./heading-sections.ts";
 import { applySyntaxHighlight } from "./highlight-code.ts";
 import { isStringArray } from "./file-search.ts";
 import type { FileTreeView } from "./file-tree.ts";
@@ -73,6 +77,7 @@ export async function loadContent(
 
         contentBody.replaceChildren(prose);
         enhanceProseCodeCopy(prose);
+        enhanceHeadingSections(prose, { storageKey: storageKeyForFile(file) });
         applySyntaxHighlight(prose);
         Iconify.scan(prose);
     } catch {

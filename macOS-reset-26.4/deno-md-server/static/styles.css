@@ -1,3 +1,9 @@
+/* App-wide type: iA Writer Quattro when installed, else system monospace */
+body {
+    font-family: "iA Writer Quattro", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco,
+        Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
 /* Path strip above article card (monospace, distinct from prose) */
 .content-shell {
     width: 100%;
@@ -6,8 +12,7 @@
 .doc-path {
     margin: 0;
     padding: 0.55rem 0.9rem;
-    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas,
-        "Liberation Mono", "Courier New", monospace;
+    font-family: inherit;
     font-size: 0.8125rem;
     line-height: 1.45;
     letter-spacing: 0.02em;
@@ -71,6 +76,65 @@
     margin-top: 1.5em;
     padding-bottom: 0.25em;
     border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.prose .md-h2-action-btn {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #f8fafc;
+    color: #475569;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.prose .md-h2-action-btn:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+
+.prose .md-h2-action-btn svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+}
+
+.prose .md-h2-collapse-btn:not(.is-expanded) svg {
+    transform: rotate(180deg);
+}
+
+.prose .md-h2-blur-btn.is-blurred {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+
+.prose .md-section-body {
+    transition: filter 0.2s ease;
+}
+
+.prose .md-section-body.is-collapsed {
+    display: none;
+}
+
+.prose .md-section-body.is-blurred {
+    filter: blur(6px);
+    pointer-events: none;
 }
 
 .prose h3 {
