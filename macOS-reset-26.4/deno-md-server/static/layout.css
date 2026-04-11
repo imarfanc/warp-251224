@@ -1,0 +1,63 @@
+/* Sidebar collapse (toggled via body.sidebar-hidden) */
+#sidebar {
+    transition:
+        width 0.2s ease,
+        opacity 0.2s ease,
+        padding 0.2s ease,
+        border-width 0.2s ease;
+}
+
+body.sidebar-hidden #sidebar {
+    width: 0 !important;
+    min-width: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    border-width: 0 !important;
+    pointer-events: none;
+}
+
+/* FAB: toggle sidebar */
+.fab-sidebar {
+    position: fixed;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    border: none;
+    border-radius: 9999px;
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.fab-sidebar:hover {
+    background: #1d4ed8;
+}
+
+.fab-sidebar:active {
+    transform: scale(0.96);
+}
+
+.fab-sidebar:focus {
+    outline: none;
+}
+
+.fab-sidebar:focus-visible {
+    outline: 2px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+.fab-sidebar .iconify {
+    width: 1.35rem;
+    height: 1.35rem;
+}

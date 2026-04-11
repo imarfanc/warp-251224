@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom", "dom.iterable", "esnext"]
+  },
+  "tasks": {
+    "bundle": "deno bundle deno-md-server/static/app.ts -o deno-md-server/static/app.js",
+    "serve": "deno run --allow-read --allow-net deno-md-server/main.ts",
+    "start": "deno task bundle && deno task serve"
+  }
+}
