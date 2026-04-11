@@ -1,3 +1,74 @@
+/* Pinned files strip (above the tree) */
+.sidebar-pinned {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.sidebar-pinned__head {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.4rem;
+}
+
+.sidebar-pinned__head-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.sidebar-pinned__title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+.sidebar-pinned__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.sidebar-pinned__item {
+    display: block;
+    width: 100%;
+    padding: 0.3rem 0.45rem;
+    border: none;
+    border-radius: 0.3rem;
+    background: #eff6ff;
+    color: #1e40af;
+    font-size: 0.8125rem;
+    text-align: left;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: inherit;
+    line-height: 1.35;
+}
+
+.sidebar-pinned__item:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.sidebar-pinned__item--active {
+    background: #bfdbfe;
+    color: #1e3a8a;
+    font-weight: 600;
+}
+
+.sidebar-pinned__item--dimmed {
+    text-decoration: line-through;
+    filter: blur(0.45px);
+    opacity: 0.65;
+    color: #64748b;
+}
+
 .file-tree {
     font-size: 0.875rem;
     text-align: left;
@@ -52,10 +123,87 @@
     border-left: 1px solid #e5e7eb;
 }
 
+.file-tree__file-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    width: 100%;
+    min-width: 0;
+    border-radius: 0.375rem;
+}
+
+/* Pin / dim on the right; hidden until row hover or keyboard focus inside */
+.file-tree__file-actions {
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+    gap: 0.125rem;
+    margin-left: auto;
+    max-width: 0;
+    min-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        max-width 0.18s ease,
+        opacity 0.15s ease;
+}
+
+.file-tree__file-row:hover .file-tree__file-actions,
+.file-tree__file-row:focus-within .file-tree__file-actions {
+    max-width: 3.5rem;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.file-tree__icon-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    min-height: 2rem;
+    padding: 0;
+    border: none;
+    border-radius: 0.25rem;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    transition:
+        color 0.12s ease,
+        background 0.12s ease;
+}
+
+.file-tree__icon-btn:hover {
+    color: #64748b;
+    background: #f1f5f9;
+}
+
+.file-tree__icon-btn--active {
+    color: #2563eb;
+}
+
+.file-tree__icon-btn .iconify {
+    width: 1rem;
+    height: 1rem;
+}
+
+.file-tree__file-row--dimmed .file-tree__file {
+    text-decoration: line-through;
+    filter: blur(0.45px);
+    opacity: 0.55;
+    color: #94a3b8;
+}
+
+.file-tree__file-row--dimmed .file-tree__file--active {
+    color: #64748b;
+}
+
 .file-tree__file {
     display: block;
-    width: 100%;
-    padding: 0.35rem 0.5rem 0.35rem 1.25rem;
+    flex: 1;
+    min-width: 0;
+    padding: 0.35rem 0.35rem 0.35rem 1.25rem;
     border-radius: 0.375rem;
     border: none;
     background: transparent;
@@ -63,6 +211,9 @@
     text-align: left;
     font: inherit;
     color: #1f2937;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .file-tree__file:hover {

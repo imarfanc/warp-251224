@@ -1,3 +1,6 @@
+/// <reference path="./iconify-global.d.ts" />
+import { CONFIG } from "./config.ts";
+
 export interface FileNode {
     type: "file";
     name: string;
@@ -79,6 +82,65 @@ function expandParentsIntoSet(filePath: string, expanded: Set<string>): void {
     }
 }
 
+function readPathSet(key: string): Set<string> {
+    try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return new Set();
+        const parsed = JSON.parse(raw) as unknown;
+        if (!Array.isArray(parsed)) return new Set();
+        return new Set(parsed.filter((x): x is string => typeof x === "string"));
+    } catch {
+        return new Set();
+    }
+}
+
+function writePathSet(key: string, paths: Set<string>): void {
+    try {
+        localStorage.setItem(key, JSON.stringify([...paths]));
+    } catch {
+        /* ignore */
+    }
+}
+
+function readPinnedPaths(): string[] {
+    try {
+        const raw = localStorage.getItem(CONFIG.fileTree.pinsStorageKey);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw) as unknown;
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter((x): x is string => typeof x === "string");
+    } catch {
+        return [];
+    }
+}
+
+function writePinnedPaths(paths: string[]): void {
+    try {
+        localStorage.setItem(
+            CONFIG.fileTree.pinsStorageKey,
+            JSON.stringify(paths),
+        );
+    } catch {
+        /* ignore */
+    }
+}
+
+/** Pinned files sort before unpinned siblings in each folder. */
+function reorderFilesForPins(
+    node: DirNode,
+    sortByPath: Record<string, number>,
+    pinned: Set<string>,
+): void {
+    const dirs = node.children.filter((c): c is DirNode => c.type === "dir");
+    const files = node.children.filter((c): c is FileNode => c.type === "file");
+    const pinnedFiles = files.filter((f) => pinned.has(f.path));
+    const unpinned = files.filter((f) => !pinned.has(f.path));
+    pinnedFiles.sort((a, b) => compareFileOrder(a, b, sortByPath));
+    unpinned.sort((a, b) => compareFileOrder(a, b, sortByPath));
+    node.children = [...dirs, ...pinnedFiles, ...unpinned];
+    for (const d of dirs) reorderFilesForPins(d, sortByPath, pinned);
+}
+
 export type LoadPathsOptions = {
     /** Keep this path selected if it appears in `relativePaths`. */
     preservePath?: string | null;
@@ -95,16 +157,22 @@ export class FileTreeView {
     private readonly expandedFolders = new Set<string>();
     private selectedPath: string | null = null;
     private emptyHint: string | null = null;
+    private sortByPath: Record<string, number> = {};
+    /** Paths from the last successful `loadPaths` (for the pinned strip). */
+    private lastPaths: string[] = [];
 
     constructor(
         private readonly container: HTMLElement,
         private readonly onSelectFile: (path: string) => void,
+        private readonly pinnedPanel: HTMLElement | null = null,
     ) {}
 
     loadPaths(relativePaths: string[], options?: LoadPathsOptions): void {
+        this.lastPaths = [...relativePaths];
         this.root = { type: "dir", name: "", children: [] };
         relativePaths.forEach((f) => addFile(this.root, f.split("/"), f));
         const sortByPath = options?.sortByPath ?? {};
+        this.sortByPath = sortByPath;
         sortTree(this.root, sortByPath);
         this.expandedFolders.clear();
         this.selectedPath = null;
@@ -137,33 +205,154 @@ export class FileTreeView {
     }
 
     render(): void {
+        const pinnedPaths = readPinnedPaths();
+        const pinned = new Set(pinnedPaths);
+        const dimmed = readPathSet(CONFIG.fileTree.dimmedStorageKey);
+        reorderFilesForPins(this.root, this.sortByPath, pinned);
+
         this.container.innerHTML = "";
         if (this.root.children.length === 0) {
             const empty = document.createElement("div");
             empty.className = "file-tree__empty";
             empty.textContent = this.emptyHint ?? "No files.";
             this.container.appendChild(empty);
+            this.renderPinnedPanel(pinnedPaths, dimmed);
             return;
         }
         const wrap = document.createElement("div");
         wrap.className = "file-tree";
         for (const entry of this.root.children) {
-            this.renderEntry(entry, wrap, "");
+            this.renderEntry(entry, wrap, "", pinned, dimmed);
         }
         this.container.appendChild(wrap);
+        Iconify.scan(wrap);
+        this.renderPinnedPanel(pinnedPaths, dimmed);
     }
 
     showListError(): void {
         this.container.innerHTML =
             '<div class="text-red-500">Error loading files</div>';
+        if (this.pinnedPanel) {
+            this.pinnedPanel.replaceChildren();
+            this.pinnedPanel.hidden = true;
+        }
+    }
+
+    private renderPinnedPanel(pinnedPaths: string[], dimmed: Set<string>): void {
+        const panel = this.pinnedPanel;
+        if (!panel) return;
+
+        const known = new Set(this.lastPaths);
+        const ordered = pinnedPaths.filter((p) => known.has(p));
+        panel.replaceChildren();
+
+        if (ordered.length === 0) {
+            panel.hidden = true;
+            return;
+        }
+
+        panel.hidden = false;
+
+        const head = document.createElement("div");
+        head.className = "sidebar-pinned__head";
+        const icon = document.createElement("span");
+        icon.className = "iconify sidebar-pinned__head-icon";
+        icon.setAttribute("data-icon", "mdi:pin");
+        icon.setAttribute("aria-hidden", "true");
+        const title = document.createElement("div");
+        title.className = "sidebar-pinned__title";
+        title.textContent = "Pinned";
+        head.append(icon, title);
+
+        const list = document.createElement("div");
+        list.className = "sidebar-pinned__list";
+        for (const path of ordered) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            const parts = path.split("/");
+            const leaf = parts[parts.length - 1] ?? path;
+            btn.textContent = leaf;
+            btn.title = path;
+            let cls = "sidebar-pinned__item";
+            if (this.selectedPath === path) cls += " sidebar-pinned__item--active";
+            if (dimmed.has(path)) cls += " sidebar-pinned__item--dimmed";
+            btn.className = cls;
+            btn.onclick = () => this.onSelectFile(path);
+            list.appendChild(btn);
+        }
+
+        panel.append(head, list);
+        Iconify.scan(panel);
     }
 
     private renderEntry(
         entry: TreeEntry,
         parent: HTMLElement,
         parentPath: string,
+        pinned: Set<string>,
+        dimmed: Set<string>,
     ): void {
         if (entry.type === "file") {
+            const row = document.createElement("div");
+            row.className = "file-tree__file-row";
+            if (dimmed.has(entry.path)) {
+                row.classList.add("file-tree__file-row--dimmed");
+            }
+
+            const pinBtn = document.createElement("button");
+            pinBtn.type = "button";
+            pinBtn.className = pinned.has(entry.path)
+                ? "file-tree__icon-btn file-tree__icon-btn--active"
+                : "file-tree__icon-btn";
+            pinBtn.setAttribute("aria-label", pinned.has(entry.path) ? "Unpin file" : "Pin file to top");
+            pinBtn.title = pinned.has(entry.path) ? "Unpin" : "Pin to top";
+            const pinIcon = document.createElement("span");
+            pinIcon.className = "iconify";
+            pinIcon.setAttribute(
+                "data-icon",
+                pinned.has(entry.path) ? "mdi:pin" : "mdi:pin-outline",
+            );
+            pinIcon.setAttribute("aria-hidden", "true");
+            pinBtn.appendChild(pinIcon);
+            pinBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                let paths = readPinnedPaths();
+                if (paths.includes(entry.path)) {
+                    paths = paths.filter((p) => p !== entry.path);
+                } else {
+                    paths = [...paths, entry.path];
+                }
+                writePinnedPaths(paths);
+                this.render();
+            });
+
+            const dimBtn = document.createElement("button");
+            dimBtn.type = "button";
+            dimBtn.className = dimmed.has(entry.path)
+                ? "file-tree__icon-btn file-tree__icon-btn--active"
+                : "file-tree__icon-btn";
+            dimBtn.setAttribute(
+                "aria-label",
+                dimmed.has(entry.path) ? "Show file normally" : "Cross and blur file",
+            );
+            dimBtn.title = dimmed.has(entry.path) ? "Clear dim" : "Dim / blur";
+            const dimIcon = document.createElement("span");
+            dimIcon.className = "iconify";
+            dimIcon.setAttribute(
+                "data-icon",
+                dimmed.has(entry.path) ? "mdi:eye-outline" : "mdi:blur",
+            );
+            dimIcon.setAttribute("aria-hidden", "true");
+            dimBtn.appendChild(dimIcon);
+            dimBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const set = readPathSet(CONFIG.fileTree.dimmedStorageKey);
+                if (set.has(entry.path)) set.delete(entry.path);
+                else set.add(entry.path);
+                writePathSet(CONFIG.fileTree.dimmedStorageKey, set);
+                this.render();
+            });
+
             const btn = document.createElement("button");
             btn.type = "button";
             const isSel = this.selectedPath === entry.path;
@@ -173,7 +362,13 @@ export class FileTreeView {
             btn.textContent = entry.name;
             btn.title = entry.path;
             btn.onclick = () => this.onSelectFile(entry.path);
-            parent.appendChild(btn);
+
+            const actions = document.createElement("div");
+            actions.className = "file-tree__file-actions";
+            actions.append(pinBtn, dimBtn);
+
+            row.append(btn, actions);
+            parent.appendChild(row);
             return;
         }
 
@@ -215,7 +410,7 @@ export class FileTreeView {
         if (!isOpen) kids.hidden = true;
 
         for (const child of entry.children) {
-            this.renderEntry(child, kids, key);
+            this.renderEntry(child, kids, key, pinned, dimmed);
         }
         dirWrap.appendChild(kids);
         parent.appendChild(dirWrap);

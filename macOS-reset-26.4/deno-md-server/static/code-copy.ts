@@ -1,5 +1,7 @@
 /// <reference path="./iconify-global.d.ts" />
 
+import { CONFIG } from "./config.ts";
+
 const COPY_ICON = "mdi:content-copy";
 const CHECK_ICON = "mdi:check";
 
@@ -241,6 +243,11 @@ export function enhanceCodeBlocks(prose: HTMLElement): void {
 
         pre.parentNode?.insertBefore(wrap, pre);
         wrap.append(toolbar, pre);
+
+        if (CONFIG.codeBlock.maxHeight) {
+            pre.style.maxHeight = CONFIG.codeBlock.maxHeight;
+            pre.style.overflowY = "auto";
+        }
     }
 }
 

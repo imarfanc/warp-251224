@@ -1,42 +1,66 @@
 /// <reference path="./iconify-global.d.ts" />
 
-const SIDEBAR_HIDDEN_KEY = "deno-md-viewer-sidebar-hidden";
+import { CONFIG } from "./config.ts";
 
-function updateSidebarFabUi(sidebarFab: HTMLButtonElement, hidden: boolean): void {
+function getSidebar(): HTMLElement {
+    const el = document.getElementById("sidebar");
+    if (!el) throw new Error("Missing required element: #sidebar");
+    return el;
+}
+
+function updateSidebarFabUi(sidebarFab: HTMLButtonElement, stateId: string): void {
     const icon = sidebarFab.querySelector(".iconify");
     if (icon) {
-        icon.setAttribute("data-icon", hidden ? "mdi:chevron-right" : "mdi:chevron-left");
+        // If hidden, point right to show it. If visible (any width), point left to hide/cycle.
+        icon.setAttribute("data-icon", stateId === "hidden" ? "mdi:chevron-right" : "mdi:chevron-left");
     }
-    const label = hidden ? "Show sidebar" : "Hide sidebar";
+    const label = stateId === "hidden" ? "Show sidebar" : "Cycle sidebar width / Hide";
     sidebarFab.setAttribute("aria-label", label);
     sidebarFab.title = label;
     Iconify.scan(sidebarFab);
 }
 
-function applySidebarHidden(sidebarFab: HTMLButtonElement, hidden: boolean): void {
-    document.body.classList.toggle("sidebar-hidden", hidden);
+function applySidebarState(sidebarFab: HTMLButtonElement, stateId: string): void {
+    const sidebar = getSidebar();
+    const state = CONFIG.sidebar.states.find((s) => s.id === stateId) || CONFIG.sidebar.states[1];
+
+    // 1. Toggle body classes for hidden state
+    document.body.classList.toggle("sidebar-hidden", state.id === "hidden");
+
+    // 2. Manage width classes on #sidebar
+    for (const s of CONFIG.sidebar.states) {
+        if (s.width) sidebar.classList.remove(s.width);
+    }
+    if (state.width) sidebar.classList.add(state.width);
+
+    // 3. Persist
     try {
-        localStorage.setItem(SIDEBAR_HIDDEN_KEY, hidden ? "1" : "");
+        localStorage.setItem(CONFIG.sidebar.storageKey, state.id);
     } catch {
         /* ignore */
     }
-    updateSidebarFabUi(sidebarFab, hidden);
+
+    updateSidebarFabUi(sidebarFab, state.id);
 }
 
 /** Reads persisted state, applies layout, and wires the FAB click handler. */
 export function initSidebarFab(sidebarFab: HTMLButtonElement): void {
-    let hidden = false;
+    let stateId = "medium";
     try {
-        hidden = localStorage.getItem(SIDEBAR_HIDDEN_KEY) === "1";
+        const saved = localStorage.getItem(CONFIG.sidebar.storageKey);
+        if (saved && CONFIG.sidebar.states.some((s) => s.id === saved)) {
+            stateId = saved;
+        }
     } catch {
         /* ignore */
     }
-    applySidebarHidden(sidebarFab, hidden);
+    applySidebarState(sidebarFab, stateId);
 
     sidebarFab.addEventListener("click", () => {
-        applySidebarHidden(
-            sidebarFab,
-            !document.body.classList.contains("sidebar-hidden"),
-        );
+        const saved = localStorage.getItem(CONFIG.sidebar.storageKey) || "medium";
+        const currentIndex = CONFIG.sidebar.states.findIndex((s) => s.id === saved);
+        const nextIndex = (currentIndex + 1) % CONFIG.sidebar.states.length;
+        const nextState = CONFIG.sidebar.states[nextIndex];
+        applySidebarState(sidebarFab, nextState.id);
     });
 }

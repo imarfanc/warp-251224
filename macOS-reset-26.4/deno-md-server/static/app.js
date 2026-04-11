@@ -50,6 +50,48 @@ function attachSidebarSearch(input, tree2) {
   });
 }
 
+// deno-md-server/static/config.ts
+var CONFIG = {
+  favicon: "/favicon.svg",
+  codeBlock: {
+    /** Maximum height for code blocks (e.g., "500px", "60vh"). Set to null for no limit. */
+    maxHeight: "600px"
+  },
+  sidebar: {
+    /** Available width states for the sidebar. */
+    states: [
+      {
+        id: "hidden",
+        class: "sidebar-hidden",
+        width: null
+      },
+      {
+        id: "large",
+        class: "",
+        width: "w-96"
+      },
+      {
+        id: "medium",
+        class: "",
+        width: "w-64"
+      }
+    ],
+    storageKey: "deno-md-viewer-sidebar-state-v2"
+  },
+  /** Sidebar file list: pin-to-top and dim (cross + blur) per path. */
+  fileTree: {
+    pinsStorageKey: "deno-md-viewer-file-pins",
+    dimmedStorageKey: "deno-md-viewer-file-dimmed"
+  },
+  /**
+   * macOS Marked 2 — `open` command (`?file=` POSIX path).
+   * @see https://marked2app.com/help/URL_Handler.html
+   */
+  marked: {
+    openBase: "x-marked://open"
+  }
+};
+
 // deno-md-server/static/file-tree.ts
 function addFile(root, segments, fullPath) {
   if (segments.length === 1) {
@@ -111,16 +153,71 @@ function expandParentsIntoSet(filePath, expanded) {
     expanded.add(parts.slice(0, i + 1).join("/"));
   }
 }
+function readPathSet(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return /* @__PURE__ */ new Set();
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return /* @__PURE__ */ new Set();
+    return new Set(parsed.filter((x) => typeof x === "string"));
+  } catch {
+    return /* @__PURE__ */ new Set();
+  }
+}
+function writePathSet(key, paths) {
+  try {
+    localStorage.setItem(key, JSON.stringify([
+      ...paths
+    ]));
+  } catch {
+  }
+}
+function readPinnedPaths() {
+  try {
+    const raw = localStorage.getItem(CONFIG.fileTree.pinsStorageKey);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((x) => typeof x === "string");
+  } catch {
+    return [];
+  }
+}
+function writePinnedPaths(paths) {
+  try {
+    localStorage.setItem(CONFIG.fileTree.pinsStorageKey, JSON.stringify(paths));
+  } catch {
+  }
+}
+function reorderFilesForPins(node, sortByPath, pinned) {
+  const dirs = node.children.filter((c) => c.type === "dir");
+  const files = node.children.filter((c) => c.type === "file");
+  const pinnedFiles = files.filter((f) => pinned.has(f.path));
+  const unpinned = files.filter((f) => !pinned.has(f.path));
+  pinnedFiles.sort((a, b) => compareFileOrder(a, b, sortByPath));
+  unpinned.sort((a, b) => compareFileOrder(a, b, sortByPath));
+  node.children = [
+    ...dirs,
+    ...pinnedFiles,
+    ...unpinned
+  ];
+  for (const d of dirs) reorderFilesForPins(d, sortByPath, pinned);
+}
 var FileTreeView = class {
   container;
   onSelectFile;
+  pinnedPanel;
   root;
   expandedFolders;
   selectedPath;
   emptyHint;
-  constructor(container, onSelectFile) {
+  sortByPath;
+  /** Paths from the last successful `loadPaths` (for the pinned strip). */
+  lastPaths;
+  constructor(container, onSelectFile, pinnedPanel = null) {
     this.container = container;
     this.onSelectFile = onSelectFile;
+    this.pinnedPanel = pinnedPanel;
     this.root = {
       type: "dir",
       name: "",
@@ -129,8 +226,13 @@ var FileTreeView = class {
     this.expandedFolders = /* @__PURE__ */ new Set();
     this.selectedPath = null;
     this.emptyHint = null;
+    this.sortByPath = {};
+    this.lastPaths = [];
   }
   loadPaths(relativePaths, options) {
+    this.lastPaths = [
+      ...relativePaths
+    ];
     this.root = {
       type: "dir",
       name: "",
@@ -138,6 +240,7 @@ var FileTreeView = class {
     };
     relativePaths.forEach((f) => addFile(this.root, f.split("/"), f));
     const sortByPath = options?.sortByPath ?? {};
+    this.sortByPath = sortByPath;
     sortTree(this.root, sortByPath);
     this.expandedFolders.clear();
     this.selectedPath = null;
@@ -164,26 +267,124 @@ var FileTreeView = class {
     expandParentsIntoSet(path, this.expandedFolders);
   }
   render() {
+    const pinnedPaths = readPinnedPaths();
+    const pinned = new Set(pinnedPaths);
+    const dimmed = readPathSet(CONFIG.fileTree.dimmedStorageKey);
+    reorderFilesForPins(this.root, this.sortByPath, pinned);
     this.container.innerHTML = "";
     if (this.root.children.length === 0) {
       const empty = document.createElement("div");
       empty.className = "file-tree__empty";
       empty.textContent = this.emptyHint ?? "No files.";
       this.container.appendChild(empty);
+      this.renderPinnedPanel(pinnedPaths, dimmed);
       return;
     }
     const wrap = document.createElement("div");
     wrap.className = "file-tree";
     for (const entry of this.root.children) {
-      this.renderEntry(entry, wrap, "");
+      this.renderEntry(entry, wrap, "", pinned, dimmed);
     }
     this.container.appendChild(wrap);
+    Iconify.scan(wrap);
+    this.renderPinnedPanel(pinnedPaths, dimmed);
   }
   showListError() {
     this.container.innerHTML = '<div class="text-red-500">Error loading files</div>';
+    if (this.pinnedPanel) {
+      this.pinnedPanel.replaceChildren();
+      this.pinnedPanel.hidden = true;
+    }
   }
-  renderEntry(entry, parent, parentPath) {
+  renderPinnedPanel(pinnedPaths, dimmed) {
+    const panel = this.pinnedPanel;
+    if (!panel) return;
+    const known = new Set(this.lastPaths);
+    const ordered = pinnedPaths.filter((p) => known.has(p));
+    panel.replaceChildren();
+    if (ordered.length === 0) {
+      panel.hidden = true;
+      return;
+    }
+    panel.hidden = false;
+    const head = document.createElement("div");
+    head.className = "sidebar-pinned__head";
+    const icon = document.createElement("span");
+    icon.className = "iconify sidebar-pinned__head-icon";
+    icon.setAttribute("data-icon", "mdi:pin");
+    icon.setAttribute("aria-hidden", "true");
+    const title = document.createElement("div");
+    title.className = "sidebar-pinned__title";
+    title.textContent = "Pinned";
+    head.append(icon, title);
+    const list = document.createElement("div");
+    list.className = "sidebar-pinned__list";
+    for (const path of ordered) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      const parts = path.split("/");
+      const leaf = parts[parts.length - 1] ?? path;
+      btn.textContent = leaf;
+      btn.title = path;
+      let cls = "sidebar-pinned__item";
+      if (this.selectedPath === path) cls += " sidebar-pinned__item--active";
+      if (dimmed.has(path)) cls += " sidebar-pinned__item--dimmed";
+      btn.className = cls;
+      btn.onclick = () => this.onSelectFile(path);
+      list.appendChild(btn);
+    }
+    panel.append(head, list);
+    Iconify.scan(panel);
+  }
+  renderEntry(entry, parent, parentPath, pinned, dimmed) {
     if (entry.type === "file") {
+      const row2 = document.createElement("div");
+      row2.className = "file-tree__file-row";
+      if (dimmed.has(entry.path)) {
+        row2.classList.add("file-tree__file-row--dimmed");
+      }
+      const pinBtn = document.createElement("button");
+      pinBtn.type = "button";
+      pinBtn.className = pinned.has(entry.path) ? "file-tree__icon-btn file-tree__icon-btn--active" : "file-tree__icon-btn";
+      pinBtn.setAttribute("aria-label", pinned.has(entry.path) ? "Unpin file" : "Pin file to top");
+      pinBtn.title = pinned.has(entry.path) ? "Unpin" : "Pin to top";
+      const pinIcon = document.createElement("span");
+      pinIcon.className = "iconify";
+      pinIcon.setAttribute("data-icon", pinned.has(entry.path) ? "mdi:pin" : "mdi:pin-outline");
+      pinIcon.setAttribute("aria-hidden", "true");
+      pinBtn.appendChild(pinIcon);
+      pinBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        let paths = readPinnedPaths();
+        if (paths.includes(entry.path)) {
+          paths = paths.filter((p) => p !== entry.path);
+        } else {
+          paths = [
+            ...paths,
+            entry.path
+          ];
+        }
+        writePinnedPaths(paths);
+        this.render();
+      });
+      const dimBtn = document.createElement("button");
+      dimBtn.type = "button";
+      dimBtn.className = dimmed.has(entry.path) ? "file-tree__icon-btn file-tree__icon-btn--active" : "file-tree__icon-btn";
+      dimBtn.setAttribute("aria-label", dimmed.has(entry.path) ? "Show file normally" : "Cross and blur file");
+      dimBtn.title = dimmed.has(entry.path) ? "Clear dim" : "Dim / blur";
+      const dimIcon = document.createElement("span");
+      dimIcon.className = "iconify";
+      dimIcon.setAttribute("data-icon", dimmed.has(entry.path) ? "mdi:eye-outline" : "mdi:blur");
+      dimIcon.setAttribute("aria-hidden", "true");
+      dimBtn.appendChild(dimIcon);
+      dimBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const set = readPathSet(CONFIG.fileTree.dimmedStorageKey);
+        if (set.has(entry.path)) set.delete(entry.path);
+        else set.add(entry.path);
+        writePathSet(CONFIG.fileTree.dimmedStorageKey, set);
+        this.render();
+      });
       const btn = document.createElement("button");
       btn.type = "button";
       const isSel = this.selectedPath === entry.path;
@@ -191,7 +392,11 @@ var FileTreeView = class {
       btn.textContent = entry.name;
       btn.title = entry.path;
       btn.onclick = () => this.onSelectFile(entry.path);
-      parent.appendChild(btn);
+      const actions = document.createElement("div");
+      actions.className = "file-tree__file-actions";
+      actions.append(pinBtn, dimBtn);
+      row2.append(btn, actions);
+      parent.appendChild(row2);
       return;
     }
     const key = dirKey(parentPath, entry.name);
@@ -224,7 +429,7 @@ var FileTreeView = class {
     kids.className = "file-tree__children";
     if (!isOpen) kids.hidden = true;
     for (const child of entry.children) {
-      this.renderEntry(child, kids, key);
+      this.renderEntry(child, kids, key, pinned, dimmed);
     }
     dirWrap.appendChild(kids);
     parent.appendChild(dirWrap);
@@ -239,34 +444,51 @@ function getEl(id) {
 }
 
 // deno-md-server/static/sidebar-fab.ts
-var SIDEBAR_HIDDEN_KEY = "deno-md-viewer-sidebar-hidden";
-function updateSidebarFabUi(sidebarFab2, hidden) {
+function getSidebar() {
+  const el = document.getElementById("sidebar");
+  if (!el) throw new Error("Missing required element: #sidebar");
+  return el;
+}
+function updateSidebarFabUi(sidebarFab2, stateId) {
   const icon = sidebarFab2.querySelector(".iconify");
   if (icon) {
-    icon.setAttribute("data-icon", hidden ? "mdi:chevron-right" : "mdi:chevron-left");
+    icon.setAttribute("data-icon", stateId === "hidden" ? "mdi:chevron-right" : "mdi:chevron-left");
   }
-  const label = hidden ? "Show sidebar" : "Hide sidebar";
+  const label = stateId === "hidden" ? "Show sidebar" : "Cycle sidebar width / Hide";
   sidebarFab2.setAttribute("aria-label", label);
   sidebarFab2.title = label;
   Iconify.scan(sidebarFab2);
 }
-function applySidebarHidden(sidebarFab2, hidden) {
-  document.body.classList.toggle("sidebar-hidden", hidden);
+function applySidebarState(sidebarFab2, stateId) {
+  const sidebar = getSidebar();
+  const state = CONFIG.sidebar.states.find((s) => s.id === stateId) || CONFIG.sidebar.states[1];
+  document.body.classList.toggle("sidebar-hidden", state.id === "hidden");
+  for (const s of CONFIG.sidebar.states) {
+    if (s.width) sidebar.classList.remove(s.width);
+  }
+  if (state.width) sidebar.classList.add(state.width);
   try {
-    localStorage.setItem(SIDEBAR_HIDDEN_KEY, hidden ? "1" : "");
+    localStorage.setItem(CONFIG.sidebar.storageKey, state.id);
   } catch {
   }
-  updateSidebarFabUi(sidebarFab2, hidden);
+  updateSidebarFabUi(sidebarFab2, state.id);
 }
 function initSidebarFab(sidebarFab2) {
-  let hidden = false;
+  let stateId = "medium";
   try {
-    hidden = localStorage.getItem(SIDEBAR_HIDDEN_KEY) === "1";
+    const saved = localStorage.getItem(CONFIG.sidebar.storageKey);
+    if (saved && CONFIG.sidebar.states.some((s) => s.id === saved)) {
+      stateId = saved;
+    }
   } catch {
   }
-  applySidebarHidden(sidebarFab2, hidden);
+  applySidebarState(sidebarFab2, stateId);
   sidebarFab2.addEventListener("click", () => {
-    applySidebarHidden(sidebarFab2, !document.body.classList.contains("sidebar-hidden"));
+    const saved = localStorage.getItem(CONFIG.sidebar.storageKey) || "medium";
+    const currentIndex = CONFIG.sidebar.states.findIndex((s) => s.id === saved);
+    const nextIndex = (currentIndex + 1) % CONFIG.sidebar.states.length;
+    const nextState = CONFIG.sidebar.states[nextIndex];
+    applySidebarState(sidebarFab2, nextState.id);
   });
 }
 
@@ -470,6 +692,10 @@ function enhanceCodeBlocks(prose) {
     toolbar.append(meta, actions);
     pre.parentNode?.insertBefore(wrap, pre);
     wrap.append(toolbar, pre);
+    if (CONFIG.codeBlock.maxHeight) {
+      pre.style.maxHeight = CONFIG.codeBlock.maxHeight;
+      pre.style.overflowY = "auto";
+    }
   }
 }
 function enhanceInlineCode(prose) {
@@ -694,6 +920,10 @@ function hrefOpenInCursor(absolutePath) {
   const normalized = absolutePath.replace(/\\/g, "/");
   return `cursor://file${encodeURI(normalized)}`;
 }
+function hrefOpenInMarked(absolutePath) {
+  const normalized = absolutePath.replace(/\\/g, "/");
+  return `${CONFIG.marked.openBase}?file=${encodeURIComponent(normalized)}`;
+}
 function appendOpenInCursorButton(docPathEl2, absolutePath) {
   const a = document.createElement("a");
   a.className = "doc-path__cursor-btn";
@@ -709,6 +939,25 @@ function appendOpenInCursorButton(docPathEl2, absolutePath) {
   docPathEl2.appendChild(a);
   Iconify.scan(a);
 }
+function appendOpenInMarkedButton(docPathEl2, absolutePath) {
+  const a = document.createElement("a");
+  a.className = "doc-path__marked-btn";
+  a.href = hrefOpenInMarked(absolutePath);
+  a.setAttribute("aria-label", "Open file in Marked");
+  a.title = "Open in Marked";
+  a.rel = "noopener noreferrer";
+  const icon = document.createElement("span");
+  icon.className = "iconify";
+  icon.setAttribute("data-icon", "mdi:language-markdown");
+  icon.setAttribute("aria-hidden", "true");
+  a.appendChild(icon);
+  docPathEl2.appendChild(a);
+  Iconify.scan(a);
+}
+function appendDocPathAppButtons(docPathEl2, absolutePath) {
+  appendOpenInCursorButton(docPathEl2, absolutePath);
+  appendOpenInMarkedButton(docPathEl2, absolutePath);
+}
 function setDocPathDisplay(docPathEl2, path, options) {
   docPathEl2.replaceChildren();
   const absolutePath = options?.absolutePath;
@@ -719,7 +968,7 @@ function setDocPathDisplay(docPathEl2, path, options) {
     fallback.textContent = path;
     docPathEl2.appendChild(fallback);
     if (absolutePath) {
-      appendOpenInCursorButton(docPathEl2, absolutePath);
+      appendDocPathAppButtons(docPathEl2, absolutePath);
     }
     docPathEl2.classList.remove("hidden");
     return;
@@ -740,7 +989,7 @@ function setDocPathDisplay(docPathEl2, path, options) {
     docPathEl2.appendChild(span);
     const isLeaf = i === parts.length - 1;
     if (isLeaf && absolutePath) {
-      appendOpenInCursorButton(docPathEl2, absolutePath);
+      appendDocPathAppButtons(docPathEl2, absolutePath);
     }
   }
   docPathEl2.classList.remove("hidden");
@@ -973,7 +1222,15 @@ function registerPopstateHandler(dom2) {
 }
 
 // deno-md-server/static/app.ts
+function updateFavicon() {
+  const link = document.querySelector("link[rel*='icon']") || document.createElement("link");
+  link.type = "image/svg+xml";
+  link.rel = "icon";
+  link.href = CONFIG.favicon;
+  document.getElementsByTagName("head")[0].appendChild(link);
+}
 var fileListEl = getEl("file-list");
+var pinnedFilesEl = getEl("pinned-files");
 var contentBody = getEl("content-body");
 var docPathEl = getEl("doc-path");
 var fileSearchInput = getEl("file-search");
@@ -984,7 +1241,7 @@ var tree = new FileTreeView(fileListEl, (path) => {
     contentBody,
     docPathEl
   }, path);
-});
+}, pinnedFilesEl);
 var dom = {
   tree,
   contentBody,
@@ -992,6 +1249,7 @@ var dom = {
 };
 attachSidebarSearch(fileSearchInput, tree);
 initSidebarFab(sidebarFab);
+updateFavicon();
 renderContentPlaceholder(contentBody);
 registerPopstateHandler(dom);
 void loadInitialFileList(dom);
