@@ -1,8 +1,22 @@
-# 1
+---
+title: "1"
+sort: 2
+category: "macOS reset"
+description: "the first file in the macOS reset project"
+date: 2026-04-11
+tags:
+  - macOS
+  - reset
+  - 1
+  - one
+  - first
+  - initial
+---
 
 ## safari
 
 `open safari`
+
 - get iphone
 - sign into google
 
@@ -16,7 +30,7 @@
 - change computer name
 - activate clipboard history
 
-## terminal script to quit oepn apps (except terminal & finder)
+## terminal script to quit open apps (except terminal & finder)
 
 ```sh
 osascript -e 'tell application "System Events" to set quitApps to name of every process whose background only is false' \

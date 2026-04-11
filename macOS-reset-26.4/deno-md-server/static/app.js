@@ -1,6 +1,19 @@
 // deno-md-server/static/file-search.ts
-function isStringArray(data) {
-  return Array.isArray(data) && data.every((x) => typeof x === "string");
+function isFilesListPayload(data) {
+  if (!data || typeof data !== "object") return false;
+  const o = data;
+  if (!Array.isArray(o.paths) || !o.paths.every((x) => typeof x === "string")) {
+    return false;
+  }
+  if (o.sort !== void 0) {
+    if (typeof o.sort !== "object" || o.sort === null || Array.isArray(o.sort)) {
+      return false;
+    }
+    for (const v of Object.values(o.sort)) {
+      if (typeof v !== "number" || !Number.isFinite(v)) return false;
+    }
+  }
+  return true;
 }
 async function refreshSidebarFileList(input, tree2) {
   const q = input.value.trim();
@@ -8,17 +21,18 @@ async function refreshSidebarFileList(input, tree2) {
   try {
     const res = await fetch(endpoint);
     const data = await res.json();
-    if (!isStringArray(data)) {
+    if (!isFilesListPayload(data)) {
       tree2.showListError();
       return;
     }
-    const files = data;
+    const files = data.paths;
     const sel = tree2.getSelectedPath();
     const keep = sel && files.includes(sel) ? sel : null;
     tree2.loadPaths(files, {
       preservePath: keep,
       expandAll: q.length > 0,
-      emptyHint: files.length === 0 ? q ? "No files match your search." : "No markdown files found." : void 0
+      emptyHint: files.length === 0 ? q ? "No files match your search." : "No markdown files found." : void 0,
+      sortByPath: data.sort
     });
     tree2.render();
   } catch {
@@ -58,15 +72,34 @@ function addFile(root, segments, fullPath) {
   }
   addFile(dir, rest, fullPath);
 }
-function sortTree(node) {
+function fileSortKey(path, name, sortByPath) {
+  const s = sortByPath[path];
+  const primary = typeof s === "number" && Number.isFinite(s) ? s : Number.POSITIVE_INFINITY;
+  return [
+    primary,
+    name.toLowerCase()
+  ];
+}
+function compareFileOrder(a, b, sortByPath) {
+  const [pa, na] = fileSortKey(a.path, a.name, sortByPath);
+  const [pb, nb] = fileSortKey(b.path, b.name, sortByPath);
+  if (pa !== pb) return pa - pb;
+  return na.localeCompare(nb, void 0, {
+    sensitivity: "base"
+  });
+}
+function sortTree(node, sortByPath) {
   node.children.sort((a, b) => {
     if (a.type !== b.type) return a.type === "dir" ? -1 : 1;
+    if (a.type === "file" && b.type === "file") {
+      return compareFileOrder(a, b, sortByPath);
+    }
     return a.name.localeCompare(b.name, void 0, {
       sensitivity: "base"
     });
   });
   for (const c of node.children) {
-    if (c.type === "dir") sortTree(c);
+    if (c.type === "dir") sortTree(c, sortByPath);
   }
 }
 function dirKey(parentPath, name) {
@@ -104,7 +137,8 @@ var FileTreeView = class {
       children: []
     };
     relativePaths.forEach((f) => addFile(this.root, f.split("/"), f));
-    sortTree(this.root);
+    const sortByPath = options?.sortByPath ?? {};
+    sortTree(this.root, sortByPath);
     this.expandedFolders.clear();
     this.selectedPath = null;
     this.emptyHint = options?.emptyHint ?? null;
@@ -716,6 +750,95 @@ function clearDocPath(docPathEl2) {
   docPathEl2.classList.add("hidden");
 }
 
+// deno-md-server/static/frontmatter-meta.ts
+function normalizeTags(v) {
+  if (!Array.isArray(v)) return [];
+  return v.filter((t) => typeof t === "string" && t.trim() !== "");
+}
+function formatDate(v) {
+  if (typeof v === "string" && v.trim()) return v.trim();
+  if (typeof v === "number" && Number.isFinite(v)) {
+    const d = new Date(v);
+    if (!Number.isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+  }
+  return null;
+}
+function buildFrontmatterMetaEl(fm, options) {
+  if (!fm) return null;
+  const title = options?.showTitle && typeof fm.title === "string" && fm.title.trim() !== "" ? fm.title.trim() : null;
+  const category = typeof fm.category === "string" && fm.category.trim() !== "" ? fm.category.trim() : null;
+  const description = typeof fm.description === "string" && fm.description.trim() !== "" ? fm.description.trim() : null;
+  const dateStr = formatDate(fm.date);
+  const tags = normalizeTags(fm.tags);
+  if (!title && !category && !description && !dateStr && tags.length === 0) {
+    return null;
+  }
+  const root = document.createElement("div");
+  root.className = "doc-meta not-prose space-y-3.5 mb-8 p-6 bg-orange-50/50 rounded-xl border border-orange-100/80";
+  if (title) {
+    const h = document.createElement("h1");
+    h.className = "doc-meta__title text-2xl font-semibold text-slate-900 tracking-tight leading-snug";
+    h.textContent = title;
+    root.appendChild(h);
+  }
+  if (category) {
+    const row = document.createElement("div");
+    row.className = "flex flex-wrap items-baseline gap-x-2 gap-y-1";
+    const lab = document.createElement("span");
+    lab.className = "text-[0.65rem] font-semibold uppercase tracking-wider text-slate-500 shrink-0";
+    lab.textContent = "Category";
+    const val = document.createElement("span");
+    val.className = "text-sm text-slate-700";
+    val.textContent = category;
+    row.appendChild(lab);
+    row.appendChild(val);
+    root.appendChild(row);
+  }
+  if (description) {
+    const p = document.createElement("p");
+    p.className = "text-sm text-slate-600 leading-relaxed max-w-2xl";
+    p.textContent = description;
+    root.appendChild(p);
+  }
+  if (dateStr) {
+    const row = document.createElement("div");
+    row.className = "flex flex-wrap items-center gap-2 text-sm text-slate-600";
+    const icon = document.createElement("span");
+    icon.className = "iconify shrink-0 text-slate-400";
+    icon.setAttribute("data-icon", "mdi:calendar-outline");
+    icon.setAttribute("aria-hidden", "true");
+    const lab = document.createElement("span");
+    lab.className = "sr-only";
+    lab.textContent = "Date";
+    const val = document.createElement("time");
+    val.dateTime = dateStr;
+    val.textContent = dateStr;
+    row.appendChild(icon);
+    row.appendChild(lab);
+    row.appendChild(val);
+    root.appendChild(row);
+  }
+  if (tags.length > 0) {
+    const block = document.createElement("div");
+    block.className = "space-y-1.5";
+    const lab = document.createElement("div");
+    lab.className = "text-[0.65rem] font-semibold uppercase tracking-wider text-slate-500";
+    lab.textContent = "Tags";
+    const chips = document.createElement("div");
+    chips.className = "flex flex-wrap gap-2";
+    for (const t of tags) {
+      const chip = document.createElement("span");
+      chip.className = "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 text-slate-700 border border-slate-200/90";
+      chip.textContent = t;
+      chips.appendChild(chip);
+    }
+    block.appendChild(lab);
+    block.appendChild(chips);
+    root.appendChild(block);
+  }
+  return root;
+}
+
 // deno-md-server/static/file-url.ts
 var FILE_QUERY = "file";
 function getFileFromUrl() {
@@ -735,6 +858,10 @@ function syncFileToUrl(file, mode) {
 
 // deno-md-server/static/document-loader.ts
 var DEFAULT_TITLE = "Markdown Viewer";
+function pageTitleFromFrontmatter(frontmatter) {
+  const t = frontmatter?.title;
+  return typeof t === "string" && t.trim() !== "" ? t : null;
+}
 function titleForFile(path) {
   return `${path} \xB7 ${DEFAULT_TITLE}`;
 }
@@ -760,19 +887,27 @@ async function loadContent(dom2, file, opts = {}) {
       return;
     }
     syncFileToUrl(file, syncUrl);
+    const fmTitle = pageTitleFromFrontmatter(data.frontmatter);
+    document.title = fmTitle ? `${fmTitle} \xB7 ${DEFAULT_TITLE}` : titleForFile(file);
     setDocPathDisplay(docPathEl2, data.title, {
       absolutePath: data.absolutePath
     });
     const prose = document.createElement("div");
     prose.className = "prose prose-slate max-w-none";
     prose.innerHTML = data.html;
-    contentBody2.replaceChildren(prose);
+    const hasDocumentH1 = prose.querySelector("h1") !== null;
+    contentBody2.replaceChildren();
+    const resolvedMetaEl = buildFrontmatterMetaEl(data.frontmatter, {
+      showTitle: !hasDocumentH1
+    });
+    if (resolvedMetaEl) contentBody2.appendChild(resolvedMetaEl);
+    contentBody2.appendChild(prose);
     enhanceProseCodeCopy(prose);
     enhanceHeadingSections(prose, {
       storageKey: storageKeyForFile(file)
     });
     applySyntaxHighlight(prose);
-    Iconify.scan(prose);
+    Iconify.scan(contentBody2);
   } catch {
     renderContentFetchFailed(contentBody2);
   } finally {
@@ -790,13 +925,14 @@ async function loadInitialFileList(dom2) {
   try {
     const res = await fetch("/api/files");
     const data = await res.json();
-    if (!isStringArray(data)) {
+    if (!isFilesListPayload(data)) {
       tree2.showListError();
       return;
     }
-    const files = data;
+    const files = data.paths;
     tree2.loadPaths(files, {
-      emptyHint: files.length === 0 ? "No markdown files found." : void 0
+      emptyHint: files.length === 0 ? "No markdown files found." : void 0,
+      sortByPath: data.sort
     });
     const fromUrl = getFileFromUrl();
     if (fromUrl) {

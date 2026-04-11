@@ -32,13 +32,39 @@ function addFile(root: DirNode, segments: string[], fullPath: string): void {
     addFile(dir, rest, fullPath);
 }
 
-function sortTree(node: DirNode): void {
+function fileSortKey(
+    path: string,
+    name: string,
+    sortByPath: Record<string, number>,
+): [number, string] {
+    const s = sortByPath[path];
+    const primary = typeof s === "number" && Number.isFinite(s)
+        ? s
+        : Number.POSITIVE_INFINITY;
+    return [primary, name.toLowerCase()];
+}
+
+function compareFileOrder(
+    a: FileNode,
+    b: FileNode,
+    sortByPath: Record<string, number>,
+): number {
+    const [pa, na] = fileSortKey(a.path, a.name, sortByPath);
+    const [pb, nb] = fileSortKey(b.path, b.name, sortByPath);
+    if (pa !== pb) return pa - pb;
+    return na.localeCompare(nb, undefined, { sensitivity: "base" });
+}
+
+function sortTree(node: DirNode, sortByPath: Record<string, number>): void {
     node.children.sort((a, b) => {
         if (a.type !== b.type) return a.type === "dir" ? -1 : 1;
+        if (a.type === "file" && b.type === "file") {
+            return compareFileOrder(a, b, sortByPath);
+        }
         return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
     });
     for (const c of node.children) {
-        if (c.type === "dir") sortTree(c);
+        if (c.type === "dir") sortTree(c, sortByPath);
     }
 }
 
@@ -60,6 +86,8 @@ export type LoadPathsOptions = {
     expandAll?: boolean;
     /** Shown when `relativePaths` is empty (defaults to "No files."). */
     emptyHint?: string;
+    /** Frontmatter `sort` (numeric) per relative path; files without an entry sort after, by name. */
+    sortByPath?: Record<string, number>;
 };
 
 export class FileTreeView {
@@ -76,7 +104,8 @@ export class FileTreeView {
     loadPaths(relativePaths: string[], options?: LoadPathsOptions): void {
         this.root = { type: "dir", name: "", children: [] };
         relativePaths.forEach((f) => addFile(this.root, f.split("/"), f));
-        sortTree(this.root);
+        const sortByPath = options?.sortByPath ?? {};
+        sortTree(this.root, sortByPath);
         this.expandedFolders.clear();
         this.selectedPath = null;
         this.emptyHint = options?.emptyHint ?? null;

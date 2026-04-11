@@ -1,11 +1,16 @@
 {
   "version": "5",
   "specifiers": {
-    "npm:marked@12.0.1": "12.0.1"
+    "npm:marked@12.0.1": "12.0.1",
+    "npm:yaml@2.6.0": "2.6.0"
   },
   "npm": {
     "marked@12.0.1": {
       "integrity": "sha512-Y1/V2yafOcOdWQCX0XpAKXzDakPOpn6U0YLxTJs3cww6VxOzZV1BTOOYWLvH3gX38cq+iLwljHHTnMtlDfg01Q==",
+      "bin": true
+    },
+    "yaml@2.6.0": {
+      "integrity": "sha512-a6ae//JvKDEra2kdi1qzCyrJW/WZCgFi8ydDV+eXExl95t+5R+ijnqHJbz9tmMh8FUjx3iv2fCQ4dclAQlO2UQ==",
       "bin": true
     }
   },

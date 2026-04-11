@@ -1,7 +1,25 @@
 import type { FileTreeView } from "./file-tree.ts";
 
-export function isStringArray(data: unknown): data is string[] {
-    return Array.isArray(data) && data.every((x) => typeof x === "string");
+export type FilesListPayload = {
+    paths: string[];
+    sort?: Record<string, number>;
+};
+
+export function isFilesListPayload(data: unknown): data is FilesListPayload {
+    if (!data || typeof data !== "object") return false;
+    const o = data as Record<string, unknown>;
+    if (!Array.isArray(o.paths) || !o.paths.every((x) => typeof x === "string")) {
+        return false;
+    }
+    if (o.sort !== undefined) {
+        if (typeof o.sort !== "object" || o.sort === null || Array.isArray(o.sort)) {
+            return false;
+        }
+        for (const v of Object.values(o.sort)) {
+            if (typeof v !== "number" || !Number.isFinite(v)) return false;
+        }
+    }
+    return true;
 }
 
 export async function refreshSidebarFileList(
@@ -15,11 +33,12 @@ export async function refreshSidebarFileList(
     try {
         const res = await fetch(endpoint);
         const data: unknown = await res.json();
-        if (!isStringArray(data)) {
+        if (!isFilesListPayload(data)) {
             tree.showListError();
             return;
         }
-        const files = data;
+
+        const files = data.paths;
         const sel = tree.getSelectedPath();
         const keep = sel && files.includes(sel) ? sel : null;
         tree.loadPaths(files, {
@@ -30,6 +49,7 @@ export async function refreshSidebarFileList(
                     ? "No files match your search."
                     : "No markdown files found.")
                 : undefined,
+            sortByPath: data.sort,
         });
         tree.render();
     } catch {

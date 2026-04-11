@@ -1,4 +1,15 @@
-# three
+---
+title: "three"
+sort: 1
+date: 2026-04-11
+tags:
+  - macOS
+  - reset
+  - 2
+  - two
+  - second
+  - second file
+---
 
 ## install deno
 

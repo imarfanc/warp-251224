@@ -5,7 +5,7 @@ import {
     storageKeyForFile,
 } from "./heading-sections.ts";
 import { applySyntaxHighlight } from "./highlight-code.ts";
-import { isStringArray } from "./file-search.ts";
+import { isFilesListPayload } from "./file-search.ts";
 import type { FileTreeView } from "./file-tree.ts";
 import {
     renderContentError,
@@ -15,13 +15,27 @@ import {
     renderContentPlaceholder,
 } from "./content-fragments.ts";
 import { clearDocPath, setDocPathDisplay } from "./doc-path.ts";
+import { buildFrontmatterMetaEl } from "./frontmatter-meta.ts";
 import { getFileFromUrl, syncFileToUrl, type UrlSyncMode } from "./file-url.ts";
 
 const DEFAULT_TITLE = "Markdown Viewer";
 
 export type ContentResponse =
-    | { html: string; title: string; absolutePath?: string; error?: undefined }
+    | {
+        html: string;
+        title: string;
+        absolutePath?: string;
+        frontmatter?: Record<string, unknown>;
+        error?: undefined;
+    }
     | { error: string; html?: undefined; title?: undefined };
+
+function pageTitleFromFrontmatter(
+    frontmatter: Record<string, unknown> | undefined,
+): string | null {
+    const t = frontmatter?.title;
+    return typeof t === "string" && t.trim() !== "" ? t : null;
+}
 
 export type ViewerDom = {
     tree: FileTreeView;
@@ -69,6 +83,11 @@ export async function loadContent(
 
         syncFileToUrl(file, syncUrl);
 
+        const fmTitle = pageTitleFromFrontmatter(data.frontmatter);
+        document.title = fmTitle
+            ? `${fmTitle} · ${DEFAULT_TITLE}`
+            : titleForFile(file);
+
         setDocPathDisplay(docPathEl, data.title, {
             absolutePath: data.absolutePath,
         });
@@ -77,11 +96,17 @@ export async function loadContent(
         prose.className = "prose prose-slate max-w-none";
         prose.innerHTML = data.html;
 
-        contentBody.replaceChildren(prose);
+        const hasDocumentH1 = prose.querySelector("h1") !== null;
+        contentBody.replaceChildren();
+        const resolvedMetaEl = buildFrontmatterMetaEl(data.frontmatter, {
+            showTitle: !hasDocumentH1,
+        });
+        if (resolvedMetaEl) contentBody.appendChild(resolvedMetaEl);
+        contentBody.appendChild(prose);
         enhanceProseCodeCopy(prose);
         enhanceHeadingSections(prose, { storageKey: storageKeyForFile(file) });
         applySyntaxHighlight(prose);
-        Iconify.scan(prose);
+        Iconify.scan(contentBody);
     } catch {
         renderContentFetchFailed(contentBody);
     } finally {
@@ -99,14 +124,15 @@ export async function loadInitialFileList(dom: ViewerDom): Promise<void> {
     try {
         const res = await fetch("/api/files");
         const data: unknown = await res.json();
-        if (!isStringArray(data)) {
+        if (!isFilesListPayload(data)) {
             tree.showListError();
             return;
         }
-        const files = data;
+        const files = data.paths;
 
         tree.loadPaths(files, {
             emptyHint: files.length === 0 ? "No markdown files found." : undefined,
+            sortByPath: data.sort,
         });
         const fromUrl = getFileFromUrl();
         if (fromUrl) {
