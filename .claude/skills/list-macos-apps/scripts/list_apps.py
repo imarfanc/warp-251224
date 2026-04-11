@@ -11,6 +11,7 @@ import re
 import subprocess
 from collections import defaultdict
 
+from rich.box import HEAVY_HEAD
 from rich.console import Console
 from rich.table import Table
 
@@ -31,44 +32,44 @@ ENGINE_ONLY_EXECUTABLES: dict[str, set[str]] = {
 }
 
 APP_ICONS: dict[str, str] = {
-    'Alfred': '🔍',
-    'Amphetamine': '💊',
-    'Arc': '🌐',
-    'Bartender': '🍸',
-    'BetterTouchTool': '🖱️',
-    'Calendar': '📅',
-    'CleanMyMac': '🧹',
-    'CleanShot X': '📸',
-    'Cursor': '💻',
-    'Discord': '🎮',
-    'Figma': '🎨',
-    'Finder': '📁',
-    'Google Chrome': '🌐',
-    'iStat Menus': '📊',
-    'Keyboard Maestro': '⌨️',
-    'Lungo': '☕',
-    'Mail': '📧',
-    'Messages': '💬',
-    'MonitorControl': '🔆',
-    'Notes': '📝',
-    'Notion': '📋',
-    'PopClip': '✂️',
-    'Raycast': '🔍',
-    'Safari': '🌐',
-    'Setapp': '📦',
-    'Shottr': '📸',
-    'Slack': '💼',
-    'Spotify': '🎵',
-    'Stats': '📊',
-    'Terminal': '💻',
-    'Tot': '✏️',
-    'VoiceInk': '🎙️',
-    'Warp': '⚡',
-    'Weather': '🌤️',
-    'WhatsApp': '💬',
-    'Xcode': '🔨',
-    'Zed': '⚡',
-    'Zoom': '📹',
+    'Alfred': '',
+    'Amphetamine': '',
+    'Arc': '',
+    'Bartender': '',
+    'BetterTouchTool': '',
+    'Calendar': '',
+    'CleanMyMac': '',
+    'CleanShot X': '',
+    'Cursor': '',
+    'Discord': '',
+    'Figma': '',
+    'Finder': '',
+    'Google Chrome': '',
+    'iStat Menus': '',
+    'Keyboard Maestro': '',
+    'Lungo': '',
+    'Mail': '',
+    'Messages': '',
+    'MonitorControl': '',
+    'Notes': '',
+    'Notion': '',
+    'PopClip': '',
+    'Raycast': '',
+    'Safari': '',
+    'Setapp': '',
+    'Shottr': '',
+    'Slack': '',
+    'Spotify': '',
+    'Stats': '',
+    'Terminal': '',
+    'Tot': '',
+    'VoiceInk': '',
+    'Warp': '',
+    'Weather': '',
+    'WhatsApp': '',
+    'Xcode': '',
+    'Zed': '󰆍',
+    'Zoom': '',
 }
 
 
@@ -78,7 +79,7 @@ def get_icon(app_name: str) -> str:
     for key, icon in APP_ICONS.items():
         if key.lower() in app_name.lower() or app_name.lower() in key.lower():
             return icon
-    return '📱'
+    return ''
 
 
 def is_menubar_app(app_name: str) -> bool:
@@ -189,16 +190,57 @@ for app_name, procs in user_apps.items():
 console = Console()
 
 
+def app_style(app_name: str) -> str:
+    if app_name in RUNTIME_MENUBAR_APPS or app_name in ENGINE_ONLY_EXECUTABLES:
+        return "bold cyan"
+    if app_name in {'Google Chrome', 'Safari', 'Arc'}:
+        return "bold blue"
+    if app_name in {'Warp', 'Terminal', 'iTerm2'}:
+        return "bold yellow"
+    if app_name in {'Cursor', 'Zed', 'Xcode'}:
+        return "bold magenta"
+    return "bold white"
+
+
+def usage_style(value: float, *, kind: str) -> str:
+    if kind == 'cpu':
+        if value >= 20:
+            return "bold red"
+        if value >= 5:
+            return "bold yellow"
+        return "green"
+    if value >= 8:
+        return "bold red"
+    if value >= 3:
+        return "bold yellow"
+    return "green"
+
+
 def build_table(title: str, data: dict[str, list]) -> Table:
-    table = Table(title=title)
-    table.add_column("App", style="bold")
-    table.add_column("PIDs", justify="right")
-    table.add_column("CPU%", justify="right")
-    table.add_column("MEM%", justify="right")
+    table = Table(
+        title=f"[bold bright_white]{title}[/]",
+        box=HEAVY_HEAD,
+        header_style="bold bright_white",
+        border_style="bright_black",
+        title_justify="center",
+        padding=(0, 1),
+        expand=False,
+    )
+    table.add_column("", width=3, justify="center", no_wrap=True)
+    table.add_column("App", style="bold", min_width=22, no_wrap=True)
+    table.add_column("PIDs", justify="right", width=4, style="bright_white")
+    table.add_column("CPU%", justify="right", width=6)
+    table.add_column("MEM%", justify="right", width=6)
     for name, procs in sorted(data.items(), key=lambda x: x[0].lower()):
         cpu = sum(float(p['cpu']) for p in procs)
         mem = sum(float(p['mem']) for p in procs)
-        table.add_row(f"{get_icon(name)} {name}", str(len(procs)), f"{cpu:.1f}%", f"{mem:.1f}%")
+        table.add_row(
+            get_icon(name),
+            f"[{app_style(name)}]{name}[/]",
+            str(len(procs)),
+            f"[{usage_style(cpu, kind='cpu')}]{cpu:>4.1f}%[/]",
+            f"[{usage_style(mem, kind='mem')}]{mem:>4.1f}%[/]",
+        )
     return table
 
 
