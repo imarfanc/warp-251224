@@ -1,0 +1,104 @@
+[
+  {
+    "BTTLastUpdatedAt" : 1775903589.6291609,
+    "BTTTriggerType" : 112,
+    "BTTTriggerTypeDescriptionReadOnly" : "3 Finger Click",
+    "BTTTriggerClass" : "BTTTriggerTypeTouchpadAll",
+    "BTTUUID" : "E9D47A8C-62A6-44C4-8573-F4003A36AF91",
+    "BTTOrder" : 0,
+    "BTTActionsToExecute" : [
+      {
+        "BTTLastUpdatedAt" : 1775893329.7737122,
+        "BTTTriggerParentUUID" : "E9D47A8C-62A6-44C4-8573-F4003A36AF91",
+        "BTTIsPureAction" : true,
+        "BTTUUID" : "1A3F9B38-F544-4532-A492-DC1DAD1F586B",
+        "BTTPredefinedActionType" : 1,
+        "BTTPredefinedActionName" : "Middle Click (At Current Mouse Position)",
+        "BTTOrder" : 1
+      }
+    ]
+  },
+  {
+    "BTTLastUpdatedAt" : 1775903589.6291499,
+    "BTTTriggerType" : 202,
+    "BTTTriggerTypeDescriptionReadOnly" : "",
+    "BTTTriggerClass" : "BTTTriggerTypeTouchpadAll",
+    "BTTUUID" : "BD346537-0A06-413D-B7A2-32E1EB8AF1E9",
+    "BTTGenericActionConfig2" : "87.000002, 135.000007, 38.000002, 255.000000",
+    "BTTSeparatorFontColor" : "0.000000, 0.000000, 0.000000, 255.000000",
+    "BTTSeparatorBackgroundColorDark" : "87.000002, 135.000007, 38.000002, 255.000000",
+    "BTTSeparatorFontColorDark" : "0.000000, 0.000000, 0.000000, 255.000000",
+    "BTTSeparatorBackgroundColor" : "156.000006, 226.000002, 90.000002, 255.000000",
+    "BTTOrder" : 1
+  },
+  {
+    "BTTLastUpdatedAt" : 1775903589.6291261,
+    "BTTTriggerType" : 108,
+    "BTTTriggerTypeDescriptionReadOnly" : "4 Finger Swipe Up",
+    "BTTTriggerClass" : "BTTTriggerTypeTouchpadAll",
+    "BTTUUID" : "0B32ABF7-E5F2-4FB3-B14E-55B6296F2E03",
+    "BTTOrder" : 2,
+    "BTTActionsToExecute" : [
+      {
+        "BTTLastUpdatedAt" : 1775894214.4929481,
+        "BTTTriggerParentUUID" : "0B32ABF7-E5F2-4FB3-B14E-55B6296F2E03",
+        "BTTIsPureAction" : true,
+        "BTTUUID" : "7D58164B-0B10-489A-98B1-EB6DA5A08483",
+        "BTTLayoutIndependentActionChar" : "t",
+        "BTTShortcutToSend" : "55,17",
+        "BTTOrder" : 2
+      }
+    ]
+  },
+  {
+    "BTTLastUpdatedAt" : 1775903589.6291561,
+    "BTTTriggerType" : 107,
+    "BTTTriggerTypeDescriptionReadOnly" : "4 Finger Swipe Down",
+    "BTTTriggerClass" : "BTTTriggerTypeTouchpadAll",
+    "BTTUUID" : "350B66F9-B47A-4C29-973E-0AABDFB52F4A",
+    "BTTOrder" : 3,
+    "BTTActionsToExecute" : [
+      {
+        "BTTLastUpdatedAt" : 1775894288.5353141,
+        "BTTTriggerParentUUID" : "350B66F9-B47A-4C29-973E-0AABDFB52F4A",
+        "BTTIsPureAction" : true,
+        "BTTUUID" : "133F2A39-0A1D-4681-87C4-FA9741A1E7D8",
+        "BTTLayoutIndependentActionChar" : "w",
+        "BTTShortcutToSend" : "55,13",
+        "BTTOrder" : 3
+      }
+    ]
+  },
+  {
+    "BTTLastUpdatedAt" : 1775903589.6291351,
+    "BTTTriggerType" : 202,
+    "BTTTriggerTypeDescriptionReadOnly" : "",
+    "BTTTriggerClass" : "BTTTriggerTypeTouchpadAll",
+    "BTTUUID" : "2DB2343E-60AE-4839-904B-AE2AB047F352",
+    "BTTGenericActionConfig2" : "198.000003, 147.000006, 0.000000, 255.000000",
+    "BTTSeparatorFontColor" : "0.000000, 0.000000, 0.000000, 255.000000",
+    "BTTSeparatorBackgroundColorDark" : "198.000003, 147.000006, 0.000000, 255.000000",
+    "BTTSeparatorFontColorDark" : "0.000000, 0.000000, 0.000000, 255.000000",
+    "BTTSeparatorBackgroundColor" : "255.000000, 224.000002, 97.000002, 255.000000",
+    "BTTOrder" : 4
+  },
+  {
+    "BTTLastUpdatedAt" : 1775903602.9181561,
+    "BTTTriggerType" : 100,
+    "BTTTriggerTypeDescriptionReadOnly" : "3 Finger Swipe Left",
+    "BTTTriggerClass" : "BTTTriggerTypeTouchpadAll",
+    "BTTUUID" : "D45788BB-778E-4819-8B58-E45D3B2CED4E",
+    "BTTOrder" : 5,
+    "BTTActionsToExecute" : [
+      {
+        "BTTLastUpdatedAt" : 1775903606.6825562,
+        "BTTTriggerParentUUID" : "D45788BB-778E-4819-8B58-E45D3B2CED4E",
+        "BTTIsPureAction" : true,
+        "BTTUUID" : "11A0D9C3-0A24-4650-8FA6-90E62734AD98",
+        "BTTLayoutIndependentActionChar" : "TAB",
+        "BTTShortcutToSend" : "59,56,48",
+        "BTTOrder" : 5
+      }
+    ]
+  }
+]
