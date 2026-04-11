@@ -1,3 +1,241 @@
+// deno-md-server/static/file-search.ts
+function isStringArray(data) {
+  return Array.isArray(data) && data.every((x) => typeof x === "string");
+}
+async function refreshSidebarFileList(input, tree2) {
+  const q = input.value.trim();
+  const endpoint = q ? `/api/search?q=${encodeURIComponent(q)}` : "/api/files";
+  try {
+    const res = await fetch(endpoint);
+    const data = await res.json();
+    if (!isStringArray(data)) {
+      tree2.showListError();
+      return;
+    }
+    const files = data;
+    const sel = tree2.getSelectedPath();
+    const keep = sel && files.includes(sel) ? sel : null;
+    tree2.loadPaths(files, {
+      preservePath: keep,
+      expandAll: q.length > 0,
+      emptyHint: files.length === 0 ? q ? "No files match your search." : "No markdown files found." : void 0
+    });
+    tree2.render();
+  } catch {
+    tree2.showListError();
+  }
+}
+var DEBOUNCE_MS = 300;
+function attachSidebarSearch(input, tree2) {
+  let searchDebounce = 0;
+  input.addEventListener("input", () => {
+    window.clearTimeout(searchDebounce);
+    searchDebounce = window.setTimeout(() => {
+      void refreshSidebarFileList(input, tree2);
+    }, DEBOUNCE_MS);
+  });
+}
+
+// deno-md-server/static/file-tree.ts
+function addFile(root, segments, fullPath) {
+  if (segments.length === 1) {
+    root.children.push({
+      type: "file",
+      name: segments[0],
+      path: fullPath
+    });
+    return;
+  }
+  const [first, ...rest] = segments;
+  let dir = root.children.find((c) => c.type === "dir" && c.name === first);
+  if (!dir) {
+    dir = {
+      type: "dir",
+      name: first,
+      children: []
+    };
+    root.children.push(dir);
+  }
+  addFile(dir, rest, fullPath);
+}
+function sortTree(node) {
+  node.children.sort((a, b) => {
+    if (a.type !== b.type) return a.type === "dir" ? -1 : 1;
+    return a.name.localeCompare(b.name, void 0, {
+      sensitivity: "base"
+    });
+  });
+  for (const c of node.children) {
+    if (c.type === "dir") sortTree(c);
+  }
+}
+function dirKey(parentPath, name) {
+  return parentPath ? `${parentPath}/${name}` : name;
+}
+function expandParentsIntoSet(filePath, expanded) {
+  const parts = filePath.split("/");
+  for (let i = 0; i < parts.length - 1; i++) {
+    expanded.add(parts.slice(0, i + 1).join("/"));
+  }
+}
+var FileTreeView = class {
+  container;
+  onSelectFile;
+  root;
+  expandedFolders;
+  selectedPath;
+  emptyHint;
+  constructor(container, onSelectFile) {
+    this.container = container;
+    this.onSelectFile = onSelectFile;
+    this.root = {
+      type: "dir",
+      name: "",
+      children: []
+    };
+    this.expandedFolders = /* @__PURE__ */ new Set();
+    this.selectedPath = null;
+    this.emptyHint = null;
+  }
+  loadPaths(relativePaths, options) {
+    this.root = {
+      type: "dir",
+      name: "",
+      children: []
+    };
+    relativePaths.forEach((f) => addFile(this.root, f.split("/"), f));
+    sortTree(this.root);
+    this.expandedFolders.clear();
+    this.selectedPath = null;
+    this.emptyHint = options?.emptyHint ?? null;
+    const preserve = options?.preservePath;
+    if (preserve && relativePaths.includes(preserve)) {
+      this.selectedPath = preserve;
+    }
+    if (options?.expandAll) {
+      for (const p of relativePaths) {
+        expandParentsIntoSet(p, this.expandedFolders);
+      }
+    } else if (preserve && relativePaths.includes(preserve)) {
+      expandParentsIntoSet(preserve, this.expandedFolders);
+    }
+  }
+  getSelectedPath() {
+    return this.selectedPath;
+  }
+  setSelectedPath(path) {
+    this.selectedPath = path;
+  }
+  expandParentsForPath(path) {
+    expandParentsIntoSet(path, this.expandedFolders);
+  }
+  render() {
+    this.container.innerHTML = "";
+    if (this.root.children.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "file-tree__empty";
+      empty.textContent = this.emptyHint ?? "No files.";
+      this.container.appendChild(empty);
+      return;
+    }
+    const wrap = document.createElement("div");
+    wrap.className = "file-tree";
+    for (const entry of this.root.children) {
+      this.renderEntry(entry, wrap, "");
+    }
+    this.container.appendChild(wrap);
+  }
+  showListError() {
+    this.container.innerHTML = '<div class="text-red-500">Error loading files</div>';
+  }
+  renderEntry(entry, parent, parentPath) {
+    if (entry.type === "file") {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      const isSel = this.selectedPath === entry.path;
+      btn.className = isSel ? "file-tree__file file-tree__file--active" : "file-tree__file";
+      btn.textContent = entry.name;
+      btn.title = entry.path;
+      btn.onclick = () => this.onSelectFile(entry.path);
+      parent.appendChild(btn);
+      return;
+    }
+    const key = dirKey(parentPath, entry.name);
+    const isOpen = this.expandedFolders.has(key);
+    const dirWrap = document.createElement("div");
+    dirWrap.className = "file-tree__dir";
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "file-tree__folder";
+    row.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    const chev = document.createElement("span");
+    chev.className = "file-tree__chevron";
+    chev.setAttribute("aria-hidden", "true");
+    chev.textContent = isOpen ? "\u25BC" : "\u25B6";
+    const label = document.createElement("span");
+    label.className = "file-tree__folder-label truncate";
+    label.textContent = entry.name;
+    row.appendChild(chev);
+    row.appendChild(label);
+    row.onclick = () => {
+      if (this.expandedFolders.has(key)) {
+        this.expandedFolders.delete(key);
+      } else {
+        this.expandedFolders.add(key);
+      }
+      this.render();
+    };
+    dirWrap.appendChild(row);
+    const kids = document.createElement("div");
+    kids.className = "file-tree__children";
+    if (!isOpen) kids.hidden = true;
+    for (const child of entry.children) {
+      this.renderEntry(child, kids, key);
+    }
+    dirWrap.appendChild(kids);
+    parent.appendChild(dirWrap);
+  }
+};
+
+// deno-md-server/static/dom.ts
+function getEl(id) {
+  const el = document.getElementById(id);
+  if (!el) throw new Error(`Missing required element: #${id}`);
+  return el;
+}
+
+// deno-md-server/static/sidebar-fab.ts
+var SIDEBAR_HIDDEN_KEY = "deno-md-viewer-sidebar-hidden";
+function updateSidebarFabUi(sidebarFab2, hidden) {
+  const icon = sidebarFab2.querySelector(".iconify");
+  if (icon) {
+    icon.setAttribute("data-icon", hidden ? "mdi:chevron-right" : "mdi:chevron-left");
+  }
+  const label = hidden ? "Show sidebar" : "Hide sidebar";
+  sidebarFab2.setAttribute("aria-label", label);
+  sidebarFab2.title = label;
+  Iconify.scan(sidebarFab2);
+}
+function applySidebarHidden(sidebarFab2, hidden) {
+  document.body.classList.toggle("sidebar-hidden", hidden);
+  try {
+    localStorage.setItem(SIDEBAR_HIDDEN_KEY, hidden ? "1" : "");
+  } catch {
+  }
+  updateSidebarFabUi(sidebarFab2, hidden);
+}
+function initSidebarFab(sidebarFab2) {
+  let hidden = false;
+  try {
+    hidden = localStorage.getItem(SIDEBAR_HIDDEN_KEY) === "1";
+  } catch {
+  }
+  applySidebarHidden(sidebarFab2, hidden);
+  sidebarFab2.addEventListener("click", () => {
+    applySidebarHidden(sidebarFab2, !document.body.classList.contains("sidebar-hidden"));
+  });
+}
+
 // deno-md-server/static/code-copy.ts
 var COPY_ICON = "mdi:content-copy";
 var CHECK_ICON = "mdi:check";
@@ -225,216 +463,68 @@ function applySyntaxHighlight(root) {
   }
 }
 
-// deno-md-server/static/file-search.ts
-function isStringArray(data) {
-  return Array.isArray(data) && data.every((x) => typeof x === "string");
+// deno-md-server/static/content-fragments.ts
+var PLACEHOLDER_TEMPLATE_ID = "content-placeholder-tpl";
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
-async function refreshSidebarFileList(input, tree2) {
-  const q = input.value.trim();
-  const endpoint = q ? `/api/search?q=${encodeURIComponent(q)}` : "/api/files";
-  try {
-    const res = await fetch(endpoint);
-    const data = await res.json();
-    if (!isStringArray(data)) {
-      tree2.showListError();
-      return;
-    }
-    const files = data;
-    const sel = tree2.getSelectedPath();
-    const keep = sel && files.includes(sel) ? sel : null;
-    tree2.loadPaths(files, {
-      preservePath: keep,
-      expandAll: q.length > 0,
-      emptyHint: files.length === 0 ? q ? "No files match your search." : "No markdown files found." : void 0
-    });
-    tree2.render();
-  } catch {
-    tree2.showListError();
-  }
-}
-var DEBOUNCE_MS = 300;
-function attachSidebarSearch(input, tree2) {
-  let searchDebounce = 0;
-  input.addEventListener("input", () => {
-    window.clearTimeout(searchDebounce);
-    searchDebounce = window.setTimeout(() => {
-      void refreshSidebarFileList(input, tree2);
-    }, DEBOUNCE_MS);
-  });
-}
-
-// deno-md-server/static/file-tree.ts
-function addFile(root, segments, fullPath) {
-  if (segments.length === 1) {
-    root.children.push({
-      type: "file",
-      name: segments[0],
-      path: fullPath
-    });
+var FALLBACK_PLACEHOLDER_HTML = '<div class="text-gray-400 italic placeholder-msg">Select a file from the sidebar to view its content.</div>';
+function renderContentPlaceholder(container) {
+  const tpl = document.getElementById(PLACEHOLDER_TEMPLATE_ID);
+  if (tpl instanceof HTMLTemplateElement) {
+    container.replaceChildren(tpl.content.cloneNode(true));
     return;
   }
-  const [first, ...rest] = segments;
-  let dir = root.children.find((c) => c.type === "dir" && c.name === first);
-  if (!dir) {
-    dir = {
-      type: "dir",
-      name: first,
-      children: []
-    };
-    root.children.push(dir);
-  }
-  addFile(dir, rest, fullPath);
+  container.innerHTML = FALLBACK_PLACEHOLDER_HTML;
 }
-function sortTree(node) {
-  node.children.sort((a, b) => {
-    if (a.type !== b.type) return a.type === "dir" ? -1 : 1;
-    return a.name.localeCompare(b.name, void 0, {
-      sensitivity: "base"
-    });
-  });
-  for (const c of node.children) {
-    if (c.type === "dir") sortTree(c);
-  }
+function renderContentLoading(container) {
+  container.innerHTML = '<div class="animate-pulse text-gray-400">Loading...</div>';
 }
-function dirKey(parentPath, name) {
-  return parentPath ? `${parentPath}/${name}` : name;
+function renderContentError(container, message) {
+  container.innerHTML = `<div class="text-red-500">Error: ${escapeHtml(message)}</div>`;
 }
-function expandParentsIntoSet(filePath, expanded) {
-  const parts = filePath.split("/");
-  for (let i = 0; i < parts.length - 1; i++) {
-    expanded.add(parts.slice(0, i + 1).join("/"));
-  }
+function renderContentInvalidResponse(container) {
+  container.innerHTML = '<div class="text-red-500">Error: invalid response</div>';
 }
-var FileTreeView = class {
-  container;
-  onSelectFile;
-  root;
-  expandedFolders;
-  selectedPath;
-  emptyHint;
-  constructor(container, onSelectFile) {
-    this.container = container;
-    this.onSelectFile = onSelectFile;
-    this.root = {
-      type: "dir",
-      name: "",
-      children: []
-    };
-    this.expandedFolders = /* @__PURE__ */ new Set();
-    this.selectedPath = null;
-    this.emptyHint = null;
-  }
-  loadPaths(relativePaths, options) {
-    this.root = {
-      type: "dir",
-      name: "",
-      children: []
-    };
-    relativePaths.forEach((f) => addFile(this.root, f.split("/"), f));
-    sortTree(this.root);
-    this.expandedFolders.clear();
-    this.selectedPath = null;
-    this.emptyHint = options?.emptyHint ?? null;
-    const preserve = options?.preservePath;
-    if (preserve && relativePaths.includes(preserve)) {
-      this.selectedPath = preserve;
-    }
-    if (options?.expandAll) {
-      for (const p of relativePaths) {
-        expandParentsIntoSet(p, this.expandedFolders);
-      }
-    } else if (preserve && relativePaths.includes(preserve)) {
-      expandParentsIntoSet(preserve, this.expandedFolders);
-    }
-  }
-  getSelectedPath() {
-    return this.selectedPath;
-  }
-  setSelectedPath(path) {
-    this.selectedPath = path;
-  }
-  expandParentsForPath(path) {
-    expandParentsIntoSet(path, this.expandedFolders);
-  }
-  render() {
-    this.container.innerHTML = "";
-    if (this.root.children.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "file-tree__empty";
-      empty.textContent = this.emptyHint ?? "No files.";
-      this.container.appendChild(empty);
-      return;
-    }
-    const wrap = document.createElement("div");
-    wrap.className = "file-tree";
-    for (const entry of this.root.children) {
-      this.renderEntry(entry, wrap, "");
-    }
-    this.container.appendChild(wrap);
-  }
-  showListError() {
-    this.container.innerHTML = '<div class="text-red-500">Error loading files</div>';
-  }
-  renderEntry(entry, parent, parentPath) {
-    if (entry.type === "file") {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      const isSel = this.selectedPath === entry.path;
-      btn.className = isSel ? "file-tree__file file-tree__file--active" : "file-tree__file";
-      btn.textContent = entry.name;
-      btn.title = entry.path;
-      btn.onclick = () => this.onSelectFile(entry.path);
-      parent.appendChild(btn);
-      return;
-    }
-    const key = dirKey(parentPath, entry.name);
-    const isOpen = this.expandedFolders.has(key);
-    const dirWrap = document.createElement("div");
-    dirWrap.className = "file-tree__dir";
-    const row = document.createElement("button");
-    row.type = "button";
-    row.className = "file-tree__folder";
-    row.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    const chev = document.createElement("span");
-    chev.className = "file-tree__chevron";
-    chev.setAttribute("aria-hidden", "true");
-    chev.textContent = isOpen ? "\u25BC" : "\u25B6";
-    const label = document.createElement("span");
-    label.className = "file-tree__folder-label truncate";
-    label.textContent = entry.name;
-    row.appendChild(chev);
-    row.appendChild(label);
-    row.onclick = () => {
-      if (this.expandedFolders.has(key)) {
-        this.expandedFolders.delete(key);
-      } else {
-        this.expandedFolders.add(key);
-      }
-      this.render();
-    };
-    dirWrap.appendChild(row);
-    const kids = document.createElement("div");
-    kids.className = "file-tree__children";
-    if (!isOpen) kids.hidden = true;
-    for (const child of entry.children) {
-      this.renderEntry(child, kids, key);
-    }
-    dirWrap.appendChild(kids);
-    parent.appendChild(dirWrap);
-  }
-};
+function renderContentFetchFailed(container) {
+  container.innerHTML = '<div class="text-red-500">Error loading content</div>';
+}
 
-// deno-md-server/static/app.ts
-function getEl(id) {
-  const el = document.getElementById(id);
-  if (!el) throw new Error(`Missing required element: #${id}`);
-  return el;
+// deno-md-server/static/doc-path.ts
+function setDocPathDisplay(docPathEl2, path) {
+  docPathEl2.textContent = "";
+  const parts = path.split("/").filter((p) => p.length > 0);
+  if (parts.length === 0) {
+    const fallback = document.createElement("span");
+    fallback.className = "doc-path__leaf";
+    fallback.textContent = path;
+    docPathEl2.appendChild(fallback);
+    docPathEl2.classList.remove("hidden");
+    return;
+  }
+  for (let i = 0; i < parts.length; i++) {
+    if (i > 0) {
+      docPathEl2.appendChild(document.createTextNode(" "));
+      const sep = document.createElement("span");
+      sep.className = "doc-path__sep";
+      sep.textContent = ">";
+      sep.setAttribute("aria-hidden", "true");
+      docPathEl2.appendChild(sep);
+      docPathEl2.appendChild(document.createTextNode(" "));
+    }
+    const span = document.createElement("span");
+    span.className = i === parts.length - 1 ? "doc-path__leaf" : "doc-path__crumb";
+    span.textContent = parts[i];
+    docPathEl2.appendChild(span);
+  }
+  docPathEl2.classList.remove("hidden");
 }
-var fileListEl = getEl("file-list");
-var contentEl = getEl("content");
-var fileSearchInput = getEl("file-search");
-var sidebarFab = getEl("sidebar-fab");
-var SIDEBAR_HIDDEN_KEY = "deno-md-viewer-sidebar-hidden";
+function clearDocPath(docPathEl2) {
+  docPathEl2.textContent = "";
+  docPathEl2.classList.add("hidden");
+}
+
+// deno-md-server/static/file-url.ts
 var FILE_QUERY = "file";
 function getFileFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -446,129 +536,129 @@ function setFileInUrl(file, replace) {
   url.searchParams.set(FILE_QUERY, file);
   history[replace ? "replaceState" : "pushState"]({}, "", url);
 }
-var tree = new FileTreeView(fileListEl, (path) => {
-  void selectFile(path);
-});
-attachSidebarSearch(fileSearchInput, tree);
-function updateSidebarFabUi(hidden) {
-  const icon = sidebarFab.querySelector(".iconify");
-  if (icon) {
-    icon.setAttribute("data-icon", hidden ? "mdi:chevron-right" : "mdi:chevron-left");
-  }
-  const label = hidden ? "Show sidebar" : "Hide sidebar";
-  sidebarFab.setAttribute("aria-label", label);
-  sidebarFab.title = label;
-  Iconify.scan(sidebarFab);
+function syncFileToUrl(file, mode) {
+  if (mode === "push") setFileInUrl(file, false);
+  else if (mode === "replace") setFileInUrl(file, true);
 }
-function applySidebarHidden(hidden) {
-  document.body.classList.toggle("sidebar-hidden", hidden);
-  try {
-    localStorage.setItem(SIDEBAR_HIDDEN_KEY, hidden ? "1" : "");
-  } catch {
-  }
-  updateSidebarFabUi(hidden);
+
+// deno-md-server/static/document-loader.ts
+var DEFAULT_TITLE = "Markdown Viewer";
+function titleForFile(path) {
+  return `${path} \xB7 ${DEFAULT_TITLE}`;
 }
-function initSidebarFab() {
-  let hidden = false;
-  try {
-    hidden = localStorage.getItem(SIDEBAR_HIDDEN_KEY) === "1";
-  } catch {
-  }
-  applySidebarHidden(hidden);
-  sidebarFab.addEventListener("click", () => {
-    applySidebarHidden(!document.body.classList.contains("sidebar-hidden"));
-  });
-}
-initSidebarFab();
-async function loadContent(file, opts = {}) {
+async function loadContent(dom2, file, opts = {}) {
+  const { tree: tree2, contentBody: contentBody2, docPathEl: docPathEl2 } = dom2;
   const syncUrl = opts.syncUrl ?? "push";
-  tree.setSelectedPath(file);
-  tree.render();
-  document.title = `${file} \xB7 Markdown Viewer`;
-  contentEl.innerHTML = '<div class="animate-pulse text-gray-400">Loading...</div>';
+  tree2.setSelectedPath(file);
+  tree2.render();
+  document.title = titleForFile(file);
+  setDocPathDisplay(docPathEl2, file);
+  renderContentLoading(contentBody2);
+  contentBody2.setAttribute("aria-busy", "true");
   try {
     const res = await fetch(`/api/content/${encodeURIComponent(file)}`);
     const data = await res.json();
     if ("error" in data && data.error) {
-      contentEl.innerHTML = `<div class="text-red-500">Error: ${escapeHtml(data.error)}</div>`;
-      if (syncUrl === "push") setFileInUrl(file, false);
-      else if (syncUrl === "replace") setFileInUrl(file, true);
+      renderContentError(contentBody2, data.error);
+      syncFileToUrl(file, syncUrl);
       return;
     }
     if (!data.html || data.title === void 0) {
-      contentEl.innerHTML = '<div class="text-red-500">Error: invalid response</div>';
+      renderContentInvalidResponse(contentBody2);
       return;
     }
-    if (syncUrl === "push") setFileInUrl(file, false);
-    else if (syncUrl === "replace") setFileInUrl(file, true);
-    const title = document.createElement("h1");
-    title.className = "text-3xl font-bold mb-6 border-b pb-4 text-gray-900";
-    title.textContent = data.title;
+    syncFileToUrl(file, syncUrl);
+    setDocPathDisplay(docPathEl2, data.title);
     const prose = document.createElement("div");
     prose.className = "prose prose-slate max-w-none";
     prose.innerHTML = data.html;
-    contentEl.innerHTML = "";
-    contentEl.appendChild(title);
-    contentEl.appendChild(prose);
+    contentBody2.replaceChildren(prose);
     enhanceProseCodeCopy(prose);
     applySyntaxHighlight(prose);
     Iconify.scan(prose);
   } catch {
-    contentEl.innerHTML = '<div class="text-red-500">Error loading content</div>';
+    renderContentFetchFailed(contentBody2);
+  } finally {
+    contentBody2.removeAttribute("aria-busy");
   }
 }
-function escapeHtml(s) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-async function selectFile(path) {
-  tree.expandParentsForPath(path);
-  await loadContent(path, {
+async function selectFile(dom2, path) {
+  dom2.tree.expandParentsForPath(path);
+  await loadContent(dom2, path, {
     syncUrl: "push"
   });
 }
-async function loadFiles() {
+async function loadInitialFileList(dom2) {
+  const { tree: tree2 } = dom2;
   try {
     const res = await fetch("/api/files");
     const data = await res.json();
     if (!isStringArray(data)) {
-      tree.showListError();
+      tree2.showListError();
       return;
     }
     const files = data;
-    tree.loadPaths(files, {
+    tree2.loadPaths(files, {
       emptyHint: files.length === 0 ? "No markdown files found." : void 0
     });
     const fromUrl = getFileFromUrl();
     if (fromUrl) {
-      tree.expandParentsForPath(fromUrl);
-      tree.setSelectedPath(fromUrl);
-      tree.render();
-      await loadContent(fromUrl, {
+      tree2.expandParentsForPath(fromUrl);
+      tree2.setSelectedPath(fromUrl);
+      tree2.render();
+      await loadContent(dom2, fromUrl, {
         syncUrl: "replace"
       });
     } else {
-      tree.setSelectedPath(null);
-      tree.render();
-      document.title = "Markdown Viewer";
+      tree2.setSelectedPath(null);
+      tree2.render();
+      document.title = DEFAULT_TITLE;
     }
   } catch {
-    tree.showListError();
+    tree2.showListError();
   }
 }
-window.addEventListener("popstate", () => {
-  const f = getFileFromUrl();
-  if (f) {
-    tree.expandParentsForPath(f);
-    tree.setSelectedPath(f);
-    tree.render();
-    void loadContent(f, {
-      syncUrl: "none"
-    });
-  } else {
-    tree.setSelectedPath(null);
-    tree.render();
-    contentEl.innerHTML = '<div class="text-gray-400 italic">Select a file from the sidebar to view its content.</div>';
-    document.title = "Markdown Viewer";
-  }
+function registerPopstateHandler(dom2) {
+  const { tree: tree2, contentBody: contentBody2, docPathEl: docPathEl2 } = dom2;
+  window.addEventListener("popstate", () => {
+    const f = getFileFromUrl();
+    if (f) {
+      tree2.expandParentsForPath(f);
+      tree2.setSelectedPath(f);
+      tree2.render();
+      void loadContent(dom2, f, {
+        syncUrl: "none"
+      });
+    } else {
+      tree2.setSelectedPath(null);
+      tree2.render();
+      clearDocPath(docPathEl2);
+      renderContentPlaceholder(contentBody2);
+      document.title = DEFAULT_TITLE;
+    }
+  });
+}
+
+// deno-md-server/static/app.ts
+var fileListEl = getEl("file-list");
+var contentBody = getEl("content-body");
+var docPathEl = getEl("doc-path");
+var fileSearchInput = getEl("file-search");
+var sidebarFab = getEl("sidebar-fab");
+var tree = new FileTreeView(fileListEl, (path) => {
+  void selectFile({
+    tree,
+    contentBody,
+    docPathEl
+  }, path);
 });
-void loadFiles();
+var dom = {
+  tree,
+  contentBody,
+  docPathEl
+};
+attachSidebarSearch(fileSearchInput, tree);
+initSidebarFab(sidebarFab);
+renderContentPlaceholder(contentBody);
+registerPopstateHandler(dom);
+void loadInitialFileList(dom);

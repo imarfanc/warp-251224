@@ -1,3 +1,39 @@
+/* Path strip above article card (monospace, distinct from prose) */
+.content-shell {
+    width: 100%;
+}
+
+.doc-path {
+    margin: 0;
+    padding: 0.55rem 0.9rem;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    letter-spacing: 0.02em;
+    background: linear-gradient(180deg, #f1f5f9 0%, #e8eef4 100%);
+    border: 1px solid #cbd5e1;
+    border-radius: 0.5rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    word-break: break-all;
+}
+
+.doc-path__crumb {
+    font-weight: 500;
+    color: #64748b;
+}
+
+.doc-path__leaf {
+    font-weight: 600;
+    color: #1d4ed8;
+}
+
+.doc-path__sep {
+    font-weight: 500;
+    color: #94a3b8;
+    user-select: none;
+}
+
 /* Markdown body (inside .prose) */
 .prose {
     color: #334155;
