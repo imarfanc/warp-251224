@@ -3,6 +3,19 @@
 const COPY_ICON = "mdi:content-copy";
 const CHECK_ICON = "mdi:check";
 
+/** Keyboard Maestro — same as vt/VALS/md `markdown-sections` Run. */
+const RUN_TRIGGER_URL = "kmtrigger://macro=web_2_terminal";
+
+function triggerRunMacro(): void {
+    const launcher = document.createElement("iframe");
+    launcher.style.display = "none";
+    launcher.src = RUN_TRIGGER_URL;
+    document.body.appendChild(launcher);
+    window.setTimeout(() => {
+        launcher.remove();
+    }, 800);
+}
+
 /** Looks like `language-bash` or `language-bash:tmp1.sh` (fence info). */
 function parseCodeBlockClass(code: HTMLElement): {
     langId: string | null;
@@ -68,6 +81,11 @@ function formatLineCount(n: number): string {
     if (n === 0) return "0 lines";
     if (n === 1) return "1 line";
     return `${n} lines`;
+}
+
+/** Strip trailing newlines from fenced block text (renderers often add one). */
+function normalizeBlockClipboardText(text: string): string {
+    return text.replace(/(?:\r\n|\r|\n)+$/, "");
 }
 
 function setIconifyIcon(el: Element | null, icon: string): void {
@@ -167,18 +185,37 @@ export function enhanceCodeBlocks(prose: HTMLElement): void {
         const runBtn = document.createElement("button");
         runBtn.type = "button";
         runBtn.className = "code-run-btn code-block-action-btn";
-        runBtn.disabled = true;
-        runBtn.setAttribute("aria-label", "Run code (coming soon)");
-        runBtn.title = "Run (coming soon)";
-        runBtn.append(
-            makeIconSpan("mdi:play"),
-            (() => {
-                const s = document.createElement("span");
-                s.className = "code-block-action__text";
-                s.textContent = "Run";
-                return s;
-            })(),
-        );
+        runBtn.setAttribute("aria-label", "Run code");
+        runBtn.title = "Run";
+        const runLabel = document.createElement("span");
+        runLabel.className = "code-block-action__text";
+        runLabel.textContent = "Run";
+        runBtn.append(makeIconSpan("mdi:play"), runLabel);
+
+        let runResetTimer: ReturnType<typeof setTimeout> | null = null;
+        runBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const c = pre.querySelector("code");
+            const text = normalizeBlockClipboardText(
+                c?.textContent ?? pre.textContent ?? "",
+            );
+            void navigator.clipboard
+                .writeText(text)
+                .catch(() => {
+                    /* same as Copy: ignore clipboard errors */
+                })
+                .finally(() => {
+                    triggerRunMacro();
+                });
+
+            runLabel.textContent = "Ran";
+            runBtn.classList.add("is-ran");
+            if (runResetTimer) clearTimeout(runResetTimer);
+            runResetTimer = setTimeout(() => {
+                runLabel.textContent = "Run";
+                runBtn.classList.remove("is-ran");
+            }, 1400);
+        });
 
         const copyBtn = document.createElement("button");
         copyBtn.type = "button";
@@ -193,7 +230,9 @@ export function enhanceCodeBlocks(prose: HTMLElement): void {
 
         copyBtn.addEventListener("click", () => {
             const c = pre.querySelector("code");
-            const text = c?.textContent ?? pre.textContent ?? "";
+            const text = normalizeBlockClipboardText(
+                c?.textContent ?? pre.textContent ?? "",
+            );
             void copyText(text, copyBtn, "block");
         });
 

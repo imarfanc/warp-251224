@@ -115,12 +115,38 @@
     background: #fff;
     border: 1px solid #cbd5e1;
     box-shadow: 0 1px 1px rgba(15, 23, 42, 0.05);
+    cursor: pointer;
 }
 
-.code-run-btn:disabled {
-    opacity: 0.72;
-    cursor: not-allowed;
-    box-shadow: none;
+.code-run-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.07);
+}
+
+.code-run-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 1px rgba(15, 23, 42, 0.05);
+}
+
+.code-run-btn:focus {
+    outline: none;
+}
+
+.code-run-btn:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 1px;
+}
+
+.code-run-btn.is-ran {
+    border-color: #7cb8ad;
+    color: #0d6158;
+    background: #dff3ef;
+}
+
+.code-run-btn.is-ran .iconify {
+    display: none;
 }
 
 .code-copy-btn {
