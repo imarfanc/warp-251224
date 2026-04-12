@@ -131,6 +131,7 @@ body {
 }
 
 .prose h2 {
+    color: #2563eb;
     font-size: 1.375rem;
     margin-top: 1.5em;
     padding-bottom: 0.25em;

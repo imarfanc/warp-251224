@@ -1,6 +1,6 @@
 ---
 title: "1"
-sort: 2
+sort: 1
 category: "macOS reset"
 description: "the first file in the macOS reset project"
 date: 2026-04-11
