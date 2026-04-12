@@ -8,6 +8,22 @@ const MDS_DIR = join(SERVER_DIR, "../mds");
 const STATIC_DIR = join(SERVER_DIR, "static");
 const marked = new Marked();
 
+async function resolvedWorkspaceRoot(): Promise<string> {
+  const candidate = join(SERVER_DIR, "..", "..");
+  try {
+    return await Deno.realPath(candidate);
+  } catch {
+    return candidate;
+  }
+}
+
+function isPathInside(root: string, candidate: string): boolean {
+  const normalizedRoot = root.replace(/\\/g, "/").replace(/\/$/, "");
+  const normalizedCandidate = candidate.replace(/\\/g, "/");
+  return normalizedCandidate === normalizedRoot ||
+    normalizedCandidate.startsWith(`${normalizedRoot}/`);
+}
+
 /** Leading `---` YAML block; on parse failure the full source is returned unchanged. */
 function splitFrontmatter(raw: string): {
   body: string;
@@ -159,6 +175,61 @@ const handler = async (req: Request): Promise<Response> => {
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       return new Response(JSON.stringify({ error: message }), { status: 404 });
+    }
+  }
+
+  if (path === "/api/open-in-cursor" && req.method === "POST") {
+    try {
+      const { absolutePath } = await req.json() as { absolutePath?: unknown };
+      if (typeof absolutePath !== "string" || absolutePath.length === 0) {
+        return new Response(JSON.stringify({ error: "Missing absolutePath" }), {
+          status: 400,
+          headers: { "content-type": "application/json" },
+        });
+      }
+
+      const workspaceRoot = await resolvedWorkspaceRoot();
+      let realAbsolutePath = absolutePath;
+      try {
+        realAbsolutePath = await Deno.realPath(absolutePath);
+      } catch {
+        // keep provided path if it still exists logically
+      }
+
+      if (!isPathInside(workspaceRoot, realAbsolutePath)) {
+        return new Response(JSON.stringify({ error: "Path is outside workspace" }), {
+          status: 403,
+          headers: { "content-type": "application/json" },
+        });
+      }
+
+      const command = new Deno.Command("cursor", {
+        args: ["--new-window", workspaceRoot, realAbsolutePath],
+      });
+      const { success, stderr } = await command.output();
+      if (!success) {
+        const message = new TextDecoder().decode(stderr).trim() || "Cursor CLI failed";
+        return new Response(JSON.stringify({ error: message }), {
+          status: 500,
+          headers: { "content-type": "application/json" },
+        });
+      }
+
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { "content-type": "application/json" },
+      });
+    } catch (e) {
+      if (e instanceof Deno.errors.NotFound) {
+        return new Response(JSON.stringify({ error: "Cursor CLI not found" }), {
+          status: 500,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      const message = e instanceof Error ? e.message : String(e);
+      return new Response(JSON.stringify({ error: message }), {
+        status: 500,
+        headers: { "content-type": "application/json" },
+      });
     }
   }
 

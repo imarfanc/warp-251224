@@ -916,9 +916,14 @@ function renderContentFetchFailed(container) {
 }
 
 // deno-md-server/static/doc-path.ts
-function hrefOpenInCursor(absolutePath) {
+var CURSOR_NEW_WINDOW_QUERY = "?windowId=_blank";
+function hrefOpenInCursor(absolutePath, options) {
   const normalized = absolutePath.replace(/\\/g, "/");
-  return `cursor://file${encodeURI(normalized)}`;
+  let url = `cursor://file${encodeURI(normalized)}`;
+  if (options?.newWindow) {
+    url += CURSOR_NEW_WINDOW_QUERY;
+  }
+  return url;
 }
 function hrefOpenInMarked(absolutePath) {
   const normalized = absolutePath.replace(/\\/g, "/");
@@ -927,10 +932,36 @@ function hrefOpenInMarked(absolutePath) {
 function appendOpenInCursorButton(docPathEl2, absolutePath) {
   const a = document.createElement("a");
   a.className = "doc-path__cursor-btn";
-  a.href = hrefOpenInCursor(absolutePath);
-  a.setAttribute("aria-label", "Open file in Cursor");
-  a.title = "Open in Cursor";
+  a.href = hrefOpenInCursor(absolutePath, {
+    newWindow: true
+  });
+  a.setAttribute("aria-label", "Open project and file in Cursor");
+  a.title = "Open project and file in Cursor";
   a.rel = "noopener noreferrer";
+  a.addEventListener("click", async (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+      return;
+    }
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/open-in-cursor", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          absolutePath
+        })
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        const message = data?.error ?? "Failed to open project in Cursor";
+        window.alert(message);
+      }
+    } catch {
+      window.alert("Failed to open project in Cursor");
+    }
+  });
   const icon = document.createElement("span");
   icon.className = "iconify";
   icon.setAttribute("data-icon", "simple-icons:cursor");

@@ -1,10 +1,23 @@
 /// <reference path="./iconify-global.d.ts" />
 import { CONFIG } from "./config.ts";
 
+/**
+ * VS Code–compatible hint: open in a **new** window instead of reusing the active Cursor window.
+ * @see https://github.com/microsoft/vscode/pull/80260
+ */
+const CURSOR_NEW_WINDOW_QUERY = "?windowId=_blank";
+
 /** Deep link handled by Cursor (same family as `cursor://file/...` in devtools / stack traces). */
-export function hrefOpenInCursor(absolutePath: string): string {
+export function hrefOpenInCursor(
+    absolutePath: string,
+    options?: { newWindow?: boolean },
+): string {
     const normalized = absolutePath.replace(/\\/g, "/");
-    return `cursor://file${encodeURI(normalized)}`;
+    let url = `cursor://file${encodeURI(normalized)}`;
+    if (options?.newWindow) {
+        url += CURSOR_NEW_WINDOW_QUERY;
+    }
+    return url;
 }
 
 /** Deep link for Marked 2 (`x-marked://open?file=…`). */
@@ -19,10 +32,35 @@ function appendOpenInCursorButton(
 ): void {
     const a = document.createElement("a");
     a.className = "doc-path__cursor-btn";
-    a.href = hrefOpenInCursor(absolutePath);
-    a.setAttribute("aria-label", "Open file in Cursor");
-    a.title = "Open in Cursor";
+    a.href = hrefOpenInCursor(absolutePath, { newWindow: true });
+    a.setAttribute("aria-label", "Open project and file in Cursor");
+    a.title = "Open project and file in Cursor";
     a.rel = "noopener noreferrer";
+    a.addEventListener("click", async (e) => {
+        if (
+            e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey ||
+            e.shiftKey || e.altKey
+        ) {
+            return;
+        }
+        e.preventDefault();
+        try {
+            const res = await fetch("/api/open-in-cursor", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ absolutePath }),
+            });
+            if (!res.ok) {
+                const data = await res.json().catch(() => null) as
+                    | { error?: string }
+                    | null;
+                const message = data?.error ?? "Failed to open project in Cursor";
+                window.alert(message);
+            }
+        } catch {
+            window.alert("Failed to open project in Cursor");
+        }
+    });
 
     const icon = document.createElement("span");
     icon.className = "iconify";
