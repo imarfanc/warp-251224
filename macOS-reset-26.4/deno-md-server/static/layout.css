@@ -28,8 +28,8 @@ body.sidebar-hidden #sidebar {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3rem;
-    height: 3rem;
+    width: 2.5rem;
+    height: 2.5rem;
     padding: 0;
     border: none;
     border-radius: 9999px;
@@ -38,6 +38,49 @@ body.sidebar-hidden #sidebar {
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
     cursor: pointer;
     transition: background 0.15s ease, transform 0.15s ease;
+}
+
+/* FAB: jump to next h2 */
+.fab-next-h2 {
+    position: fixed;
+    bottom: 1.25rem;
+    left: 4.25rem;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: none;
+    border-radius: 9999px;
+    background: #10b981;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.fab-next-h2:hover {
+    background: #059669;
+}
+
+.fab-next-h2:active {
+    transform: scale(0.96);
+}
+
+.fab-next-h2:focus {
+    outline: none;
+}
+
+.fab-next-h2:focus-visible {
+    outline: 2px solid #6ee7b7;
+    outline-offset: 2px;
+}
+
+.fab-next-h2 .iconify {
+    width: 1.25rem;
+    height: 1.25rem;
 }
 
 .fab-sidebar:hover {
@@ -57,7 +100,8 @@ body.sidebar-hidden #sidebar {
     outline-offset: 2px;
 }
 
-.fab-sidebar .iconify {
-    width: 1.35rem;
-    height: 1.35rem;
+.fab-sidebar .iconify,
+.fab-next-h2 .iconify {
+    width: 1.25rem;
+    height: 1.25rem;
 }

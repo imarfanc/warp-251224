@@ -11,12 +11,6 @@ tags:
   - second file
 ---
 
-## install deno
-
-```sh
-curl -fsSL https://deno.land/install.sh | sh
-```
-
 ## reset home directory
 
 This script is designed to **completely wipe personal data and system junk**
@@ -31,7 +25,7 @@ from your Mac's home directory:
 4. **Creates a Workspace**: Finally, it creates a new, clean directory at
    `~/Developer/macos-reset`.
 
-```sh
+```bash:reset-home-directory.sh
 #sudo find ~/Movies ~/Music ~/Public ~/Downloads ~/Desktop ~/Documents ~/Pictures \
 
 bash <<'EOF'
@@ -65,6 +59,14 @@ EOF
 mkdir -p Developer/macos-reset
 ```
 
+## install deno
+
+- [https://deno.com/](https://deno.com/)
+
+```sh
+curl -fsSL https://deno.land/install.sh | sh
+```
+
 ## scan and map files
 
 This Deno script performs a **deep analysis of your filesystem** and provides a
@@ -82,7 +84,7 @@ comprehensive report of its structure and usage:
    colors) to a timestamped file in `~/Developer/macos-reset` for future
    reference.
 
-```sh
+```ts:scan-and-map-files.ts
 deno run --allow-read --allow-write --allow-env --allow-run - <<'TS'
 import * as path from "jsr:@std/path";
 
@@ -693,7 +695,7 @@ afplay /System/Library/Sounds/Ping.aiff
 
 ## opencode
 
-```bash
+```sh:opencode.sh
 printf '%s\n' '# zsh config' >> ~/.zshrc
 mkdir -p Developer/gh
 mkdir -p Developer/tmp1

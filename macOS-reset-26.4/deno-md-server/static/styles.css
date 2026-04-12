@@ -1,3 +1,7 @@
+#content-body {
+    padding-bottom: 80vh;
+}
+
 /* App-wide type: iA Writer Quattro when installed, else system monospace */
 body {
     font-family: "iA Writer Quattro", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco,

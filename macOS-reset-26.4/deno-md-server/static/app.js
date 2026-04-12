@@ -492,6 +492,35 @@ function initSidebarFab(sidebarFab2) {
   });
 }
 
+// deno-md-server/static/next-h2-fab.ts
+function initNextH2Fab(fab) {
+  fab.addEventListener("click", () => {
+    const contentBody2 = getEl("content-body");
+    const headings = Array.from(contentBody2.querySelectorAll("h2"));
+    if (headings.length === 0) return;
+    const viewportTop = window.scrollY || document.documentElement.scrollTop;
+    const nextHeading = headings.find((h) => {
+      const rect = h.getBoundingClientRect();
+      const absoluteTop = rect.top + window.scrollY;
+      return absoluteTop > viewportTop + 10;
+    });
+    if (nextHeading) {
+      nextHeading.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    } else {
+      headings[0].scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  });
+  if (typeof Iconify !== "undefined") {
+    Iconify.scan(fab);
+  }
+}
+
 // deno-md-server/static/code-copy.ts
 var COPY_ICON = "mdi:content-copy";
 var CHECK_ICON = "mdi:check";
@@ -1266,6 +1295,7 @@ var contentBody = getEl("content-body");
 var docPathEl = getEl("doc-path");
 var fileSearchInput = getEl("file-search");
 var sidebarFab = getEl("sidebar-fab");
+var nextH2Fab = getEl("next-h2-fab");
 var tree = new FileTreeView(fileListEl, (path) => {
   void selectFile({
     tree,
@@ -1280,6 +1310,7 @@ var dom = {
 };
 attachSidebarSearch(fileSearchInput, tree);
 initSidebarFab(sidebarFab);
+initNextH2Fab(nextH2Fab);
 updateFavicon();
 renderContentPlaceholder(contentBody);
 registerPopstateHandler(dom);
