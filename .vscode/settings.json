@@ -171,8 +171,8 @@
     "**/Thumbs.db": true,
     ".yoyo": true
   },
-  // "workbench.colorTheme": "Default High Contrast"
-  "workbench.colorTheme": "Red",
+  "workbench.colorTheme": "Default High Contrast",
+  // "workbench.colorTheme": "Red",
   // "workbench.colorTheme": "Kimbie Dark",
   "prettier.bracketSameLine": true,
   "git.autofetch": true,
