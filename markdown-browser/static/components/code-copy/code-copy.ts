@@ -1,6 +1,6 @@
-/// <reference path="./iconify-global.d.ts" />
+/// <reference path="../../iconify-global.d.ts" />
 
-import { CONFIG } from "./config.ts";
+import { CONFIG } from "../../config.ts";
 
 const COPY_ICON = "mdi:content-copy";
 const CHECK_ICON = "mdi:check";

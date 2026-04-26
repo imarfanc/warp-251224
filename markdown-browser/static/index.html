@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Viewer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    >
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/components/file-tree/file-tree.css">
+    <link rel="stylesheet" href="/components/code-copy/code-copy.css">
+    <link rel="stylesheet" href="/layout.css">
+    <link rel="stylesheet" href="/components/sidebar-fab/sidebar-fab.css">
+    <link rel="stylesheet" href="/components/next-h2-fab/next-h2-fab.css">
+    <link rel="stylesheet" href="/components/settings/settings-fab.css">
+    <!-- highlight.js — theme + core (cdnjs) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    >
+    <!-- Iconify 3.1.1 (@iconify/iconify). Types: https://cdnjs.cloudflare.com/ajax/libs/iconify/3.1.1/iconify.d.ts -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/iconify/3.1.1/iconify.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+  </head>
+  <body class="app-body">
+    <div class="app-layout">
+      <!-- Sidebar -->
+      <div
+        id="sidebar"
+        class="app-sidebar w-64"
+      >
+        <h1
+          id="sidebar-files-heading"
+          class="sidebar-heading"
+        >
+          Files
+        </h1>
+        <section
+          id="root-picker"
+          class="root-picker"
+          aria-label="Markdown root"
+        >
+          <div
+            id="root-current-path"
+            class="root-picker__path"
+            aria-live="polite"
+          >
+            <span id="root-current-path-name" class="root-picker__recent-name"
+              >No folder selected</span
+            >
+            <span
+              id="root-current-path-full"
+              class="root-picker__recent-path"
+              hidden
+            ></span>
+          </div>
+          <ul
+            id="root-recent-folders"
+            class="root-picker__recent"
+            aria-label="Recent folders"
+            hidden
+          ></ul>
+          <div class="root-picker__head">
+            <span class="root-picker__label">Current root</span>
+            <button
+              type="button"
+              id="root-change-btn"
+              class="root-picker__change-btn"
+            >
+              Change...
+            </button>
+          </div>
+          <div class="root-picker__actions">
+            <button
+              type="button"
+              id="root-manual-toggle"
+              class="root-picker__manual-toggle"
+              aria-expanded="false"
+            >
+              Enter path manually
+            </button>
+          </div>
+          <div id="root-manual-panel" class="root-picker__manual-panel" hidden>
+            <label for="root-manual-input" class="sr-only">Folder path</label>
+            <input
+              type="text"
+              id="root-manual-input"
+              placeholder="/Users/you/Documents/notes"
+              autocomplete="off"
+              class="root-picker__manual-input"
+            />
+            <div class="root-picker__manual-buttons">
+              <button
+                type="button"
+                id="root-manual-submit"
+                class="root-picker__manual-submit"
+              >
+                Use path
+              </button>
+              <button
+                type="button"
+                id="root-manual-cancel"
+                class="root-picker__manual-cancel"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+          <p id="root-picker-error" class="root-picker__error" hidden></p>
+        </section>
+        <label for="file-search" class="sr-only"
+        >Filter files by name or content</label>
+        <input
+          type="search"
+          id="file-search"
+          placeholder="Search name or content…"
+          autocomplete="off"
+          class="file-search"
+        />
+        <section
+          id="pinned-files"
+          class="sidebar-pinned"
+          hidden
+          aria-label="Pinned files"
+        >
+        </section>
+        <div id="file-list" class="file-list">
+          <div class="file-list-skeleton">
+            <div class="file-list-skeleton__bar file-list-skeleton__bar--wide"></div>
+            <div class="file-list-skeleton__bar file-list-skeleton__bar--short"></div>
+            <div class="file-list-skeleton__bar file-list-skeleton__bar--full"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <main class="app-main">
+        <div
+          id="content"
+          class="content-shell"
+        >
+          <p id="doc-path" class="doc-path hidden" aria-live="polite"></p>
+          <!-- Cloned into #content-body on load; keep markup in sync with renderContentPlaceholder() -->
+          <template id="content-placeholder-tpl">
+            <div class="placeholder-msg">
+              Select a file from the sidebar to view its content.
+            </div>
+          </template>
+          <template id="content-choose-root-tpl">
+            <div class="placeholder-msg">
+              Choose a folder to begin.
+            </div>
+          </template>
+          <div
+            id="content-body"
+            class="content-body"
+          >
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <button
+      type="button"
+      id="sidebar-fab"
+      class="fab-sidebar"
+      aria-label="Hide sidebar"
+      title="Hide sidebar"
+    >
+      <span
+        class="iconify"
+        data-icon="mdi:chevron-left"
+        aria-hidden="true"
+      ></span>
+    </button>
+
+    <button
+      type="button"
+      id="next-h2-fab"
+      class="fab-next-h2"
+      aria-label="Jump to next H2"
+      title="Jump to next H2"
+    >
+      <span
+        class="iconify"
+        data-icon="mdi:chevron-double-down"
+        aria-hidden="true"
+      ></span>
+    </button>
+
+    <section
+      id="settings-panel"
+      class="settings-panel"
+      aria-label="Settings"
+      hidden
+    >
+      <h2 class="settings-panel__title">Theme</h2>
+      <div class="settings-panel__themes" data-settings-theme-list></div>
+    </section>
+
+    <button
+      type="button"
+      id="settings-fab"
+      class="settings-fab"
+      aria-label="Open settings"
+      aria-controls="settings-panel"
+      aria-expanded="false"
+      title="Open settings"
+    >
+      <span
+        class="iconify"
+        data-icon="mdi:cog"
+        aria-hidden="true"
+      ></span>
+    </button>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

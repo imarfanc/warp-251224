@@ -1,6 +1,6 @@
-/// <reference path="./iconify-global.d.ts" />
+/// <reference path="../../iconify-global.d.ts" />
 
-import { CONFIG } from "./config.ts";
+import { CONFIG } from "../../config.ts";
 
 function getSidebar(): HTMLElement {
     const el = document.getElementById("sidebar");

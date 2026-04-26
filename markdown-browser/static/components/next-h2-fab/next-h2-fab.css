@@ -1,0 +1,44 @@
+/* FAB: jump to next h2 */
+.fab-next-h2 {
+    position: fixed;
+    bottom: 1.25rem;
+    left: 4.25rem;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: none;
+    border-radius: 9999px;
+    background: var(--theme-secondary-action);
+    color: var(--theme-on-accent);
+    box-shadow: 0 4px 14px var(--theme-secondary-action-shadow);
+    cursor: pointer;
+    transition:
+        background 0.15s ease,
+        transform 0.15s ease;
+}
+
+.fab-next-h2:hover {
+    background: var(--theme-secondary-action-hover);
+}
+
+.fab-next-h2:active {
+    transform: scale(0.96);
+}
+
+.fab-next-h2:focus {
+    outline: none;
+}
+
+.fab-next-h2:focus-visible {
+    outline: 2px solid var(--theme-secondary-focus);
+    outline-offset: 2px;
+}
+
+.fab-next-h2 .iconify {
+    width: 1.25rem;
+    height: 1.25rem;
+}

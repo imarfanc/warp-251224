@@ -1,85 +1,103 @@
 {
-    "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v11/terminal-keeper.json",
-    "theme": "tribe",
-    "active": "warp",
-    "activateOnStartup": true,
-    "keepExistingTerminals": false,
-    "sessions": {
-        "warp": [
-            {
-                "name": "warp",
-                "autoExecuteCommands": true,
-                "icon": "smiley",
-                "color": "terminal.ansiGreen",
-                "commands": [
-                    "echo hello warp!"
-                ]
-            },
-            {
-                "name": "warp/macOS-reset-26.4",
-                "autoExecuteCommands": true,
-                "icon": "folder-opened",
-                "color": "terminal.ansiCyan",
-                "commands": [
-                    "echo hello warp/macOS-reset-26.4!",
-                    "cd macOS-reset-26.4"
-                ]
-            },
-            {
-                "name": "claude haiku",
-                "autoExecuteCommands": false,
-                "icon": "hubot",
-                "color": "terminal.ansiMagenta",
-                "commands": [
-                    "claude code --model haiku"
-                ]
-            },
-            {
-                "name": "claude opus",
-                "autoExecuteCommands": false,
-                "icon": "star-full",
-                "color": "terminal.ansiYellow",
-                "commands": [
-                    "claude code --model opus"
-                ]
-            },
-            {
-                "name": "codex",
-                "autoExecuteCommands": false,
-                "icon": "code",
-                "color": "terminal.ansiBlue",
-                "commands": [
-                    "codex"
-                ]
-            },
-            {
-                "name": "opencode glm-5-turbo",
-                "autoExecuteCommands": false,
-                "icon": "rocket",
-                "color": "terminal.ansiBlue",
-                "commands": [
-                    "opencode --model zai-coding-plan/glm-5-turbo"
-                ]
-            },
-            {
-                "name": "opencode glm-5.1",
-                "autoExecuteCommands": false,
-                "icon": "versions",
-                "color": "terminal.ansiRed",
-                "commands": [
-                    "opencode --model zai-coding-plan/glm-5.1"
-                ]
-            },
-            {
-                "name": "npx serve",
-                "autoExecuteCommands": false,
-                "icon": "notebook",
-                "color": "terminal.ansiGreen",
-                "commands": [
-                    "echo hello npx serve!",
-                    "npx serve"
-                ]
-            }
+  "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v11/terminal-keeper.json",
+  "theme": "tribe",
+  "active": "warp",
+  "activateOnStartup": true,
+  "keepExistingTerminals": false,
+  "sessions": {
+    "warp": [
+      {
+        "name": "warp",
+        "autoExecuteCommands": true,
+        "icon": "smiley",
+        "color": "terminal.ansiGreen",
+        "commands": [
+          "echo hello warp!"
         ]
-    }
+      },
+      {
+        "name": "warp/macOS-reset-26.4",
+        "autoExecuteCommands": true,
+        "icon": "folder-opened",
+        "color": "terminal.ansiCyan",
+        "commands": [
+          "echo hello warp/macOS-reset-26.4!",
+          "cd macOS-reset-26.4"
+        ]
+      },
+      {
+        "name": "claude haiku",
+        "autoExecuteCommands": false,
+        "icon": "hubot",
+        "color": "terminal.ansiMagenta",
+        "commands": [
+          "claude code --model haiku"
+        ]
+      },
+      {
+        "name": "claude sonnet (low)",
+        "autoExecuteCommands": false,
+        "icon": "star-half",
+        "color": "terminal.ansiRed",
+        "commands": [
+          "claude code --effort low --model opusplan"
+        ]
+      },
+      {
+        "name": "claude sonnet (high)",
+        "autoExecuteCommands": false,
+        "icon": "star-half",
+        "color": "terminal.ansiRed",
+        "commands": [
+          "claude code --effort high --model opusplan"
+        ]
+      },
+      {
+        "name": "claude opus",
+        "autoExecuteCommands": false,
+        "icon": "star-full",
+        "color": "terminal.ansiYellow",
+        "commands": [
+          "claude code --model opus"
+        ]
+      },
+      {
+        "name": "codex",
+        "autoExecuteCommands": false,
+        "icon": "code",
+        "color": "terminal.ansiBlue",
+        "commands": [
+          "codex"
+        ]
+      },
+      {
+        "name": "opencode glm-5-turbo",
+        "autoExecuteCommands": false,
+        "icon": "rocket",
+        "color": "terminal.ansiBlue",
+        "commands": [
+          "opencode --model zai-coding-plan/glm-5-turbo"
+        ]
+      },
+      {
+        "name": "opencode glm-5.1",
+        "autoExecuteCommands": false,
+        "icon": "versions",
+        "color": "terminal.ansiRed",
+        "commands": [
+          "opencode --model zai-coding-plan/glm-5.1"
+        ]
+      },
+      {
+        "name": "npx serve",
+        "autoExecuteCommands": false,
+        "icon": "notebook",
+        "color": "terminal.ansiGreen",
+        "commands": [
+          "echo hello npx serve!",
+          "npx serve"
+        ]
+      }
+    ]
+  }
 }

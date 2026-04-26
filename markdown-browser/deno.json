@@ -3,8 +3,8 @@
     "lib": ["deno.ns", "dom", "dom.iterable", "esnext"]
   },
   "tasks": {
-    "bundle": "deno bundle deno-md-server/static/app.ts -o deno-md-server/static/app.js",
-    "serve": "deno run --allow-read --allow-net --allow-run=cursor --allow-env=LOG_TOKENS,LOG_STREAM deno-md-server/main.ts",
+    "bundle": "deno bundle static/app.ts -o static/app.js",
+    "serve": "deno run --allow-read --allow-write=. --allow-net --allow-run=cursor,osascript --allow-env=LOG_TOKENS,LOG_STREAM main.ts",
     "open": "\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --app=\"http://localhost:8000/\"",
     "start": "deno task bundle && deno task serve"
   }

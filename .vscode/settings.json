@@ -19,7 +19,8 @@
   "material-icon-theme.folders.associations": {
     "html_Apps": "App",
     "chat": "",
-    "websim": "App"
+    "websim": "App",
+    "MARKDOWN-FILES": "Ui"
   },
 
   // ╭──────────────────────── Editor Configuration ────────────────────╮

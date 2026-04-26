@@ -251,3 +251,57 @@
     width: 0.95em;
     height: 0.95em;
 }
+
+/* Theme mappings */
+.code-block-wrap {
+    background: var(--theme-surface-soft);
+    border-color: var(--theme-border);
+    border-radius: var(--theme-radius-md);
+}
+
+.code-block-toolbar {
+    background: var(--theme-toolbar-bg);
+    border-color: var(--theme-border-strong);
+}
+
+.code-block-meta,
+.code-block-filename,
+.code-copy-btn--inline {
+    color: var(--theme-muted);
+}
+
+.code-block-lang {
+    color: var(--theme-text);
+}
+
+.code-block-meta-sep,
+.code-block-lines {
+    color: var(--theme-subtle);
+}
+
+.code-run-btn,
+.code-copy-btn {
+    background: var(--theme-control-bg);
+    border-color: var(--theme-border-strong);
+    color: var(--theme-text);
+    border-radius: var(--theme-radius-sm);
+}
+
+.code-run-btn:hover,
+.code-copy-btn:hover:not(:disabled),
+.code-copy-btn--inline:hover:not(:disabled) {
+    background: var(--theme-accent-soft);
+    border-color: var(--theme-accent);
+    color: var(--theme-accent-text);
+}
+
+.code-run-btn:focus-visible,
+.code-copy-btn:focus-visible {
+    outline-color: var(--theme-focus);
+}
+
+.code-run-btn.is-ran {
+    background: var(--theme-accent-soft);
+    border-color: var(--theme-accent);
+    color: var(--theme-accent-text);
+}

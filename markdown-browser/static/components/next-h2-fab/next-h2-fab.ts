@@ -1,4 +1,4 @@
-import { getEl } from "./dom.ts";
+import { getEl } from "../../dom.ts";
 
 /**
  * Initializes the FAB that jumps to the next H2 heading in the content.

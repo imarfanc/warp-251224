@@ -72,6 +72,26 @@ function appendOpenInCursorButton(
     Iconify.scan(a);
 }
 
+/** Reserved for “open parent folder in Finder” — UI slot only until wired again. */
+function appendParentFolderPlaceholderButton(docPathEl: HTMLElement): void {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className =
+        "doc-path__parent-folder-btn doc-path__parent-folder-btn--placeholder";
+    btn.disabled = true;
+    btn.setAttribute("aria-label", "Open parent folder — not available yet");
+    btn.title = "Open parent folder — not available yet";
+
+    const icon = document.createElement("span");
+    icon.className = "iconify";
+    icon.setAttribute("data-icon", "mdi:folder-outline");
+    icon.setAttribute("aria-hidden", "true");
+    btn.appendChild(icon);
+
+    docPathEl.appendChild(btn);
+    Iconify.scan(btn);
+}
+
 function appendOpenInMarkedButton(
     docPathEl: HTMLElement,
     absolutePath: string,
@@ -98,6 +118,7 @@ function appendDocPathAppButtons(
     absolutePath: string,
 ): void {
     appendOpenInCursorButton(docPathEl, absolutePath);
+    appendParentFolderPlaceholderButton(docPathEl);
     appendOpenInMarkedButton(docPathEl, absolutePath);
 }
 

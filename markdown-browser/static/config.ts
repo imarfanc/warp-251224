@@ -21,6 +21,29 @@ export const CONFIG = {
     pinsStorageKey: "deno-md-viewer-file-pins",
     dimmedStorageKey: "deno-md-viewer-file-dimmed",
   },
+  themes: {
+    storageKey: "deno-md-viewer-theme",
+    defaultId: "default",
+    options: [
+      {
+        id: "default",
+        name: "Default",
+        description: "Current markdown-browser baseline.",
+      },
+      {
+        id: "candy",
+        name: "Pastel Candy",
+        description: "Marshmallow pink, mint, butter.",
+      },
+      {
+        id: "forest",
+        name: "Forest Floor",
+        description: "Moss, bark, and a ribbon of copper.",
+      },
+    ] as const,
+  },
+  /** Last opened markdown roots (absolute paths), for quick switching in the sidebar. */
+  recentRootsStorageKey: "deno-md-viewer-recent-roots",
   /**
    * macOS Marked 2 — `open` command (`?file=` POSIX path).
    * @see https://marked2app.com/help/URL_Handler.html

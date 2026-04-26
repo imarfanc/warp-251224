@@ -1,5 +1,5 @@
-/// <reference path="./iconify-global.d.ts" />
-import { CONFIG } from "./config.ts";
+/// <reference path="../../iconify-global.d.ts" />
+import { CONFIG } from "../../config.ts";
 
 export interface FileNode {
     type: "file";
@@ -125,6 +125,10 @@ function writePinnedPaths(paths: string[]): void {
     }
 }
 
+function isHtmlPath(path: string): boolean {
+    return /\.html?$/i.test(path);
+}
+
 /** Pinned files sort before unpinned siblings in each folder. */
 function reorderFilesForPins(
     node: DirNode,
@@ -231,7 +235,7 @@ export class FileTreeView {
 
     showListError(): void {
         this.container.innerHTML =
-            '<div class="text-red-500">Error loading files</div>';
+            '<div class="error-msg">Error loading files</div>';
         if (this.pinnedPanel) {
             this.pinnedPanel.replaceChildren();
             this.pinnedPanel.hidden = true;
@@ -274,6 +278,7 @@ export class FileTreeView {
             btn.textContent = leaf;
             btn.title = path;
             let cls = "sidebar-pinned__item";
+            if (isHtmlPath(path)) cls += " sidebar-pinned__item--html";
             if (this.selectedPath === path) cls += " sidebar-pinned__item--active";
             if (dimmed.has(path)) cls += " sidebar-pinned__item--dimmed";
             btn.className = cls;
@@ -356,9 +361,10 @@ export class FileTreeView {
             const btn = document.createElement("button");
             btn.type = "button";
             const isSel = this.selectedPath === entry.path;
-            btn.className = isSel
-                ? "file-tree__file file-tree__file--active"
-                : "file-tree__file";
+            let fileClass = "file-tree__file";
+            if (isHtmlPath(entry.path)) fileClass += " file-tree__file--html";
+            if (isSel) fileClass += " file-tree__file--active";
+            btn.className = fileClass;
             btn.textContent = entry.name;
             btn.title = entry.path;
             btn.onclick = () => this.onSelectFile(entry.path);
@@ -389,7 +395,7 @@ export class FileTreeView {
         chev.textContent = isOpen ? "▼" : "▶";
 
         const label = document.createElement("span");
-        label.className = "file-tree__folder-label truncate";
+        label.className = "file-tree__folder-label";
         label.textContent = entry.name;
 
         row.appendChild(chev);

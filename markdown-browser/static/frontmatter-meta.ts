@@ -43,26 +43,23 @@ export function buildFrontmatterMetaEl(
     }
 
     const root = document.createElement("div");
-    root.className =
-        "doc-meta not-prose space-y-3.5 mb-8 p-6 bg-orange-50/50 rounded-xl border border-orange-100/80";
+    root.className = "doc-meta";
 
     if (title) {
         const h = document.createElement("h1");
-        h.className =
-            "doc-meta__title text-2xl font-semibold text-slate-900 tracking-tight leading-snug";
+        h.className = "doc-meta__title";
         h.textContent = title;
         root.appendChild(h);
     }
 
     if (category) {
         const row = document.createElement("div");
-        row.className = "flex flex-wrap items-baseline gap-x-2 gap-y-1";
+        row.className = "doc-meta__row doc-meta__row--baseline";
         const lab = document.createElement("span");
-        lab.className =
-            "text-[0.65rem] font-semibold uppercase tracking-wider text-slate-500 shrink-0";
+        lab.className = "doc-meta__label";
         lab.textContent = "Category";
         const val = document.createElement("span");
-        val.className = "text-sm text-slate-700";
+        val.className = "doc-meta__value";
         val.textContent = category;
         row.appendChild(lab);
         row.appendChild(val);
@@ -71,16 +68,16 @@ export function buildFrontmatterMetaEl(
 
     if (description) {
         const p = document.createElement("p");
-        p.className = "text-sm text-slate-600 leading-relaxed max-w-2xl";
+        p.className = "doc-meta__description";
         p.textContent = description;
         root.appendChild(p);
     }
 
     if (dateStr) {
         const row = document.createElement("div");
-        row.className = "flex flex-wrap items-center gap-2 text-sm text-slate-600";
+        row.className = "doc-meta__row doc-meta__row--center";
         const icon = document.createElement("span");
-        icon.className = "iconify shrink-0 text-slate-400";
+        icon.className = "iconify doc-meta__icon";
         icon.setAttribute("data-icon", "mdi:calendar-outline");
         icon.setAttribute("aria-hidden", "true");
         const lab = document.createElement("span");
@@ -97,17 +94,15 @@ export function buildFrontmatterMetaEl(
 
     if (tags.length > 0) {
         const block = document.createElement("div");
-        block.className = "space-y-1.5";
+        block.className = "doc-meta__block";
         const lab = document.createElement("div");
-        lab.className =
-            "text-[0.65rem] font-semibold uppercase tracking-wider text-slate-500";
+        lab.className = "doc-meta__label";
         lab.textContent = "Tags";
         const chips = document.createElement("div");
-        chips.className = "flex flex-wrap gap-2";
+        chips.className = "doc-meta__chips";
         for (const t of tags) {
             const chip = document.createElement("span");
-            chip.className =
-                "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 text-slate-700 border border-slate-200/90";
+            chip.className = "doc-meta__chip";
             chip.textContent = t;
             chips.appendChild(chip);
         }

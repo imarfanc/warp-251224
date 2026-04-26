@@ -1,4 +1,7 @@
-// deno-md-server/static/file-search.ts
+// static/file-search.ts
+function isErrorResponse(data) {
+  return !!data && typeof data === "object" && typeof data.error === "string";
+}
 function isFilesListPayload(data) {
   if (!data || typeof data !== "object") return false;
   const o = data;
@@ -21,6 +24,13 @@ async function refreshSidebarFileList(input, tree2) {
   try {
     const res = await fetch(endpoint);
     const data = await res.json();
+    if (res.status === 409 && isErrorResponse(data)) {
+      tree2.loadPaths([], {
+        emptyHint: "Choose a folder to begin."
+      });
+      tree2.render();
+      return;
+    }
     if (!isFilesListPayload(data)) {
       tree2.showListError();
       return;
@@ -31,7 +41,7 @@ async function refreshSidebarFileList(input, tree2) {
     tree2.loadPaths(files, {
       preservePath: keep,
       expandAll: q.length > 0,
-      emptyHint: files.length === 0 ? q ? "No files match your search." : "No markdown files found." : void 0,
+      emptyHint: files.length === 0 ? q ? "No files match your search." : "No markdown or HTML files found." : void 0,
       sortByPath: data.sort
     });
     tree2.render();
@@ -50,7 +60,7 @@ function attachSidebarSearch(input, tree2) {
   });
 }
 
-// deno-md-server/static/config.ts
+// static/config.ts
 var CONFIG = {
   favicon: "/favicon.svg",
   codeBlock: {
@@ -83,6 +93,29 @@ var CONFIG = {
     pinsStorageKey: "deno-md-viewer-file-pins",
     dimmedStorageKey: "deno-md-viewer-file-dimmed"
   },
+  themes: {
+    storageKey: "deno-md-viewer-theme",
+    defaultId: "default",
+    options: [
+      {
+        id: "default",
+        name: "Default",
+        description: "Current markdown-browser baseline."
+      },
+      {
+        id: "candy",
+        name: "Pastel Candy",
+        description: "Marshmallow pink, mint, butter."
+      },
+      {
+        id: "forest",
+        name: "Forest Floor",
+        description: "Moss, bark, and a ribbon of copper."
+      }
+    ]
+  },
+  /** Last opened markdown roots (absolute paths), for quick switching in the sidebar. */
+  recentRootsStorageKey: "deno-md-viewer-recent-roots",
   /**
    * macOS Marked 2 — `open` command (`?file=` POSIX path).
    * @see https://marked2app.com/help/URL_Handler.html
@@ -92,7 +125,7 @@ var CONFIG = {
   }
 };
 
-// deno-md-server/static/file-tree.ts
+// static/components/file-tree/file-tree.ts
 function addFile(root, segments, fullPath) {
   if (segments.length === 1) {
     root.children.push({
@@ -188,6 +221,9 @@ function writePinnedPaths(paths) {
     localStorage.setItem(CONFIG.fileTree.pinsStorageKey, JSON.stringify(paths));
   } catch {
   }
+}
+function isHtmlPath(path) {
+  return /\.html?$/i.test(path);
 }
 function reorderFilesForPins(node, sortByPath, pinned) {
   const dirs = node.children.filter((c) => c.type === "dir");
@@ -290,7 +326,7 @@ var FileTreeView = class {
     this.renderPinnedPanel(pinnedPaths, dimmed);
   }
   showListError() {
-    this.container.innerHTML = '<div class="text-red-500">Error loading files</div>';
+    this.container.innerHTML = '<div class="error-msg">Error loading files</div>';
     if (this.pinnedPanel) {
       this.pinnedPanel.replaceChildren();
       this.pinnedPanel.hidden = true;
@@ -327,6 +363,7 @@ var FileTreeView = class {
       btn.textContent = leaf;
       btn.title = path;
       let cls = "sidebar-pinned__item";
+      if (isHtmlPath(path)) cls += " sidebar-pinned__item--html";
       if (this.selectedPath === path) cls += " sidebar-pinned__item--active";
       if (dimmed.has(path)) cls += " sidebar-pinned__item--dimmed";
       btn.className = cls;
@@ -388,7 +425,10 @@ var FileTreeView = class {
       const btn = document.createElement("button");
       btn.type = "button";
       const isSel = this.selectedPath === entry.path;
-      btn.className = isSel ? "file-tree__file file-tree__file--active" : "file-tree__file";
+      let fileClass = "file-tree__file";
+      if (isHtmlPath(entry.path)) fileClass += " file-tree__file--html";
+      if (isSel) fileClass += " file-tree__file--active";
+      btn.className = fileClass;
       btn.textContent = entry.name;
       btn.title = entry.path;
       btn.onclick = () => this.onSelectFile(entry.path);
@@ -412,7 +452,7 @@ var FileTreeView = class {
     chev.setAttribute("aria-hidden", "true");
     chev.textContent = isOpen ? "\u25BC" : "\u25B6";
     const label = document.createElement("span");
-    label.className = "file-tree__folder-label truncate";
+    label.className = "file-tree__folder-label";
     label.textContent = entry.name;
     row.appendChild(chev);
     row.appendChild(label);
@@ -436,14 +476,14 @@ var FileTreeView = class {
   }
 };
 
-// deno-md-server/static/dom.ts
+// static/dom.ts
 function getEl(id) {
   const el = document.getElementById(id);
   if (!el) throw new Error(`Missing required element: #${id}`);
   return el;
 }
 
-// deno-md-server/static/sidebar-fab.ts
+// static/components/sidebar-fab/sidebar-fab.ts
 function getSidebar() {
   const el = document.getElementById("sidebar");
   if (!el) throw new Error("Missing required element: #sidebar");
@@ -492,7 +532,7 @@ function initSidebarFab(sidebarFab2) {
   });
 }
 
-// deno-md-server/static/next-h2-fab.ts
+// static/components/next-h2-fab/next-h2-fab.ts
 function initNextH2Fab(fab) {
   fab.addEventListener("click", () => {
     const contentBody2 = getEl("content-body");
@@ -521,7 +561,97 @@ function initNextH2Fab(fab) {
   }
 }
 
-// deno-md-server/static/code-copy.ts
+// static/components/settings/settings-fab.ts
+function isThemeId(value) {
+  return CONFIG.themes.options.some((theme) => theme.id === value);
+}
+function readThemeId() {
+  try {
+    const saved = localStorage.getItem(CONFIG.themes.storageKey);
+    if (isThemeId(saved)) return saved;
+  } catch {
+  }
+  return CONFIG.themes.defaultId;
+}
+function writeThemeId(themeId) {
+  try {
+    localStorage.setItem(CONFIG.themes.storageKey, themeId);
+  } catch {
+  }
+}
+function applyTheme(themeId) {
+  document.documentElement.dataset.theme = themeId;
+}
+function setPanelOpen(fab, panel, isOpen) {
+  panel.hidden = !isOpen;
+  fab.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  fab.title = isOpen ? "Close settings" : "Open settings";
+}
+function renderThemeOptions(panel, selectedThemeId) {
+  const list = panel.querySelector("[data-settings-theme-list]");
+  if (!list) return;
+  list.replaceChildren();
+  for (const theme of CONFIG.themes.options) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "settings-panel__theme";
+    button.dataset.themeOption = theme.id;
+    button.setAttribute("aria-pressed", theme.id === selectedThemeId ? "true" : "false");
+    const swatch = document.createElement("span");
+    swatch.className = `settings-panel__theme-swatch settings-panel__theme-swatch--${theme.id}`;
+    swatch.setAttribute("aria-hidden", "true");
+    const text = document.createElement("span");
+    text.className = "settings-panel__theme-text";
+    const name = document.createElement("span");
+    name.className = "settings-panel__theme-name";
+    name.textContent = theme.name;
+    const description = document.createElement("span");
+    description.className = "settings-panel__theme-description";
+    description.textContent = theme.description;
+    text.append(name, description);
+    button.append(swatch, text);
+    list.appendChild(button);
+  }
+}
+function updateSelectedTheme(panel, selectedThemeId) {
+  const buttons = panel.querySelectorAll("[data-theme-option]");
+  for (const button of buttons) {
+    button.setAttribute("aria-pressed", button.dataset.themeOption === selectedThemeId ? "true" : "false");
+  }
+}
+function initSettingsFab(fab, panel) {
+  let selectedThemeId = readThemeId();
+  applyTheme(selectedThemeId);
+  renderThemeOptions(panel, selectedThemeId);
+  setPanelOpen(fab, panel, false);
+  fab.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setPanelOpen(fab, panel, panel.hidden);
+  });
+  panel.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const option = event.target?.closest("[data-theme-option]");
+    const nextThemeId = option?.dataset.themeOption ?? null;
+    if (!isThemeId(nextThemeId)) return;
+    selectedThemeId = nextThemeId;
+    applyTheme(selectedThemeId);
+    writeThemeId(selectedThemeId);
+    updateSelectedTheme(panel, selectedThemeId);
+  });
+  document.addEventListener("click", () => {
+    if (!panel.hidden) setPanelOpen(fab, panel, false);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || panel.hidden) return;
+    setPanelOpen(fab, panel, false);
+    fab.focus();
+  });
+  if (typeof Iconify !== "undefined") {
+    Iconify.scan(fab);
+  }
+}
+
+// static/components/code-copy/code-copy.ts
 var COPY_ICON = "mdi:content-copy";
 var CHECK_ICON = "mdi:check";
 var RUN_TRIGGER_URL = "kmtrigger://macro=web_2_terminal";
@@ -758,7 +888,7 @@ function enhanceProseCodeCopy(prose) {
   enhanceInlineCode(prose);
 }
 
-// deno-md-server/static/heading-sections.ts
+// static/heading-sections.ts
 var STORAGE_PREFIX = "md-viewer:sections";
 function slugify(text) {
   return text.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || "section";
@@ -896,7 +1026,7 @@ function storageKeyForFile(filePath) {
   return `${STORAGE_PREFIX}:${filePath}`;
 }
 
-// deno-md-server/static/highlight-code.ts
+// static/highlight-code.ts
 function normalizeLanguageClass(code) {
   const cls = code.getAttribute("class") ?? "";
   const m = cls.match(/\blanguage-([^:\s]+)(:[^\s]+)?\b/);
@@ -917,12 +1047,13 @@ function applySyntaxHighlight(root) {
   }
 }
 
-// deno-md-server/static/content-fragments.ts
+// static/content-fragments.ts
 var PLACEHOLDER_TEMPLATE_ID = "content-placeholder-tpl";
+var CHOOSE_ROOT_TEMPLATE_ID = "content-choose-root-tpl";
 function escapeHtml(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
-var FALLBACK_PLACEHOLDER_HTML = '<div class="text-gray-400 italic placeholder-msg">Select a file from the sidebar to view its content.</div>';
+var FALLBACK_PLACEHOLDER_HTML = '<div class="placeholder-msg">Select a file from the sidebar to view its content.</div>';
 function renderContentPlaceholder(container) {
   const tpl = document.getElementById(PLACEHOLDER_TEMPLATE_ID);
   if (tpl instanceof HTMLTemplateElement) {
@@ -931,20 +1062,28 @@ function renderContentPlaceholder(container) {
   }
   container.innerHTML = FALLBACK_PLACEHOLDER_HTML;
 }
+function renderChooseRootPlaceholder(container) {
+  const tpl = document.getElementById(CHOOSE_ROOT_TEMPLATE_ID);
+  if (tpl instanceof HTMLTemplateElement) {
+    container.replaceChildren(tpl.content.cloneNode(true));
+    return;
+  }
+  container.innerHTML = '<div class="placeholder-msg">Choose a folder to begin.</div>';
+}
 function renderContentLoading(container) {
-  container.innerHTML = '<div class="animate-pulse text-gray-400">Loading...</div>';
+  container.innerHTML = '<div class="loading-msg">Loading...</div>';
 }
 function renderContentError(container, message) {
-  container.innerHTML = `<div class="text-red-500">Error: ${escapeHtml(message)}</div>`;
+  container.innerHTML = `<div class="error-msg">Error: ${escapeHtml(message)}</div>`;
 }
 function renderContentInvalidResponse(container) {
-  container.innerHTML = '<div class="text-red-500">Error: invalid response</div>';
+  container.innerHTML = '<div class="error-msg">Error: invalid response</div>';
 }
 function renderContentFetchFailed(container) {
-  container.innerHTML = '<div class="text-red-500">Error loading content</div>';
+  container.innerHTML = '<div class="error-msg">Error loading content</div>';
 }
 
-// deno-md-server/static/doc-path.ts
+// static/doc-path.ts
 var CURSOR_NEW_WINDOW_QUERY = "?windowId=_blank";
 function hrefOpenInCursor(absolutePath, options) {
   const normalized = absolutePath.replace(/\\/g, "/");
@@ -999,6 +1138,21 @@ function appendOpenInCursorButton(docPathEl2, absolutePath) {
   docPathEl2.appendChild(a);
   Iconify.scan(a);
 }
+function appendParentFolderPlaceholderButton(docPathEl2) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "doc-path__parent-folder-btn doc-path__parent-folder-btn--placeholder";
+  btn.disabled = true;
+  btn.setAttribute("aria-label", "Open parent folder \u2014 not available yet");
+  btn.title = "Open parent folder \u2014 not available yet";
+  const icon = document.createElement("span");
+  icon.className = "iconify";
+  icon.setAttribute("data-icon", "mdi:folder-outline");
+  icon.setAttribute("aria-hidden", "true");
+  btn.appendChild(icon);
+  docPathEl2.appendChild(btn);
+  Iconify.scan(btn);
+}
 function appendOpenInMarkedButton(docPathEl2, absolutePath) {
   const a = document.createElement("a");
   a.className = "doc-path__marked-btn";
@@ -1016,6 +1170,7 @@ function appendOpenInMarkedButton(docPathEl2, absolutePath) {
 }
 function appendDocPathAppButtons(docPathEl2, absolutePath) {
   appendOpenInCursorButton(docPathEl2, absolutePath);
+  appendParentFolderPlaceholderButton(docPathEl2);
   appendOpenInMarkedButton(docPathEl2, absolutePath);
 }
 function setDocPathDisplay(docPathEl2, path, options) {
@@ -1059,7 +1214,7 @@ function clearDocPath(docPathEl2) {
   docPathEl2.classList.add("hidden");
 }
 
-// deno-md-server/static/frontmatter-meta.ts
+// static/frontmatter-meta.ts
 function normalizeTags(v) {
   if (!Array.isArray(v)) return [];
   return v.filter((t) => typeof t === "string" && t.trim() !== "");
@@ -1083,21 +1238,21 @@ function buildFrontmatterMetaEl(fm, options) {
     return null;
   }
   const root = document.createElement("div");
-  root.className = "doc-meta not-prose space-y-3.5 mb-8 p-6 bg-orange-50/50 rounded-xl border border-orange-100/80";
+  root.className = "doc-meta";
   if (title) {
     const h = document.createElement("h1");
-    h.className = "doc-meta__title text-2xl font-semibold text-slate-900 tracking-tight leading-snug";
+    h.className = "doc-meta__title";
     h.textContent = title;
     root.appendChild(h);
   }
   if (category) {
     const row = document.createElement("div");
-    row.className = "flex flex-wrap items-baseline gap-x-2 gap-y-1";
+    row.className = "doc-meta__row doc-meta__row--baseline";
     const lab = document.createElement("span");
-    lab.className = "text-[0.65rem] font-semibold uppercase tracking-wider text-slate-500 shrink-0";
+    lab.className = "doc-meta__label";
     lab.textContent = "Category";
     const val = document.createElement("span");
-    val.className = "text-sm text-slate-700";
+    val.className = "doc-meta__value";
     val.textContent = category;
     row.appendChild(lab);
     row.appendChild(val);
@@ -1105,15 +1260,15 @@ function buildFrontmatterMetaEl(fm, options) {
   }
   if (description) {
     const p = document.createElement("p");
-    p.className = "text-sm text-slate-600 leading-relaxed max-w-2xl";
+    p.className = "doc-meta__description";
     p.textContent = description;
     root.appendChild(p);
   }
   if (dateStr) {
     const row = document.createElement("div");
-    row.className = "flex flex-wrap items-center gap-2 text-sm text-slate-600";
+    row.className = "doc-meta__row doc-meta__row--center";
     const icon = document.createElement("span");
-    icon.className = "iconify shrink-0 text-slate-400";
+    icon.className = "iconify doc-meta__icon";
     icon.setAttribute("data-icon", "mdi:calendar-outline");
     icon.setAttribute("aria-hidden", "true");
     const lab = document.createElement("span");
@@ -1129,15 +1284,15 @@ function buildFrontmatterMetaEl(fm, options) {
   }
   if (tags.length > 0) {
     const block = document.createElement("div");
-    block.className = "space-y-1.5";
+    block.className = "doc-meta__block";
     const lab = document.createElement("div");
-    lab.className = "text-[0.65rem] font-semibold uppercase tracking-wider text-slate-500";
+    lab.className = "doc-meta__label";
     lab.textContent = "Tags";
     const chips = document.createElement("div");
-    chips.className = "flex flex-wrap gap-2";
+    chips.className = "doc-meta__chips";
     for (const t of tags) {
       const chip = document.createElement("span");
-      chip.className = "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-slate-100 text-slate-700 border border-slate-200/90";
+      chip.className = "doc-meta__chip";
       chip.textContent = t;
       chips.appendChild(chip);
     }
@@ -1148,7 +1303,7 @@ function buildFrontmatterMetaEl(fm, options) {
   return root;
 }
 
-// deno-md-server/static/file-url.ts
+// static/file-url.ts
 var FILE_QUERY = "file";
 function getFileFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -1160,19 +1315,52 @@ function setFileInUrl(file, replace) {
   url.searchParams.set(FILE_QUERY, file);
   history[replace ? "replaceState" : "pushState"]({}, "", url);
 }
+function clearFileFromUrl(replace = true) {
+  const url = new URL(window.location.href);
+  url.searchParams.delete(FILE_QUERY);
+  history[replace ? "replaceState" : "pushState"]({}, "", url);
+}
 function syncFileToUrl(file, mode) {
   if (mode === "push") setFileInUrl(file, false);
   else if (mode === "replace") setFileInUrl(file, true);
 }
 
-// deno-md-server/static/document-loader.ts
+// static/document-loader.ts
 var DEFAULT_TITLE = "Markdown Viewer";
 function pageTitleFromFrontmatter(frontmatter) {
   const t = frontmatter?.title;
   return typeof t === "string" && t.trim() !== "" ? t : null;
 }
+function isErrorResponse2(data) {
+  return !!data && typeof data === "object" && typeof data.error === "string";
+}
 function titleForFile(path) {
   return `${path} \xB7 ${DEFAULT_TITLE}`;
+}
+function isHtmlPath2(path) {
+  return /\.html?$/i.test(path);
+}
+function showMarkdownShell(dom2) {
+  dom2.appMain.classList.remove("app-main--html");
+  if (dom2.contentShell.parentElement !== dom2.appMain) {
+    dom2.appMain.replaceChildren(dom2.contentShell);
+  }
+}
+function showHtmlMessage(dom2, message, className) {
+  const el = document.createElement("div");
+  el.className = className;
+  el.textContent = message;
+  dom2.appMain.classList.add("app-main--html");
+  dom2.appMain.replaceChildren(el);
+}
+function showHtmlDocument(dom2, html) {
+  const frame = document.createElement("iframe");
+  frame.className = "html-document-frame";
+  frame.title = "HTML preview";
+  frame.sandbox.add("allow-same-origin", "allow-scripts", "allow-forms", "allow-popups");
+  frame.srcdoc = html;
+  dom2.appMain.classList.add("app-main--html");
+  dom2.appMain.replaceChildren(frame);
 }
 async function loadContent(dom2, file, opts = {}) {
   const { tree: tree2, contentBody: contentBody2, docPathEl: docPathEl2 } = dom2;
@@ -1180,29 +1368,52 @@ async function loadContent(dom2, file, opts = {}) {
   tree2.setSelectedPath(file);
   tree2.render();
   document.title = titleForFile(file);
-  setDocPathDisplay(docPathEl2, file);
-  renderContentLoading(contentBody2);
-  contentBody2.setAttribute("aria-busy", "true");
+  const htmlFile = isHtmlPath2(file);
+  if (htmlFile) {
+    clearDocPath(docPathEl2);
+    showHtmlMessage(dom2, "Loading...", "loading-msg");
+  } else {
+    showMarkdownShell(dom2);
+    setDocPathDisplay(docPathEl2, file);
+    renderContentLoading(contentBody2);
+    contentBody2.setAttribute("aria-busy", "true");
+  }
   try {
     const res = await fetch(`/api/content/${encodeURIComponent(file)}`);
     const data = await res.json();
     if ("error" in data && data.error) {
+      if (htmlFile) {
+        showHtmlMessage(dom2, `Error: ${data.error}`, "error-msg");
+        syncFileToUrl(file, syncUrl);
+        return;
+      }
       renderContentError(contentBody2, data.error);
       syncFileToUrl(file, syncUrl);
       return;
     }
     if (!data.html || data.title === void 0) {
+      if (htmlFile) {
+        showHtmlMessage(dom2, "Error: invalid response", "error-msg");
+        return;
+      }
       renderContentInvalidResponse(contentBody2);
       return;
     }
     syncFileToUrl(file, syncUrl);
+    if (data.kind === "html") {
+      document.title = titleForFile(data.title);
+      clearDocPath(docPathEl2);
+      showHtmlDocument(dom2, data.html);
+      return;
+    }
+    showMarkdownShell(dom2);
     const fmTitle = pageTitleFromFrontmatter(data.frontmatter);
     document.title = fmTitle ? `${fmTitle} \xB7 ${DEFAULT_TITLE}` : titleForFile(file);
     setDocPathDisplay(docPathEl2, data.title, {
       absolutePath: data.absolutePath
     });
     const prose = document.createElement("div");
-    prose.className = "prose prose-slate max-w-none";
+    prose.className = "prose";
     prose.innerHTML = data.html;
     const hasDocumentH1 = prose.querySelector("h1") !== null;
     contentBody2.replaceChildren();
@@ -1218,6 +1429,10 @@ async function loadContent(dom2, file, opts = {}) {
     applySyntaxHighlight(prose);
     Iconify.scan(contentBody2);
   } catch {
+    if (htmlFile) {
+      showHtmlMessage(dom2, "Error loading content", "error-msg");
+      return;
+    }
     renderContentFetchFailed(contentBody2);
   } finally {
     contentBody2.removeAttribute("aria-busy");
@@ -1230,17 +1445,28 @@ async function selectFile(dom2, path) {
   });
 }
 async function loadInitialFileList(dom2) {
-  const { tree: tree2 } = dom2;
+  const { tree: tree2, contentBody: contentBody2, docPathEl: docPathEl2 } = dom2;
   try {
     const res = await fetch("/api/files");
     const data = await res.json();
+    if (res.status === 409 && isErrorResponse2(data)) {
+      showMarkdownShell(dom2);
+      tree2.loadPaths([], {
+        emptyHint: "Choose a folder to begin."
+      });
+      tree2.render();
+      clearDocPath(docPathEl2);
+      renderChooseRootPlaceholder(contentBody2);
+      document.title = DEFAULT_TITLE;
+      return;
+    }
     if (!isFilesListPayload(data)) {
       tree2.showListError();
       return;
     }
     const files = data.paths;
     tree2.loadPaths(files, {
-      emptyHint: files.length === 0 ? "No markdown files found." : void 0,
+      emptyHint: files.length === 0 ? "No markdown or HTML files found." : void 0,
       sortByPath: data.sort
     });
     const fromUrl = getFileFromUrl();
@@ -1252,8 +1478,11 @@ async function loadInitialFileList(dom2) {
         syncUrl: "replace"
       });
     } else {
+      showMarkdownShell(dom2);
       tree2.setSelectedPath(null);
       tree2.render();
+      clearDocPath(docPathEl2);
+      renderContentPlaceholder(contentBody2);
       document.title = DEFAULT_TITLE;
     }
   } catch {
@@ -1272,6 +1501,7 @@ function registerPopstateHandler(dom2) {
         syncUrl: "none"
       });
     } else {
+      showMarkdownShell(dom2);
       tree2.setSelectedPath(null);
       tree2.render();
       clearDocPath(docPathEl2);
@@ -1281,7 +1511,323 @@ function registerPopstateHandler(dom2) {
   });
 }
 
-// deno-md-server/static/app.ts
+// static/root-picker.ts
+var MAX_RECENT_ROOTS = 5;
+function getRootPickerEl(id) {
+  const el = document.getElementById(id);
+  if (!el) throw new Error(`Missing root picker element: #${id}`);
+  return el;
+}
+function setInlineError(message) {
+  const errorEl = getRootPickerEl("root-picker-error");
+  if (message) {
+    errorEl.textContent = message;
+    errorEl.hidden = false;
+  } else {
+    errorEl.textContent = "";
+    errorEl.hidden = true;
+  }
+}
+function getRecentRoots() {
+  try {
+    const raw = localStorage.getItem(CONFIG.recentRootsStorageKey);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((p) => typeof p === "string");
+  } catch {
+    return [];
+  }
+}
+function pushRecentRoot(path) {
+  const list = getRecentRoots().filter((p) => p !== path);
+  list.unshift(path);
+  localStorage.setItem(CONFIG.recentRootsStorageKey, JSON.stringify(list.slice(0, MAX_RECENT_ROOTS)));
+}
+function folderBasename(absolutePath) {
+  const trimmed = absolutePath.replace(/\/+$/, "");
+  const parts = trimmed.split("/").filter(Boolean);
+  if (parts.length === 0) return absolutePath === "/" ? "/" : absolutePath;
+  return parts[parts.length - 1];
+}
+function renderRecentFolders(currentRoot, listEl, onPick) {
+  const recent = getRecentRoots().filter((p) => p !== currentRoot).slice(0, MAX_RECENT_ROOTS);
+  listEl.replaceChildren();
+  if (recent.length === 0) {
+    listEl.hidden = true;
+    return;
+  }
+  listEl.hidden = false;
+  for (const path of recent) {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "root-picker__recent-item";
+    btn.title = path;
+    const nameEl = document.createElement("span");
+    nameEl.className = "root-picker__recent-name";
+    nameEl.textContent = folderBasename(path);
+    const pathEl = document.createElement("span");
+    pathEl.className = "root-picker__recent-path";
+    pathEl.textContent = path;
+    btn.append(nameEl, pathEl);
+    btn.addEventListener("click", () => onPick(path));
+    li.appendChild(btn);
+    listEl.appendChild(li);
+  }
+}
+function setCurrentRootLabel(root, filesHeading) {
+  const label = getRootPickerEl("root-current-path");
+  const nameEl = getRootPickerEl("root-current-path-name");
+  const fullEl = getRootPickerEl("root-current-path-full");
+  const rootPicker = getRootPickerEl("root-picker");
+  if (root) {
+    nameEl.textContent = folderBasename(root);
+    fullEl.textContent = root;
+    fullEl.hidden = false;
+    label.title = root;
+    rootPicker.classList.remove("root-picker--empty");
+    filesHeading.textContent = folderBasename(root);
+  } else {
+    nameEl.textContent = "No folder selected";
+    fullEl.textContent = "";
+    fullEl.hidden = true;
+    label.removeAttribute("title");
+    rootPicker.classList.add("root-picker--empty");
+    filesHeading.textContent = "Files";
+  }
+}
+function toggleManualEntry(show) {
+  const panel = getRootPickerEl("root-manual-panel");
+  const toggle = getRootPickerEl("root-manual-toggle");
+  panel.hidden = !show;
+  toggle.setAttribute("aria-expanded", show ? "true" : "false");
+}
+function toggleSidebarBrowsing(hasRoot) {
+  const fileSearch = getRootPickerEl("file-search");
+  const fileList = getRootPickerEl("file-list");
+  const pinnedFiles = getRootPickerEl("pinned-files");
+  fileSearch.disabled = !hasRoot;
+  fileSearch.placeholder = hasRoot ? "Search name or content\u2026" : "Choose a folder first";
+  fileList.hidden = !hasRoot;
+  pinnedFiles.hidden = true;
+}
+async function parseRootResponse(res) {
+  const data = await res.json();
+  if (!res.ok) {
+    return {
+      error: typeof data.error === "string" ? data.error : "Request failed"
+    };
+  }
+  if ("root" in data && (typeof data.root === "string" || data.root === null)) {
+    return {
+      root: data.root
+    };
+  }
+  if (typeof data.error === "string") return {
+    error: data.error
+  };
+  return {
+    error: "Invalid root response"
+  };
+}
+async function requestRootChange(endpoint, body) {
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: body ? {
+      "content-type": "application/json"
+    } : void 0,
+    body: body ? JSON.stringify(body) : void 0
+  });
+  const data = await parseRootResponse(res);
+  if ("error" in data) throw new Error(data.error);
+  if (typeof data.root !== "string" || data.root.length === 0) {
+    throw new Error("Invalid root response");
+  }
+  return data.root;
+}
+async function initRootPicker(onRootChanged) {
+  const changeButton = getRootPickerEl("root-change-btn");
+  const manualToggle = getRootPickerEl("root-manual-toggle");
+  const manualPanel = getRootPickerEl("root-manual-panel");
+  const manualInput = getRootPickerEl("root-manual-input");
+  const manualSubmit = getRootPickerEl("root-manual-submit");
+  const manualCancel = getRootPickerEl("root-manual-cancel");
+  const rootPicker = getRootPickerEl("root-picker");
+  const recentListEl = getRootPickerEl("root-recent-folders");
+  const filesHeading = getRootPickerEl("sidebar-files-heading");
+  let currentRoot = null;
+  let rootPickerExpanded = false;
+  function syncRootPickerVisibility() {
+    if (currentRoot === null) {
+      rootPicker.hidden = false;
+      filesHeading.removeAttribute("aria-expanded");
+      filesHeading.removeAttribute("aria-controls");
+      filesHeading.removeAttribute("aria-label");
+      filesHeading.removeAttribute("tabindex");
+      filesHeading.removeAttribute("role");
+      filesHeading.removeAttribute("title");
+      filesHeading.classList.remove("cursor-pointer");
+    } else {
+      rootPicker.hidden = !rootPickerExpanded;
+      const base = folderBasename(currentRoot);
+      filesHeading.setAttribute("aria-expanded", rootPickerExpanded ? "true" : "false");
+      filesHeading.setAttribute("aria-controls", "root-picker");
+      filesHeading.setAttribute("aria-label", `${base} \u2014 ${rootPickerExpanded ? "Hide" : "Show"} folder selection`);
+      filesHeading.setAttribute("tabindex", "0");
+      filesHeading.setAttribute("role", "button");
+      filesHeading.title = rootPickerExpanded ? "Hide folder selection" : "Show folder selection";
+      filesHeading.classList.add("cursor-pointer");
+    }
+  }
+  function refreshRecentList() {
+    renderRecentFolders(currentRoot, recentListEl, (path) => {
+      void openRecentPath(path);
+    });
+  }
+  async function openRecentPath(path) {
+    setPending(true);
+    setInlineError(null);
+    try {
+      await applyRoot(await requestRootChange("/api/root", {
+        path
+      }));
+    } catch (error) {
+      setInlineError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setPending(false);
+    }
+  }
+  async function applyRoot(root) {
+    currentRoot = root;
+    pushRecentRoot(root);
+    setCurrentRootLabel(root, filesHeading);
+    toggleSidebarBrowsing(true);
+    setInlineError(null);
+    toggleManualEntry(false);
+    manualInput.value = root;
+    rootPickerExpanded = false;
+    syncRootPickerVisibility();
+    refreshRecentList();
+    await onRootChanged(root);
+  }
+  function setPending(pending) {
+    changeButton.disabled = pending;
+    manualToggle.toggleAttribute("disabled", pending);
+    manualSubmit.disabled = pending;
+    manualCancel.disabled = pending;
+    manualInput.disabled = pending;
+    for (const btn of recentListEl.querySelectorAll(".root-picker__recent-item")) {
+      btn.disabled = pending;
+    }
+  }
+  function onFilesHeadingActivate() {
+    if (currentRoot === null) return;
+    rootPickerExpanded = !rootPickerExpanded;
+    syncRootPickerVisibility();
+  }
+  filesHeading.addEventListener("click", (e) => {
+    e.preventDefault();
+    onFilesHeadingActivate();
+  });
+  filesHeading.addEventListener("keydown", (e) => {
+    if (currentRoot === null) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onFilesHeadingActivate();
+    }
+  });
+  changeButton.addEventListener("click", () => {
+    void (async () => {
+      setPending(true);
+      setInlineError(null);
+      try {
+        await applyRoot(await requestRootChange("/api/pick-root"));
+      } catch (error) {
+        setInlineError(error instanceof Error ? error.message : String(error));
+      } finally {
+        setPending(false);
+      }
+    })();
+  });
+  manualToggle.addEventListener("click", () => {
+    const shouldShow = manualPanel.hidden;
+    toggleManualEntry(shouldShow);
+    if (shouldShow) {
+      manualInput.focus();
+      manualInput.select();
+    }
+  });
+  manualCancel.addEventListener("click", () => {
+    toggleManualEntry(false);
+    manualInput.value = currentRoot ?? "";
+    setInlineError(null);
+  });
+  manualSubmit.addEventListener("click", () => {
+    void (async () => {
+      const path = manualInput.value.trim();
+      if (!path) {
+        setInlineError("Enter a folder path.");
+        return;
+      }
+      setPending(true);
+      setInlineError(null);
+      try {
+        await applyRoot(await requestRootChange("/api/root", {
+          path
+        }));
+      } catch (error) {
+        setInlineError(error instanceof Error ? error.message : String(error));
+      } finally {
+        setPending(false);
+      }
+    })();
+  });
+  manualInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      manualSubmit.click();
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      manualCancel.click();
+    }
+  });
+  try {
+    const res = await fetch("/api/root");
+    const data = await parseRootResponse(res);
+    if ("error" in data) {
+      setInlineError(data.error ?? "Could not load saved root.");
+      setCurrentRootLabel(null, filesHeading);
+      toggleSidebarBrowsing(false);
+      syncRootPickerVisibility();
+      refreshRecentList();
+      return null;
+    }
+    currentRoot = data.root;
+    setCurrentRootLabel(currentRoot, filesHeading);
+    toggleSidebarBrowsing(currentRoot !== null);
+    if (currentRoot !== null) {
+      manualInput.value = currentRoot;
+      pushRecentRoot(currentRoot);
+      rootPickerExpanded = false;
+      syncRootPickerVisibility();
+    } else {
+      syncRootPickerVisibility();
+    }
+    refreshRecentList();
+    return currentRoot;
+  } catch {
+    setInlineError("Could not load saved root.");
+    setCurrentRootLabel(null, filesHeading);
+    toggleSidebarBrowsing(false);
+    syncRootPickerVisibility();
+    refreshRecentList();
+    return null;
+  }
+}
+
+// static/app.ts
 function updateFavicon() {
   const link = document.querySelector("link[rel*='icon']") || document.createElement("link");
   link.type = "image/svg+xml";
@@ -1291,27 +1837,54 @@ function updateFavicon() {
 }
 var fileListEl = getEl("file-list");
 var pinnedFilesEl = getEl("pinned-files");
+var appMain = document.querySelector(".app-main");
+if (!appMain) throw new Error("Missing required element: .app-main");
+var contentShell = getEl("content");
 var contentBody = getEl("content-body");
 var docPathEl = getEl("doc-path");
 var fileSearchInput = getEl("file-search");
 var sidebarFab = getEl("sidebar-fab");
 var nextH2Fab = getEl("next-h2-fab");
+var settingsFab = getEl("settings-fab");
+var settingsPanel = getEl("settings-panel");
 var tree = new FileTreeView(fileListEl, (path) => {
   void selectFile({
     tree,
+    appMain,
+    contentShell,
     contentBody,
     docPathEl
   }, path);
 }, pinnedFilesEl);
 var dom = {
   tree,
+  appMain,
+  contentShell,
   contentBody,
   docPathEl
 };
 attachSidebarSearch(fileSearchInput, tree);
 initSidebarFab(sidebarFab);
 initNextH2Fab(nextH2Fab);
+initSettingsFab(settingsFab, settingsPanel);
 updateFavicon();
 renderContentPlaceholder(contentBody);
 registerPopstateHandler(dom);
-void loadInitialFileList(dom);
+async function handleRootChanged() {
+  fileSearchInput.value = "";
+  clearFileFromUrl();
+  tree.loadPaths([]);
+  tree.render();
+  clearDocPath(docPathEl);
+  renderContentPlaceholder(contentBody);
+  await loadInitialFileList(dom);
+}
+void (async () => {
+  const initialRoot = await initRootPicker(handleRootChanged);
+  if (initialRoot === null) {
+    clearDocPath(docPathEl);
+    renderChooseRootPlaceholder(contentBody);
+    return;
+  }
+  await loadInitialFileList(dom);
+})();
