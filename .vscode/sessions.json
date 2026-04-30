@@ -40,7 +40,7 @@
         "icon": "star-half",
         "color": "terminal.ansiRed",
         "commands": [
-          "claude code --effort low --model opusplan"
+          "claude --effort low --model opusplan /git-commit"
         ]
       },
       {
@@ -49,7 +49,7 @@
         "icon": "star-half",
         "color": "terminal.ansiRed",
         "commands": [
-          "claude code --effort high --model opusplan"
+          "claude --effort high --model opusplan"
         ]
       },
       {
@@ -89,13 +89,13 @@
         ]
       },
       {
-        "name": "npx serve",
+        "name": "deno task start",
         "autoExecuteCommands": false,
         "icon": "notebook",
         "color": "terminal.ansiGreen",
         "commands": [
-          "echo hello npx serve!",
-          "npx serve"
+          "cd markdown-browser",
+          "deno task start"
         ]
       }
     ]

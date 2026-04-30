@@ -3,13 +3,13 @@
 ## using pake 1
 
 ```sh
-pake --install --hide-title-bar --name "md2" --icon "/Users/family/Downloads/icon.png" https://arfan-md2.val.run/
+pake --install --hide-title-bar --name "md2" --icon "$HOME/Downloads/icon.png" https://arfan-md2.val.run/
 ```
 
 ```sh
 pake --hide-title-bar \
      --install \
-     --name "md2" \
-     --icon "/Users/family/Downloads/icon.png" \
-       https://arfan-md2.val.run/
+     --name "md-vt2" \
+     --icon "$HOME/Downloads/pngs/icon.png" \
+       https://arfan-md.val.run/
 ```
