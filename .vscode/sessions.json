@@ -31,7 +31,7 @@
         "icon": "hubot",
         "color": "terminal.ansiMagenta",
         "commands": [
-          "claude code --model haiku"
+          "claude --model haiku"
         ]
       },
       {
@@ -58,7 +58,7 @@
         "icon": "star-full",
         "color": "terminal.ansiYellow",
         "commands": [
-          "claude code --model opus"
+          "claude --model opus"
         ]
       },
       {

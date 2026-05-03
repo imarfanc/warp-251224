@@ -1,0 +1,5062 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>798839517.21908104</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4431</integer>
+						<key>AllWindows</key>
+						<true/>
+						<key>AlreadyActivatedActionType</key>
+						<string>Normal</string>
+						<key>Application</key>
+						<dict>
+							<key>BundleIdentifier</key>
+							<string>com.google.Chrome</string>
+							<key>Name</key>
+							<string>Google Chrome</string>
+							<key>NewFile</key>
+							<string>/Applications/Google Chrome.app</string>
+						</dict>
+						<key>MacroActionType</key>
+						<string>ActivateApplication</string>
+						<key>ReopenWindows</key>
+						<false/>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4435</integer>
+						<key>Argument</key>
+						<string>https://www.midjourney.com/explore</string>
+						<key>Command</key>
+						<string>NewTab</string>
+						<key>MacroActionType</key>
+						<string>SafariControl</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>WebBrowser</key>
+						<string>Google Chrome</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4436</integer>
+						<key>Argument</key>
+						<string>1</string>
+						<key>Command</key>
+						<string>WaitForComplete</string>
+						<key>MacroActionType</key>
+						<string>SafariControl</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>WebBrowser</key>
+						<string>Google Chrome</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4432</integer>
+						<key>KeyCode</key>
+						<integer>34</integer>
+						<key>MacroActionType</key>
+						<string>SimulateKeystroke</string>
+						<key>Modifiers</key>
+						<integer>2304</integer>
+						<key>ReleaseAll</key>
+						<false/>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4438</integer>
+						<key>MacroActionType</key>
+						<string>Pause</string>
+						<key>Time</key>
+						<string>.5</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4433</integer>
+						<key>KeyCode</key>
+						<integer>40</integer>
+						<key>MacroActionType</key>
+						<string>SimulateKeystroke</string>
+						<key>Modifiers</key>
+						<integer>256</integer>
+						<key>ReleaseAll</key>
+						<false/>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4437</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScript</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>;void (async function copyFirstAndSecondImageURLsForKeyboardMaestro() {
+  const kmCompletion = typeof completion === 'function' ? completion : null;
+
+  function finish(payload) {
+    if (kmCompletion) {
+      kmCompletion(JSON.stringify(payload, null, 2));
+    }
+
+    return payload;
+  }
+  function getImageURL(el) {
+    if (el instanceof HTMLImageElement) {
+      return el.currentSrc || el.src || el.getAttribute('src') || '';
+    }
+
+    // Midjourney Explore renders images as CSS backgrounds with image-set().
+    // Prefer the last URL because it is usually the higher-density asset.
+    const bg = window.getComputedStyle(el).backgroundImage;
+    const urls = [...(bg?.matchAll(/url\(["']?([^"')]+)["']?\)/g) || [])]
+      .map((match) =&gt; match[1]);
+    return urls.at(-1) || urls[0] || '';
+  }
+
+  function isVisibleImage(el) {
+    const rect = el.getBoundingClientRect();
+    return rect.width &gt;= 40 &amp;&amp; rect.height &gt;= 40 &amp;&amp; rect.bottom &gt; 0 &amp;&amp; rect.right &gt; 0 &amp;&amp;
+      rect.top &lt; window.innerHeight &amp;&amp; rect.left &lt; window.innerWidth;
+  }
+
+  function rectSnapshot(rect) {
+    return {
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+    };
+  }
+
+  function collectImageElements() {
+    const elements = [...document.querySelectorAll('img')];
+
+    for (const el of document.querySelectorAll('*')) {
+      const bg = window.getComputedStyle(el).backgroundImage;
+      if (bg &amp;&amp; bg !== 'none' &amp;&amp; bg.includes('url(')) elements.push(el);
+    }
+
+    return elements;
+  }
+
+  function findVisibleImageCandidates() {
+    const seen = new Set();
+
+    return collectImageElements()
+      .filter((el) =&gt; {
+        const url = getImageURL(el);
+        if (!url || seen.has(url) || !isVisibleImage(el)) return false;
+
+        seen.add(url);
+        return true;
+      })
+      .map((el, index) =&gt; ({
+        el,
+        index: index + 1,
+        rect: el.getBoundingClientRect(),
+        url: getImageURL(el),
+      }))
+      // Sort by visual position so "first" and "second" match what you see.
+      .sort((a, b) =&gt; a.rect.top - b.rect.top || a.rect.left - b.rect.left);
+  }
+
+  function copyTextWithExecCommand(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = [
+      'position:fixed',
+      'top:0',
+      'left:0',
+      'width:1px',
+      'height:1px',
+      'opacity:0',
+      'pointer-events:none',
+      'z-index:-1',
+    ].join(';');
+
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+
+    let copied = false;
+    try {
+      copied = document.execCommand('copy');
+    } finally {
+      document.body.removeChild(ta);
+    }
+
+    return copied;
+  }
+
+  // Find the first and second visible image-like elements in visual order.
+  const imageCandidates = findVisibleImageCandidates();
+
+  if (imageCandidates.length &lt; 2) {
+    const result = {
+      copiedURL: null,
+      copiedURLs: [],
+      clickedCopyButton: false,
+      error: 'Less than 2 visible images found.',
+      imageCount: imageCandidates.length,
+    };
+    console.error(result.error, imageCandidates);
+    return finish(result);
+  }
+
+  const [firstImage, secondImage] = imageCandidates;
+  const result = {
+    firstImage: {
+      url: firstImage.url,
+      rect: rectSnapshot(firstImage.rect),
+    },
+    secondImage: {
+      url: secondImage.url,
+      rect: rectSnapshot(secondImage.rect),
+    },
+    copiedURL: null,
+    copiedURLs: [],
+    clickedCopyButton: false,
+    error: null,
+  };
+
+  console.log('First image candidate:', firstImage.url, firstImage.rect);
+  console.log('Second image candidate:', secondImage.url, secondImage.rect);
+
+  if (copyTextWithExecCommand(secondImage.url)) {
+    result.copiedURL = secondImage.url;
+    result.copiedURLs.push(secondImage.url);
+    console.log('✅ Copied second image URL:', secondImage.url);
+  } else {
+    result.error = 'execCommand copy failed';
+    console.error('❌ execCommand copy failed');
+  }
+
+  console.log('COPY_2ND_IMAGE_URL_DONE', result);
+  return finish(result);
+})().catch((error) =&gt; {
+  const result = {
+    copiedURL: null,
+    copiedURLs: [],
+    clickedCopyButton: false,
+    error: error?.message || String(error),
+  };
+  console.error('COPY_2ND_IMAGE_URL_FAILED', error);
+  if (typeof completion === 'function') {
+    completion(JSON.stringify(result, null, 2));
+  }
+  return result;
+});
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+						<key>WebBrowser</key>
+						<string>Google Chrome</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>798839526.702461</real>
+				<key>ModificationDate</key>
+				<real>798840347.89157605</real>
+				<key>Name</key>
+				<string>midjourney</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>DC24AD72-F5BC-4543-AC2C-4F7C06AB9B95</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>URL_Macros-2</string>
+		<key>ToggleMacroUID</key>
+		<string>9361DA19-B9B5-484C-9801-A1E29E823B7C</string>
+		<key>UID</key>
+		<string>2718E915-48BD-4F66-AC6C-D2A311303B45</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797605866.60718906</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>DisplayBriefly</string>
+						<key>ActionUID</key>
+						<integer>3206</integer>
+						<key>IsActive</key>
+						<false/>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>Text</key>
+						<string>%TriggerValue%</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3210</integer>
+						<key>MacroActionType</key>
+						<string>SetVariableToText</string>
+						<key>Text</key>
+						<string>%TriggerValue%</string>
+						<key>Variable</key>
+						<string>myVar_webCMD264</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3219</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteShellScript</string>
+						<key>Path</key>
+						<string></string>
+						<key>Source</key>
+						<string>Nothing</string>
+						<key>Text</key>
+						<string>#!/bin/bash
+
+# Execute the command stored in the variable
+eval "$KMVAR_myVar_webCMD264"</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>798103122.03219402</real>
+				<key>ModificationDate</key>
+				<real>798106065.17570305</real>
+				<key>Name</key>
+				<string>run_web_command-26.4</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>97048544-57F0-46C4-9551-8CC11F3B13CA</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>URL_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>3A19E624-17C9-4D94-AE32-CB8BA4B93D04</string>
+		<key>UID</key>
+		<string>222D49FF-1C71-4E2D-939A-B91A15CC46FC</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797605866.60718906</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionColor</key>
+						<string>Aqua</string>
+						<key>ActionUID</key>
+						<integer>2027</integer>
+						<key>AllWindows</key>
+						<true/>
+						<key>AlreadyActivatedActionType</key>
+						<string>Normal</string>
+						<key>Application</key>
+						<dict>
+							<key>BundleIdentifier</key>
+							<string>dev.warp.Warp-Stable</string>
+							<key>Name</key>
+							<string>Warp</string>
+							<key>NewFile</key>
+							<string>/Applications/Warp.app</string>
+						</dict>
+						<key>MacroActionType</key>
+						<string>ActivateApplication</string>
+						<key>ReopenWindows</key>
+						<false/>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionColor</key>
+						<string>Yellow</string>
+						<key>ActionUID</key>
+						<integer>814</integer>
+						<key>MacroActionType</key>
+						<string>Pause</string>
+						<key>Time</key>
+						<string>.8</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionColor</key>
+						<string>Purple</string>
+						<key>ActionUID</key>
+						<integer>816</integer>
+						<key>KeyCode</key>
+						<integer>9</integer>
+						<key>MacroActionType</key>
+						<string>SimulateKeystroke</string>
+						<key>Modifiers</key>
+						<integer>256</integer>
+						<key>ReleaseAll</key>
+						<false/>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+					</dict>
+					<dict>
+						<key>ActionColor</key>
+						<string>Purple</string>
+						<key>ActionUID</key>
+						<integer>821</integer>
+						<key>IsActive</key>
+						<false/>
+						<key>KeyCode</key>
+						<integer>51</integer>
+						<key>MacroActionType</key>
+						<string>SimulateKeystroke</string>
+						<key>Modifiers</key>
+						<integer>0</integer>
+						<key>ReleaseAll</key>
+						<false/>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797605885.55472398</real>
+				<key>ModificationDate</key>
+				<real>797605902.37363899</real>
+				<key>Name</key>
+				<string>web_2_terminal</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>E718C1EA-0C84-4B31-A716-8914AC29969C</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>URL_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>3A19E624-17C9-4D94-AE32-CB8BA4B93D04</string>
+		<key>UID</key>
+		<string>222D49FF-1C71-4E2D-939A-B91A15CC46FC</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1629</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>imarfanc@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797084951.38818097</real>
+				<key>ModificationDate</key>
+				<real>797084987.94866097</real>
+				<key>Name</key>
+				<string>imarfanc</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>ima </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>E56960E6-10FF-49C4-A0E8-07D0E198ABF7</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>7</integer>
+						<key>DisplayKind</key>
+						<string>Clipboard</string>
+						<key>ImageSource</key>
+						<string>TriggerClipboard</string>
+						<key>Language</key>
+						<string>Apple Text Recognition</string>
+						<key>MacroActionType</key>
+						<string>OCRImage</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>572773886.76402903</real>
+				<key>ModificationDate</key>
+				<real>572777192.36439204</real>
+				<key>Name</key>
+				<string>OCR Image</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>05C973B2-2647-42FD-ADE5-8EC4CAB8E3A8</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>848</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteShellScript</string>
+						<key>Path</key>
+						<string></string>
+						<key>Source</key>
+						<string>Nothing</string>
+						<key>Text</key>
+						<string>open "$HOME/Library/Logs/Keyboard Maestro/Engine.log"</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>796429506.48301995</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/System/Applications/Utilities/Console.app</string>
+				<key>ModificationDate</key>
+				<real>796607315.18229103</real>
+				<key>Name</key>
+				<string>open-Engine.log</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>9086075F-B662-4BB5-8604-954591EA6839</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1631</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>highfillmart@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797084951.38818097</real>
+				<key>ModificationDate</key>
+				<real>797596907.10688996</real>
+				<key>Name</key>
+				<string>highfillmart</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>hig </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>56D23FEF-931B-455E-9370-5690C0123D2E</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>798104537.79451597</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3623</integer>
+						<key>MacroActionType</key>
+						<string>SetJSONValue</string>
+						<key>OutputFormat</key>
+						<string>Pretty</string>
+						<key>Target</key>
+						<string>varJson_1.Apps{test_1}[1]</string>
+						<key>Text</key>
+						<string>{
+  "app": "Google Chrome",
+  "title": "Keptab - Google Chrome",
+  "role": "AXWindow",
+  "subrole": "AXStandardWindow",
+  "focused": false,
+  "minimized": false,
+  "x": 62,
+  "y": 41,
+  "width": 1300,
+  "height": 907
+}</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3625</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>IsActive</key>
+						<false/>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScriptForAutomation</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>const json = kmvar.varJson_1;
+const data = JSON.parse(json);
+
+const value = data.Apps.chrome_1;
+
+return typeof value === "string"
+  ? value
+  : JSON.stringify(value, null, 2);
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3626</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScriptForAutomation</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>const json = kmvar.varJson_1;
+const data = JSON.parse(json);
+
+data.Apps.chrome_1[0].height = 500000;
+
+const updatedJson = JSON.stringify(data, null, 2);
+
+const kme = Application("Keyboard Maestro Engine");
+kme.setvariable("varJson_1", { to: updatedJson });
+
+return updatedJson;
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>Action</key>
+						<string>DisplayLarge</string>
+						<key>ActionUID</key>
+						<integer>3624</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>Text</key>
+						<string>%JSONValue%varJson_1.Apps{chrome_1}%</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>798749106.08474398</real>
+				<key>ModificationDate</key>
+				<real>799357316.92791998</real>
+				<key>Name</key>
+				<string>variables-java_script</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>58A3B090-A499-484F-AB7D-FFE4FDAB3597</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TESTS</string>
+		<key>ToggleMacroUID</key>
+		<string>E41C4004-3EF5-4855-8E2F-A364AD01F95F</string>
+		<key>UID</key>
+		<string>86B59585-948C-4BA2-9BC3-3F7712BE95E7</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797605866.60718906</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>100939186</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScriptForAutomation</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>;(() =&gt; {
+    "use strict";
+
+    const URL = "https://arfan-simple-apps.val.run/THE-SIMPLE-APPS/_MAIN/html-gallery-v1a/html-gallery-data/keyboard-maestro/web-trigger-page6/index.html";
+    const TARGET_APP = "Helium";
+
+    const sys = Application.currentApplication();
+    sys.includeStandardAdditions = true;
+
+    try {
+        sys.doShellScript(`/usr/bin/open -a "${TARGET_APP}" "${URL}"`);
+        return `✅ Opened in ${TARGET_APP}`;
+    } catch (_) {
+        sys.doShellScript(`/usr/bin/open "${URL}"`);
+        return `⚠️ ${TARGET_APP} unavailable. Fell back to default browser.`;
+    }
+})();</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>100939185</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>IsActive</key>
+						<false/>
+						<key>MacroActionType</key>
+						<string>ExecuteShellScript</string>
+						<key>Path</key>
+						<string></string>
+						<key>Source</key>
+						<string>Nothing</string>
+						<key>Text</key>
+						<string>#!/bin/bash
+# Keyboard Maestro: Open URL in Helium (with graceful fallback)
+
+URL="https://arfan-simple-apps.val.run/THE-SIMPLE-APPS/_MAIN/html-gallery-v1a/html-gallery-data/keyboard-maestro/web-trigger-page6/index.html"
+TARGET_APP="Helium"
+
+# Attempt to open in Helium
+# `open -a` uses macOS LaunchServices, which resolves app names more reliably than AppleScript
+if /usr/bin/open -a "$TARGET_APP" "$URL" 2&gt;/dev/null; then
+    echo "✅ Opened in $TARGET_APP"
+    exit 0
+fi
+
+# Fallback: default browser
+echo "⚠️ $TARGET_APP not found or failed. Using default browser."
+/usr/bin/open "$URL"
+exit 0</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>798103122.03219402</real>
+				<key>ModificationDate</key>
+				<real>799358889.39074504</real>
+				<key>Name</key>
+				<string>run_web_cmd-html_test</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>96EA6535-8E6F-43A0-A9EA-DC77B4D548B0</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>URL_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>3A19E624-17C9-4D94-AE32-CB8BA4B93D04</string>
+		<key>UID</key>
+		<string>222D49FF-1C71-4E2D-939A-B91A15CC46FC</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>CenterWindow</string>
+						<key>ActionUID</key>
+						<integer>1630</integer>
+						<key>HeightExpression</key>
+						<string>300</string>
+						<key>HorizontalExpression</key>
+						<string>125</string>
+						<key>MacroActionType</key>
+						<string>ManipulateWindow</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>Targeting</key>
+						<string>FrontWindow</string>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>VerticalExpression</key>
+						<string>125</string>
+						<key>WidthExpression</key>
+						<string>300</string>
+						<key>WindowIndexExpression</key>
+						<string>2</string>
+						<key>WindowName</key>
+						<string></string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>795113871.13560605</real>
+				<key>CustomIconData</key>
+				<string>KMEP-MarkedBadge</string>
+				<key>ModificationDate</key>
+				<real>795113928.97301495</real>
+				<key>Name</key>
+				<string>center</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>896B42F3-4933-4613-A7A3-5E6F2D3D0D97</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>798104537.79451597</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3618</integer>
+						<key>AllWindows</key>
+						<true/>
+						<key>AlreadyActivatedActionType</key>
+						<string>Normal</string>
+						<key>Application</key>
+						<dict>
+							<key>BundleIdentifier</key>
+							<string>com.google.Chrome</string>
+							<key>Name</key>
+							<string>Google Chrome</string>
+							<key>NewFile</key>
+							<string>/Applications/Google Chrome.app</string>
+						</dict>
+						<key>MacroActionType</key>
+						<string>ActivateApplication</string>
+						<key>ReopenWindows</key>
+						<false/>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3631</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>IsActive</key>
+						<false/>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScriptForAutomation</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>const spec = 
+{
+  "app": "Google Chrome",
+  "title": "action:Set Variables to JSON [Keyboard Maestro Wiki] - Google Chrome",
+  "role": "AXWindow",
+  "subrole": "AXStandardWindow",
+  "focused": false,
+  "minimized": false,
+  "x": 103,
+  "y": 41,
+  "width": 1259,
+  "height": 907
+}
+;
+
+const json = JSON.stringify(spec, null, 2);
+
+const kme = Application("Keyboard Maestro Engine");
+kme.setvariable("varJson_App1", { to: json });
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3632</integer>
+						<key>IsActive</key>
+						<false/>
+						<key>MacroActionType</key>
+						<string>SetVariableToText</string>
+						<key>Text</key>
+						<string>{
+  "app": "Google Chrome",
+  "title": "action:Set Variables to JSON [Keyboard Maestro Wiki] - Google Chrome",
+  "role": "AXWindow",
+  "subrole": "AXStandardWindow",
+  "focused": false,
+  "minimized": false,
+  "x": 100,
+  "y": 40,
+  "width": 1260,
+  "height": 910
+}</string>
+						<key>Variable</key>
+						<string>varJson_App1</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3619</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScriptForAutomation</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>const spec = JSON.parse(`
+{
+  "app": "Google Chrome",
+  "title": "Keptab - Google Chrome",
+  "role": "AXWindow",
+  "subrole": "AXStandardWindow",
+  "focused": false,
+  "minimized": false,
+  "x": 62,
+  "y": 41,
+  "width": 1300,
+  "height": 907
+}
+`);
+
+const se = Application("System Events");
+const proc = se.processes.byName(spec.app);
+
+if (!proc.exists()) {
+  throw new Error(`App not running: ${spec.app}`);
+}
+
+const win = proc.windows[0];
+
+if (!win.exists()) {
+  throw new Error(`No windows found for ${spec.app}`);
+}
+
+win.position = [spec.x, spec.y];
+win.size = [spec.width, spec.height];
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>798747567.77175701</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/Applications/Google Chrome.app</string>
+				<key>ModificationDate</key>
+				<real>798751020.00544798</real>
+				<key>Name</key>
+				<string>resize Chrome (js)</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>6AA8EEC1-8EE3-4A65-A756-E0CC9CE969CE</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TESTS</string>
+		<key>ToggleMacroUID</key>
+		<string>E41C4004-3EF5-4855-8E2F-A364AD01F95F</string>
+		<key>UID</key>
+		<string>86B59585-948C-4BA2-9BC3-3F7712BE95E7</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>1238</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteSwift</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>import AppKit
+
+let appNames = [
+    "Obsidian",
+    "Google Chrome Beta",
+    "GitHub Desktop",
+    "Brave Browser",
+    "Comet",
+    "WhatsApp",
+    "Warp",
+    "System Settings",
+    "Preview"
+]
+
+var closedApps: [String] = []
+var notRunning: [String] = []
+
+for appName in appNames {
+    let matchingApps = NSWorkspace.shared.runningApplications.filter {
+        $0.localizedName == appName
+    }
+    
+    if matchingApps.isEmpty {
+        notRunning.append(appName)
+        continue
+    }
+    
+    for app in matchingApps {
+        if app.terminate() || app.forceTerminate() {
+            closedApps.append(appName)
+        }
+    }
+}
+
+print("Closed:")
+for name in closedApps {
+    print("  • \(name)")
+}
+
+if !notRunning.isEmpty {
+    print("\nNot running:")
+    for name in notRunning {
+        print("  • \(name)")
+    }
+}</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797054243.28411698</real>
+				<key>ModificationDate</key>
+				<real>797054421.29618597</real>
+				<key>Name</key>
+				<string>quit all apps</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>84D2F409-5FBE-477F-857F-DAF01D33A7CD</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>UppercaseFirst</string>
+						<key>ActionUID</key>
+						<integer>28</integer>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>TriggerClipboard</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>454303918.36955899</real>
+				<key>ModificationDate</key>
+				<real>797596120.63848102</real>
+				<key>Name</key>
+				<string>-Uppercase First</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>9D89962E-9E2C-4F49-B37C-FF6F23BCABFA</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>798104537.79451597</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>2813</integer>
+						<key>MacroActionType</key>
+						<string>SelectMenuItem</string>
+						<key>Menu</key>
+						<array>
+							<string>Window</string>
+							<string>Fill</string>
+						</array>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+					</dict>
+					<dict>
+						<key>ActionColor</key>
+						<string>Yellow</string>
+						<key>ActionUID</key>
+						<integer>2816</integer>
+						<key>MacroActionType</key>
+						<string>Pause</string>
+						<key>Time</key>
+						<string>1</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>Action</key>
+						<string>ResizeWindowBy</string>
+						<key>ActionUID</key>
+						<integer>2814</integer>
+						<key>HeightExpression</key>
+						<string>300</string>
+						<key>HorizontalExpression</key>
+						<string>-100</string>
+						<key>MacroActionType</key>
+						<string>ManipulateWindow</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>Targeting</key>
+						<string>FrontWindow</string>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>VerticalExpression</key>
+						<string>0</string>
+						<key>WidthExpression</key>
+						<string>300</string>
+						<key>WindowIndexExpression</key>
+						<string>2</string>
+						<key>WindowName</key>
+						<string></string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>795113871.13560605</real>
+				<key>CustomIconData</key>
+				<string>KMEP-MarkedBadge</string>
+				<key>ModificationDate</key>
+				<real>797867647.77316296</real>
+				<key>Name</key>
+				<string>fill -(100)</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>D869BB58-646C-4EFF-89B5-5C1C719FF4F4</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TESTS</string>
+		<key>ToggleMacroUID</key>
+		<string>E41C4004-3EF5-4855-8E2F-A364AD01F95F</string>
+		<key>UID</key>
+		<string>86B59585-948C-4BA2-9BC3-3F7712BE95E7</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>798104537.79451597</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3215</integer>
+						<key>MacroActionType</key>
+						<string>SetVariableToText</string>
+						<key>Text</key>
+						<string>lolololololol1111
+26.4.17_Fri_2.43am</string>
+						<key>Variable</key>
+						<string>myVar_test264</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3218</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteShellScript</string>
+						<key>Path</key>
+						<string></string>
+						<key>Source</key>
+						<string>Nothing</string>
+						<key>Text</key>
+						<string>#!/bin/bash
+
+# Get current value (KM exposes variables as KMVAR_ env vars automatically)
+v="$KMVAR_myVar_test264"
+
+# Print old value to terminal
+echo 'The variable is "'"$v"'"'
+
+# Set new value
+osascript -e 'tell application "Keyboard Maestro Engine" to setvariable "myVar_test264" to "4444"'</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>Action</key>
+						<string>DisplayBriefly</string>
+						<key>ActionUID</key>
+						<integer>3217</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>Text</key>
+						<string>%Variable%myVar_test264%</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>798105242.21836698</real>
+				<key>ModificationDate</key>
+				<real>799357313.09025502</real>
+				<key>Name</key>
+				<string>variables-shell_script</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>9F428BA2-E37D-4BDE-B4B0-40326F45DD3F</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TESTS</string>
+		<key>ToggleMacroUID</key>
+		<string>E41C4004-3EF5-4855-8E2F-A364AD01F95F</string>
+		<key>UID</key>
+		<string>86B59585-948C-4BA2-9BC3-3F7712BE95E7</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>798104537.79451597</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3212</integer>
+						<key>MacroActionType</key>
+						<string>SetVariableToText</string>
+						<key>Text</key>
+						<string>lolololololol1111
+26.4.17_Fri_2.43am</string>
+						<key>Variable</key>
+						<string>myVar_test264</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3213</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteAppleScript</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>tell application "Keyboard Maestro Engine"
+    set v to getvariable "myVar_test264"
+    display notification v with title "myVar_test264 (before)" 
+    setvariable "myVar_test264" to "4444"
+end tell</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>Action</key>
+						<string>DisplayBriefly</string>
+						<key>ActionUID</key>
+						<integer>3214</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>Text</key>
+						<string>%Variable%myVar_test264%</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>798104542.99409401</real>
+				<key>ModificationDate</key>
+				<real>799357303.73999798</real>
+				<key>Name</key>
+				<string>variables-apple_script</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>9C348873-109C-4BF4-9856-FE469C02BB18</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TESTS</string>
+		<key>ToggleMacroUID</key>
+		<string>E41C4004-3EF5-4855-8E2F-A364AD01F95F</string>
+		<key>UID</key>
+		<string>86B59585-948C-4BA2-9BC3-3F7712BE95E7</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>798104537.79451597</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3611</integer>
+						<key>AllWindows</key>
+						<true/>
+						<key>AlreadyActivatedActionType</key>
+						<string>Normal</string>
+						<key>Application</key>
+						<dict>
+							<key>BundleIdentifier</key>
+							<string>com.google.Chrome</string>
+							<key>Name</key>
+							<string>Google Chrome</string>
+							<key>NewFile</key>
+							<string>/Applications/Google Chrome.app</string>
+						</dict>
+						<key>MacroActionType</key>
+						<string>ActivateApplication</string>
+						<key>ReopenWindows</key>
+						<false/>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3612</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteSwift</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>import Foundation
+import AppKit
+import ApplicationServices
+
+let json = """
+{
+  "app": "Google Chrome",
+  "x": 62,
+  "y": 41,
+  "width": 1300,
+  "height": 907
+}
+"""
+
+struct WindowSpec: Decodable {
+    let app: String
+    let x: Double
+    let y: Double
+    let width: Double
+    let height: Double
+}
+
+func setCGPoint(_ element: AXUIElement, attribute: String, x: Double, y: Double) {
+    var point = CGPoint(x: x, y: y)
+    if let value = AXValueCreate(.cgPoint, &amp;point) {
+        AXUIElementSetAttributeValue(element, attribute as CFString, value)
+    }
+}
+
+func setCGSize(_ element: AXUIElement, attribute: String, width: Double, height: Double) {
+    var size = CGSize(width: width, height: height)
+    if let value = AXValueCreate(.cgSize, &amp;size) {
+        AXUIElementSetAttributeValue(element, attribute as CFString, value)
+    }
+}
+
+let spec = try JSONDecoder().decode(WindowSpec.self, from: Data(json.utf8))
+
+guard let app = NSWorkspace.shared.runningApplications.first(where: {
+    $0.localizedName == spec.app
+}) else {
+    throw NSError(domain: "WindowResize", code: 1, userInfo: [
+        NSLocalizedDescriptionKey: "App not running: \(spec.app)"
+    ])
+}
+
+let appElement = AXUIElementCreateApplication(app.processIdentifier)
+
+var windowValue: AnyObject?
+let result = AXUIElementCopyAttributeValue(
+    appElement,
+    kAXFocusedWindowAttribute as CFString,
+    &amp;windowValue
+)
+
+guard result == .success, let window = windowValue else {
+    throw NSError(domain: "WindowResize", code: 2, userInfo: [
+        NSLocalizedDescriptionKey: "Could not find focused window for \(spec.app)"
+    ])
+}
+
+let targetWindow = window as! AXUIElement
+
+setCGPoint(targetWindow, attribute: kAXPositionAttribute, x: spec.x, y: spec.y)
+setCGSize(targetWindow, attribute: kAXSizeAttribute, width: spec.width, height: spec.height)
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>798747567.77175701</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/Applications/Google Chrome.app</string>
+				<key>ModificationDate</key>
+				<real>798747779.32182503</real>
+				<key>Name</key>
+				<string>resize Chrome (swift)</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>C8E914F4-C384-4B49-97CD-9BCF4B208E25</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TESTS</string>
+		<key>ToggleMacroUID</key>
+		<string>E41C4004-3EF5-4855-8E2F-A364AD01F95F</string>
+		<key>UID</key>
+		<string>86B59585-948C-4BA2-9BC3-3F7712BE95E7</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>22</integer>
+						<key>MacroActionType</key>
+						<string>TransformImage</string>
+						<key>Rotation</key>
+						<string>45</string>
+						<key>TransformAction</key>
+						<string>RotateCCW</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>565776455.44578505</real>
+				<key>ModificationDate</key>
+				<real>565776468.42383003</real>
+				<key>Name</key>
+				<string>Rotate Counter-clockwise</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>F48474B2-0584-435A-9C44-37007694EFCA</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797610775.02107406</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>2028</integer>
+						<key>IsDefaultApplication</key>
+						<true/>
+						<key>MacroActionType</key>
+						<string>Open1File</string>
+						<key>Path</key>
+						<string>~/Library/Application Support/Marked/Custom CSS</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797610778.80021596</real>
+				<key>ModificationDate</key>
+				<real>797610876.17653298</real>
+				<key>Name</key>
+				<string>open-marked-css-styles</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>C257046D-2290-429C-9E42-85AC2B6E56EA</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>rare</string>
+		<key>ToggleMacroUID</key>
+		<string>B957F749-DC8F-48FA-92B9-E343D071C1F3</string>
+		<key>UID</key>
+		<string>907DDBF0-E1D8-4C2E-A524-CCD5F1093004</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>Lowercase</string>
+						<key>ActionUID</key>
+						<integer>15</integer>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>TriggerClipboard</string>
+					</dict>
+					<dict>
+						<key>Action</key>
+						<string>Capitalize</string>
+						<key>ActionUID</key>
+						<integer>16</integer>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>TriggerClipboard</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>454311038.52896398</real>
+				<key>ModificationDate</key>
+				<real>797596148.72496605</real>
+				<key>Name</key>
+				<string>-Lowercase then Capitalize</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>15D2FAD1-7D30-46F0-B619-F5485887380A</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>798104537.79451597</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4026</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScriptForAutomation</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>const se = Application("System Events");
+const frontProc = se.processes.whose({ frontmost: true })[0];
+
+if (!frontProc.exists()) {
+  throw new Error("No front app found");
+}
+
+frontProc.menuBars[0]
+  .menuBarItems.byName("Window")
+  .menus[0]
+  .menuItems.byName("Fill")
+  .click();
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>795113871.13560605</real>
+				<key>CustomIconData</key>
+				<string>KMEP-MarkedBadge</string>
+				<key>ModificationDate</key>
+				<real>798764795.46893597</real>
+				<key>Name</key>
+				<string>window-fill (js)</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>1D66E5F1-9AEC-48E5-AA26-80DD4179BED3</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TESTS</string>
+		<key>ToggleMacroUID</key>
+		<string>E41C4004-3EF5-4855-8E2F-A364AD01F95F</string>
+		<key>UID</key>
+		<string>86B59585-948C-4BA2-9BC3-3F7712BE95E7</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>100939577</integer>
+						<key>AllWindows</key>
+						<true/>
+						<key>AlreadyActivatedActionType</key>
+						<string>Normal</string>
+						<key>Application</key>
+						<dict>
+							<key>BundleIdentifier</key>
+							<string>com.google.Chrome</string>
+							<key>Name</key>
+							<string>Google Chrome</string>
+							<key>NewFile</key>
+							<string>/Applications/Google Chrome.app</string>
+						</dict>
+						<key>MacroActionType</key>
+						<string>ActivateApplication</string>
+						<key>ReopenWindows</key>
+						<false/>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>100939576</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScript</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>;void (async function scrapeYouTubeChannelHeaderV2() {
+  const ABOUT_PANEL_SELECTOR = "ytd-about-channel-renderer";
+  const ADDITIONAL_INFO_SELECTOR = `${ABOUT_PANEL_SELECTOR} #additional-info-container`;
+  const MORE_BUTTON_SELECTORS = [
+    "yt-description-preview-view-model button.ytTruncatedTextAbsoluteButton",
+    "yt-page-header-view-model .ytTruncatedTextAbsoluteButton",
+    ".ytTruncatedTextInlineButton",
+  ];
+
+  const kmCompletion = typeof completion === "function" ? completion : null;
+  const sleep = (ms) =&gt; new Promise((resolve) =&gt; setTimeout(resolve, ms));
+
+  const clean = (value) =&gt;
+    String(value || "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const textOf = (el) =&gt; clean(el?.innerText || el?.textContent || "");
+
+  const absoluteUrl = (value) =&gt; {
+    if (!value) return "";
+    try {
+      return new URL(value, location.href).href;
+    } catch {
+      return value;
+    }
+  };
+
+  const firstElement = (selectors, root = document) =&gt; {
+    for (const selector of selectors) {
+      const el = root.querySelector(selector);
+      if (el) return el;
+    }
+    return null;
+  };
+
+  const isVisible = (el) =&gt; Boolean(el &amp;&amp; el.offsetParent !== null);
+  const firstVisible = (selectors) =&gt;
+    selectors.map((selector) =&gt; document.querySelector(selector)).find(isVisible) || null;
+
+  const finish = (payload) =&gt; {
+    if (kmCompletion) kmCompletion(JSON.stringify(payload, null, 2));
+    return payload;
+  };
+
+  /**
+   * execCommand("copy") after await often needs workarounds: readonly textareas
+   * may not copy in Safari / some Chromium builds; user activation may be gone.
+   */
+  const copyTextWithExecCommand = (text) =&gt; {
+    try {
+      globalThis.focus?.();
+    } catch {
+      /* ignore */
+    }
+
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("aria-hidden", "true");
+    ta.style.cssText =
+      "position:fixed;top:0;left:0;width:16px;height:16px;margin:0;padding:0;border:0;outline:0;" +
+      "opacity:0.02;z-index:2147483647;resize:none;overflow:auto;appearance:none;" +
+      "-webkit-appearance:none;pointer-events:auto";
+    (document.documentElement || document.body).appendChild(ta);
+    ta.focus({ preventScroll: true });
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    let copied = false;
+    try {
+      copied = document.execCommand("copy");
+    } finally {
+      ta.remove();
+    }
+    return copied;
+  };
+
+  /** Fallback when textarea copy fails (selection inside contenteditable). */
+  const copyTextWithContentEditable = (text) =&gt; {
+    const div = document.createElement("div");
+    div.contentEditable = "true";
+    div.textContent = text;
+    div.setAttribute("aria-hidden", "true");
+    div.style.cssText =
+      "position:fixed;top:0;left:0;max-width:160px;max-height:80px;opacity:0.02;" +
+      "z-index:2147483647;overflow:hidden;white-space:pre-wrap;pointer-events:auto";
+    (document.documentElement || document.body).appendChild(div);
+    const sel = getSelection();
+    const range = document.createRange();
+    let copied = false;
+    try {
+      range.selectNodeContents(div);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      div.focus();
+      copied = document.execCommand("copy");
+    } catch {
+      /* ignore */
+    } finally {
+      sel?.removeAllRanges?.();
+      div.remove();
+    }
+    return copied;
+  };
+
+  const copyJsonToClipboard = (text) =&gt; {
+    if (copyTextWithExecCommand(text)) return "execCommand";
+    if (copyTextWithContentEditable(text)) return "execCommand-contenteditable";
+    return null;
+  };
+
+  const sourcesThumbUrl = (sources) =&gt; {
+    if (!Array.isArray(sources) || sources.length === 0) return "";
+    return absoluteUrl(sources[sources.length - 1]?.url || "");
+  };
+
+  const getYtInitialData = () =&gt;
+    typeof globalThis.ytInitialData === "object" &amp;&amp; globalThis.ytInitialData !== null
+      ? globalThis.ytInitialData
+      : null;
+
+  const extractInitialHeader = () =&gt; {
+    const vm = getYtInitialData()?.header?.pageHeaderRenderer?.content?.pageHeaderViewModel;
+    const empty = { title: "", handle: "", avatarImage: "", bannerImage: "" };
+    if (!vm) return empty;
+
+    const rows = vm.metadata?.contentMetadataViewModel?.metadataRows || [];
+    const handle =
+      rows
+        .flatMap((row) =&gt; row.metadataParts || [])
+        .map((part) =&gt; clean(part.text?.content || ""))
+        .find((text) =&gt; text.startsWith("@")) || "";
+
+    return {
+      title: clean(vm.title?.dynamicTextViewModel?.text?.content || vm.title?.simpleText || ""),
+      handle,
+      avatarImage: sourcesThumbUrl(
+        vm.image?.decoratedAvatarViewModel?.avatar?.avatarViewModel?.image?.sources
+      ),
+      bannerImage: sourcesThumbUrl(vm.banner?.imageBannerViewModel?.image?.sources),
+    };
+  };
+
+  const getImageSrc = (selectors) =&gt; absoluteUrl(firstElement(selectors)?.getAttribute("src") || "");
+
+  const scrapeDomHeader = () =&gt; {
+    const handle =
+      [...document.querySelectorAll("yt-content-metadata-view-model span.ytAttributedStringLinkInheritColor")]
+        .map(textOf)
+        .find((text) =&gt; text.startsWith("@")) || "";
+
+    return {
+      title: textOf(
+        firstElement([
+          "h1.dynamicTextViewModelH1 span.ytAttributedStringHost.ytAttributedStringWhiteSpacePreWrap",
+          "h1.dynamicTextViewModelH1 span.ytAttributedStringHost",
+          "yt-page-header-view-model h1 span.ytAttributedStringHost",
+        ])
+      ),
+      handle,
+      avatarImage: getImageSrc([
+        "yt-page-header-view-model yt-avatar-shape img",
+        "yt-decorated-avatar-view-model img",
+        "yt-avatar-shape img",
+      ]),
+      bannerImage: getImageSrc([
+        "#page-header-banner-sizer img.ytCoreImageHost",
+        "#page-header-banner img.ytCoreImageHost",
+        "#page-header-banner img",
+        "yt-image-banner-view-model img",
+      ]),
+    };
+  };
+
+  const mergeHeader = (primary, fallback) =&gt; ({
+    title: primary.title || fallback.title,
+    handle: primary.handle || fallback.handle,
+    avatarImage: primary.avatarImage || fallback.avatarImage,
+    bannerImage: primary.bannerImage || fallback.bannerImage,
+  });
+
+  const findDescriptionMoreButton = () =&gt; {
+    const direct = firstVisible(MORE_BUTTON_SELECTORS);
+    if (direct) return direct;
+
+    return [...document.querySelectorAll("yt-description-preview-view-model button")].find(
+      (button) =&gt;
+        isVisible(button) &amp;&amp;
+        (/\.\.\.\s*more|\u2026\s*more|^more$/i.test(textOf(button)) ||
+          /tap for more/i.test(button.getAttribute("aria-label") || ""))
+    );
+  };
+
+  const openAboutPanel = async () =&gt; {
+    const button = findDescriptionMoreButton();
+    if (!button) return false;
+
+    button.click();
+    await sleep(400);
+
+    const step = 120;
+    for (let waited = 0; waited &lt; 8000; waited += step) {
+      if (document.querySelector(ADDITIONAL_INFO_SELECTOR)) return true;
+      await sleep(step);
+    }
+    return false;
+  };
+
+  const scrapeAboutPanelText = () =&gt; {
+    const root = document.querySelector(ABOUT_PANEL_SELECTOR);
+    if (!root) return "";
+
+    return textOf(
+      firstElement(
+        ["#description-container", "yt-attributed-string", '[id*="description"]'],
+        root
+      )
+    );
+  };
+
+  const scrapeAdditionalInfo = () =&gt; {
+    const info = { joined: "", subscribers: "", videos: "" };
+    const root = document.querySelector(ADDITIONAL_INFO_SELECTOR);
+    if (!root) return info;
+
+    for (const td of root.querySelectorAll("table tbody td")) {
+      const text = textOf(td);
+      if (/\bjoined\b/i.test(text) &amp;&amp; /\d{4}/.test(text)) {
+        info.joined = text;
+      } else if (/subscriber/i.test(text)) {
+        info.subscribers = text;
+      } else if (/\bvideos?\b/i.test(text) &amp;&amp; /[\d,.]+/.test(text)) {
+        info.videos = text;
+      }
+    }
+
+    return info;
+  };
+
+  const scrapeAboutPanel = async () =&gt; {
+    const aboutPanelOpened = await openAboutPanel();
+    if (!aboutPanelOpened) {
+      return {
+        aboutPanelOpened,
+        aboutPanelText: "",
+        joined: "",
+        subscribers: "",
+        videos: "",
+      };
+    }
+
+    await sleep(200);
+    const { joined, subscribers, videos } = scrapeAdditionalInfo();
+
+    return {
+      aboutPanelOpened,
+      aboutPanelText: scrapeAboutPanelText(),
+      joined,
+      subscribers,
+      videos,
+    };
+  };
+
+  const channelBaseUrl = (canonicalUrl) =&gt; {
+    if (canonicalUrl) return canonicalUrl.replace(/\/$/, "");
+
+    try {
+      const url = new URL(location.href);
+      url.hash = "";
+      url.search = "";
+      url.pathname = url.pathname.replace(/\/(videos|streams)\/?$/i, "").replace(/\/$/, "");
+      return url.href.replace(/\/$/, "");
+    } catch {
+      return "";
+    }
+  };
+
+  const splitChannelTabUrls = (siteUrl, canonicalUrl) =&gt; {
+    const base = channelBaseUrl(canonicalUrl);
+    const tabUrls = {
+      yt_channel_videos_url: base ? `${base}/videos` : "",
+      yt_channel_streams_url: "",
+    };
+
+    try {
+      const url = new URL(siteUrl);
+      const path = url.pathname.replace(/\/$/, "");
+      const currentTabUrl = `${url.origin}${url.pathname}${url.search}`.replace(/\/$/, "");
+
+      if (/\/streams$/i.test(path)) {
+        tabUrls.yt_channel_streams_url = currentTabUrl;
+      } else if (/\/videos$/i.test(path)) {
+        tabUrls.yt_channel_videos_url = currentTabUrl;
+      }
+    } catch {
+      /* keep defaults */
+    }
+
+    return tabUrls;
+  };
+
+  const buildResult = ({ header, about, canonicalUrl, tabUrls }) =&gt; {
+    const nowIso = new Date().toISOString();
+
+    return {
+      yt_channel_title: header.title,
+      yt_channel_handle: header.handle,
+      category: "",
+      tags: [],
+      about_panel_text: about.aboutPanelText,
+      urls: {
+        yt_channel_url: canonicalUrl || channelBaseUrl(""),
+        yt_channel_videos_url: tabUrls.yt_channel_videos_url,
+        yt_channel_streams_url: tabUrls.yt_channel_streams_url,
+        yt_channel_banner_image: header.bannerImage,
+        yt_channel_avatar_image: header.avatarImage,
+      },
+      joined_date: about.joined,
+      subscribers_count: about.subscribers,
+      videos_count: about.videos,
+      metadata: {
+        custom_image: "",
+        date_created: nowIso,
+        date_updated: nowIso,
+        about_panel_opened: about.aboutPanelOpened,
+      },
+    };
+  };
+
+  const canonicalUrl =
+    document.querySelector('link[rel="canonical"]')?.getAttribute("href") || "";
+  const header = mergeHeader(scrapeDomHeader(), extractInitialHeader());
+  const about = await scrapeAboutPanel();
+  const tabUrls = splitChannelTabUrls(location.href, canonicalUrl);
+  const result = buildResult({ header, about, canonicalUrl, tabUrls });
+  const json = JSON.stringify(result, null, 2);
+
+  console.log("YouTube channel header (v2):", result);
+  console.log(json);
+
+  const copyMethod = copyJsonToClipboard(json);
+  if (copyMethod) {
+    console.log("Copied to clipboard via %s.", copyMethod);
+    return finish({ copied: true, method: copyMethod, result });
+  }
+
+  console.warn("Could not copy to clipboard. JSON is in the console.");
+  return finish({ copied: false, method: null, result });
+})().catch((error) =&gt; {
+  const payload = { copied: false, method: null, error: error?.message || String(error) };
+  console.error("YOUTUBE_CHANNEL_HEADER_V2_SCRAPE_FAILED", error);
+  if (typeof completion === "function") completion(JSON.stringify(payload, null, 2));
+  return payload;
+});
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+						<key>WebBrowser</key>
+						<string>Google Chrome</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>799429601.36970305</real>
+				<key>ModificationDate</key>
+				<real>799440205.25401795</real>
+				<key>Name</key>
+				<string>js_Chrome-yt-data-v2</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>542C59DA-852D-48E3-86A3-09679A76E6A6</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>847</integer>
+						<key>DisplayKind</key>
+						<string>Window</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteSwift</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>import Foundation
+import Cocoa
+import ApplicationServices
+
+func copyAttribute(_ element: AXUIElement, _ name: String) -&gt; AnyObject? {
+    var value: CFTypeRef?
+    let result = AXUIElementCopyAttributeValue(element, name as CFString, &amp;value)
+    guard result == .success, let value else { return nil }
+    return value
+}
+
+func axPoint(_ obj: AnyObject?) -&gt; CGPoint? {
+    guard let value = obj else { return nil }
+    let ax = value as! AXValue
+    var point = CGPoint.zero
+    guard AXValueGetValue(ax, .cgPoint, &amp;point) else { return nil }
+    return point
+}
+
+func axSize(_ obj: AnyObject?) -&gt; CGSize? {
+    guard let value = obj else { return nil }
+    let ax = value as! AXValue
+    var size = CGSize.zero
+    guard AXValueGetValue(ax, .cgSize, &amp;size) else { return nil }
+    return size
+}
+
+func pad(_ label: String, _ width: Int = 12) -&gt; String {
+    let s = label + ":"
+    if s.count &gt;= width { return s + " " }
+    return s + String(repeating: " ", count: width - s.count)
+}
+
+guard AXIsProcessTrusted() else {
+    fputs("Accessibility permission is not enabled.\n", stderr)
+    exit(1)
+}
+
+guard let app = NSWorkspace.shared.frontmostApplication else {
+    fputs("Could not get frontmost application.\n", stderr)
+    exit(1)
+}
+
+let appName = app.localizedName ?? "(unknown)"
+let axApp = AXUIElementCreateApplication(app.processIdentifier)
+
+guard let focusedObj = copyAttribute(axApp, kAXFocusedWindowAttribute) else {
+    fputs("Could not get focused window.\n", stderr)
+    exit(1)
+}
+
+let win = focusedObj as! AXUIElement
+
+let title = (copyAttribute(win, kAXTitleAttribute) as? String) ?? "(untitled)"
+let role = (copyAttribute(win, kAXRoleAttribute) as? String) ?? "(unknown)"
+let subrole = (copyAttribute(win, kAXSubroleAttribute) as? String) ?? "(unknown)"
+let minimized = (copyAttribute(win, kAXMinimizedAttribute) as? Bool) ?? false
+let focused = (copyAttribute(win, kAXFocusedAttribute) as? Bool) ?? true
+
+let pos = axPoint(copyAttribute(win, kAXPositionAttribute))
+let size = axSize(copyAttribute(win, kAXSizeAttribute))
+
+let x = Int(pos?.x ?? 0)
+let y = Int(pos?.y ?? 0)
+let w = Int(size?.width ?? 0)
+let h = Int(size?.height ?? 0)
+
+let textOutput = """
+\(pad("App"))\(appName)
+\(pad("Title"))\(title)
+\(pad("Role"))\(role)
+\(pad("Subrole"))\(subrole)
+\(pad("Focused"))\(focused)
+\(pad("Minimized"))\(minimized)
+\(pad("Position"))X=\(x)  Y=\(y)
+\(pad("Size"))W=\(w)  H=\(h)
+\(pad("Bounds"))\(x),\(y) \(w)x\(h)
+"""
+
+let json = """
+{
+  "app": "\(appName.replacingOccurrences(of: "\"", with: "\\\""))",
+  "title": "\(title.replacingOccurrences(of: "\"", with: "\\\""))",
+  "role": "\(role)",
+  "subrole": "\(subrole)",
+  "focused": \(focused),
+  "minimized": \(minimized),
+  "x": \(x),
+  "y": \(y),
+  "width": \(w),
+  "height": \(h)
+}
+"""
+
+print(textOutput + "\nJSON:\n" + json)</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>796432624.24225903</real>
+				<key>ModificationDate</key>
+				<real>796432663.26457</real>
+				<key>Name</key>
+				<string>window-get_Size-swift</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>5FBC96F8-C477-46EC-B131-CF42D1483B2C</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4037</integer>
+						<key>AllWindows</key>
+						<true/>
+						<key>AlreadyActivatedActionType</key>
+						<string>Normal</string>
+						<key>Application</key>
+						<dict>
+							<key>BundleIdentifier</key>
+							<string>com.todesktop.230313mzl4w4u92</string>
+							<key>Name</key>
+							<string>Cursor</string>
+							<key>NewFile</key>
+							<string>/Applications/Cursor.app</string>
+						</dict>
+						<key>MacroActionType</key>
+						<string>ActivateApplication</string>
+						<key>ReopenWindows</key>
+						<false/>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4039</integer>
+						<key>MacroActionType</key>
+						<string>SetVariableToText</string>
+						<key>Text</key>
+						<string>{
+  "app": "Cursor",
+  "title": "Cursor Agents",
+  "role": "AXWindow",
+  "subrole": "AXStandardWindow",
+  "focused": false,
+  "minimized": false,
+  "x": 60,
+  "y": 260,
+  "width": 1340,
+  "height": 700
+}</string>
+						<key>Variable</key>
+						<string>varJson_App1</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4040</integer>
+						<key>MacroActionType</key>
+						<string>SetVariableToText</string>
+						<key>Text</key>
+						<string>{
+  "app": "Cursor",
+  "title": "work-skilla-vt",
+  "role": "AXWindow",
+  "subrole": "AXStandardWindow",
+  "focused": false,
+  "minimized": false,
+  "x": 100,
+  "y": 40,
+  "width": 1260,
+  "height": 900
+}</string>
+						<key>Variable</key>
+						<string>varJson_App2</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4041</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScriptForAutomation</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>const specs = [
+  JSON.parse(kmvar.varJson_App1),
+  JSON.parse(kmvar.varJson_App2)
+];
+
+const se = Application("System Events");
+
+function titleMatches(windowName, titlePattern) {
+  if (!windowName || !titlePattern) {
+    return false;
+  }
+
+  const parts = titlePattern
+    .split("-")
+    .map(part =&gt; part.trim())
+    .filter(Boolean);
+
+  return parts.some(part =&gt; windowName.includes(part));
+}
+
+function findWindowByTitle(proc, titlePattern) {
+  const windows = proc.windows;
+
+  for (let i = 0; i &lt; windows.length; i++) {
+    const win = windows[i];
+    const name = win.name();
+
+    if (titleMatches(name, titlePattern)) {
+      return win;
+    }
+  }
+
+  return null;
+}
+
+function fallbackWindow(proc, index) {
+  return proc.windows[index];
+}
+
+for (let i = 0; i &lt; specs.length; i++) {
+  const spec = specs[i];
+  const proc = se.processes.byName(spec.app);
+
+  if (!proc.exists()) {
+    throw new Error(`App not running: ${spec.app}`);
+  }
+
+  const win = findWindowByTitle(proc, spec.title) || fallbackWindow(proc, i);
+
+  if (!win || !win.exists()) {
+    throw new Error(`Window not found for ${spec.app}: ${spec.title}`);
+  }
+
+  win.position = [spec.x, spec.y];
+  win.size = [spec.width, spec.height];
+}
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>798747567.77175701</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/Applications/Cursor.app</string>
+				<key>ModificationDate</key>
+				<real>798766679.70272696</real>
+				<key>Name</key>
+				<string>resize cursor|cursor (js)</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>391D0AAC-925E-4DF9-B07D-746B7E3A4F1B</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1636</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>shepherdoil.DBW.highfillmart@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797597346.12018394</real>
+				<key>ModificationDate</key>
+				<real>797597359.36924803</real>
+				<key>Name</key>
+				<string>shepherdoil.DBW.highfillmart</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>shep </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>EC1D9C4D-8BC9-4385-AE19-81D92EF9F8D2</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4033</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScriptForAutomation</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>// Settings
+const leftInset = 0;
+const rightInset = 100;
+const stableChecksNeeded = 3;
+const checkDelaySeconds = 0.12;
+
+// Front window
+const se = Application("System Events");
+const frontProc = se.processes.whose({ frontmost: true })[0];
+const win = frontProc.windows[0];
+
+// Helpers
+function boundsOf(win) {
+  const pos = win.position();
+  const size = win.size();
+  return [pos[0], pos[1], size[0], size[1]].join(",");
+}
+
+// Fill window
+frontProc.menuBars[0]
+  .menuBarItems.byName("Window")
+  .menus[0]
+  .menuItems.byName("Fill")
+  .click();
+
+// Wait for fill animation
+let last = "";
+let stableCount = 0;
+
+while (stableCount &lt; stableChecksNeeded) {
+  delay(checkDelaySeconds);
+
+  const current = boundsOf(win);
+
+  if (current === last) {
+    stableCount++;
+  } else {
+    stableCount = 0;
+    last = current;
+  }
+}
+
+// Apply insets
+const pos = win.position();
+const size = win.size();
+
+win.position = [pos[0] + leftInset, pos[1]];
+win.size = [size[0] - leftInset - rightInset, size[1]];
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>795113871.13560605</real>
+				<key>CustomIconData</key>
+				<string>KMEP-MarkedBadge</string>
+				<key>ModificationDate</key>
+				<real>798764822.26239204</real>
+				<key>Name</key>
+				<string>fill -{100} (js)</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>00F405E1-AB51-4DFC-8C81-A2EDC5156566</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>Lowercase</string>
+						<key>ActionUID</key>
+						<integer>17</integer>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>TriggerClipboard</string>
+					</dict>
+					<dict>
+						<key>Action</key>
+						<string>TitleCase</string>
+						<key>ActionUID</key>
+						<integer>18</integer>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>TriggerClipboard</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>454311020.24957198</real>
+				<key>ModificationDate</key>
+				<real>797596128.986745</real>
+				<key>Name</key>
+				<string>-Lowercase then Title Case</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>C6A82643-2E03-4AFA-A72E-DCE547C4787A</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4028</integer>
+						<key>AllWindows</key>
+						<true/>
+						<key>AlreadyActivatedActionType</key>
+						<string>Normal</string>
+						<key>Application</key>
+						<dict>
+							<key>BundleIdentifier</key>
+							<string>com.github.GitHubClient</string>
+							<key>Name</key>
+							<string>GitHub Desktop</string>
+							<key>NewFile</key>
+							<string>/Applications/GitHub Desktop.app</string>
+						</dict>
+						<key>MacroActionType</key>
+						<string>ActivateApplication</string>
+						<key>ReopenWindows</key>
+						<false/>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4029</integer>
+						<key>AllWindows</key>
+						<true/>
+						<key>AlreadyActivatedActionType</key>
+						<string>Normal</string>
+						<key>Application</key>
+						<dict>
+							<key>BundleIdentifier</key>
+							<string>net.imput.helium</string>
+							<key>Name</key>
+							<string>Helium</string>
+							<key>NewFile</key>
+							<string>/Applications/Helium.app</string>
+						</dict>
+						<key>MacroActionType</key>
+						<string>ActivateApplication</string>
+						<key>ReopenWindows</key>
+						<false/>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4030</integer>
+						<key>MacroActionType</key>
+						<string>SetVariableToText</string>
+						<key>Text</key>
+						<string>{
+  "app": "Helium",
+  "title": "New Tab - Helium",
+  "role": "AXWindow",
+  "subrole": "AXStandardWindow",
+  "focused": false,
+  "minimized": false,
+  "x": 60,
+  "y": 40,
+  "width": 510,
+  "height": 910
+}</string>
+						<key>Variable</key>
+						<string>varJson_App1</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4031</integer>
+						<key>MacroActionType</key>
+						<string>SetVariableToText</string>
+						<key>Text</key>
+						<string>{
+  "app": "GitHub Desktop",
+  "title": "GitHub Desktop",
+  "role": "AXWindow",
+  "subrole": "AXStandardWindow",
+  "focused": false,
+  "minimized": false,
+  "x": 460,
+  "y": 160,
+  "width": 960,
+  "height": 660
+}</string>
+						<key>Variable</key>
+						<string>varJson_App2</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4032</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScriptForAutomation</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>const specs = [
+  JSON.parse(kmvar.varJson_App1),
+  JSON.parse(kmvar.varJson_App2)
+];
+
+const se = Application("System Events");
+
+for (const spec of specs) {
+  const proc = se.processes.byName(spec.app);
+
+  if (!proc.exists()) {
+    throw new Error(`App not running: ${spec.app}`);
+  }
+
+  const win = proc.windows[0];
+
+  if (!win.exists()) {
+    throw new Error(`No windows found for ${spec.app}`);
+  }
+
+  win.position = [spec.x, spec.y];
+  win.size = [spec.width, spec.height];
+}
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>798747567.77175701</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/Applications/Helium.app</string>
+				<key>ModificationDate</key>
+				<real>798759195.35029495</real>
+				<key>Name</key>
+				<string>resize helium|GitHub (js)</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>E6166D00-2E75-4D7C-8922-7254D97C0113</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797594992.64698899</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>424</integer>
+						<key>MacroActionType</key>
+						<string>ClipboardHistorySwitcher</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797595339.16317594</real>
+				<key>ModificationDate</key>
+				<real>797595369.744699</real>
+				<key>Name</key>
+				<string>Activate Clipboard Switcher</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>9EF25D1A-9F8D-477E-BA82-D13883E2748F</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Global Macro Group</string>
+		<key>ToggleMacroUID</key>
+		<string>D656CC2C-ADC5-4B3E-8537-7749F4AC473A</string>
+		<key>UID</key>
+		<string>804D32AF-0B39-439F-8EF3-493A833B14CA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3616</integer>
+						<key>AllWindows</key>
+						<true/>
+						<key>AlreadyActivatedActionType</key>
+						<string>Normal</string>
+						<key>Application</key>
+						<dict>
+							<key>BundleIdentifier</key>
+							<string>com.google.Chrome</string>
+							<key>Name</key>
+							<string>Google Chrome</string>
+							<key>NewFile</key>
+							<string>/Applications/Google Chrome.app</string>
+						</dict>
+						<key>MacroActionType</key>
+						<string>ActivateApplication</string>
+						<key>ReopenWindows</key>
+						<false/>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3633</integer>
+						<key>AllWindows</key>
+						<true/>
+						<key>AlreadyActivatedActionType</key>
+						<string>Normal</string>
+						<key>Application</key>
+						<dict>
+							<key>BundleIdentifier</key>
+							<string>com.openai.codex</string>
+							<key>Name</key>
+							<string>Codex</string>
+							<key>NewFile</key>
+							<string>/Applications/Codex.app</string>
+						</dict>
+						<key>MacroActionType</key>
+						<string>ActivateApplication</string>
+						<key>ReopenWindows</key>
+						<false/>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3629</integer>
+						<key>MacroActionType</key>
+						<string>SetVariableToText</string>
+						<key>Text</key>
+						<string>{
+  "app": "Google Chrome",
+  "title": "action:Set Variables to JSON [Keyboard Maestro Wiki] - Google Chrome",
+  "role": "AXWindow",
+  "subrole": "AXStandardWindow",
+  "focused": false,
+  "minimized": false,
+  "x": 100,
+  "y": 40,
+  "width": 1310,
+  "height": 910
+}</string>
+						<key>Variable</key>
+						<string>varJson_App1</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3630</integer>
+						<key>MacroActionType</key>
+						<string>SetVariableToText</string>
+						<key>Text</key>
+						<string>{
+  "app": "Codex",
+  "title": "Codex",
+  "role": "AXWindow",
+  "subrole": "AXStandardWindow",
+  "focused": false,
+  "minimized": false,
+  "x": 60,
+  "y": 330,
+  "width": 930,
+  "height": 600
+}</string>
+						<key>Variable</key>
+						<string>varJson_App2</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>3628</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScriptForAutomation</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>const specs = [
+  JSON.parse(kmvar.varJson_App1),
+  JSON.parse(kmvar.varJson_App2)
+];
+
+const se = Application("System Events");
+
+for (const spec of specs) {
+  const proc = se.processes.byName(spec.app);
+
+  if (!proc.exists()) {
+    throw new Error(`App not running: ${spec.app}`);
+  }
+
+  const win = proc.windows[0];
+
+  if (!win.exists()) {
+    throw new Error(`No windows found for ${spec.app}`);
+  }
+
+  win.position = [spec.x, spec.y];
+  win.size = [spec.width, spec.height];
+}
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>798747567.77175701</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/Applications/Google Chrome.app</string>
+				<key>ModificationDate</key>
+				<real>798759243.74809504</real>
+				<key>Name</key>
+				<string>resize Codex|Chrome (js)</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>69A28F44-E6DE-49A6-9F0F-8321EF0D80C8</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>LowercaseFirst</string>
+						<key>ActionUID</key>
+						<integer>14</integer>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>TriggerClipboard</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>454303900.778404</real>
+				<key>ModificationDate</key>
+				<real>797596151.35466504</real>
+				<key>Name</key>
+				<string>-Lowercase First</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>E04F4347-8684-4EA1-B6E4-69BE67E0400A</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>2418</integer>
+						<key>IsDefaultApplication</key>
+						<true/>
+						<key>MacroActionType</key>
+						<string>OpenURL</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>URL</key>
+						<string>warp://launch/deno-markdown-browser</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797597237.94598103</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/Applications/Warp.app</string>
+				<key>ModificationDate</key>
+				<real>797949480.02320802</real>
+				<key>Name</key>
+				<string>warp—deno-markdown-browser</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>C5D5F8D4-4A24-485A-BE61-27FA9E8BC3AE</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>Capitalize</string>
+						<key>ActionUID</key>
+						<integer>8</integer>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>TriggerClipboard</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>454311001.14633501</real>
+				<key>ModificationDate</key>
+				<real>797596154.39168894</real>
+				<key>Name</key>
+				<string>-Capitalize</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>C22AFE08-5080-48A9-8A2F-F1EADCBF69EA</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797594992.64698899</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4</integer>
+						<key>MacroActionType</key>
+						<string>TriggerByName</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797594992.63693798</real>
+				<key>ModificationDate</key>
+				<real>797594992.63693798</real>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>FireType</key>
+						<string>Pressed</string>
+						<key>KeyCode</key>
+						<integer>17</integer>
+						<key>MacroTriggerType</key>
+						<string>HotKey</string>
+						<key>Modifiers</key>
+						<integer>6400</integer>
+					</dict>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>StatusMenu</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>83B92D23-FA16-4894-AFC1-30C181CA4BC6</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Global Macro Group</string>
+		<key>ToggleMacroUID</key>
+		<string>D656CC2C-ADC5-4B3E-8537-7749F4AC473A</string>
+		<key>UID</key>
+		<string>804D32AF-0B39-439F-8EF3-493A833B14CA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>Uppercase</string>
+						<key>ActionUID</key>
+						<integer>27</integer>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>TriggerClipboard</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>454303907.66604501</real>
+				<key>ModificationDate</key>
+				<real>797596156.65895402</real>
+				<key>Name</key>
+				<string>_Uppercase</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>8D48582E-781A-457F-986D-25F8CA74D53A</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>1637</integer>
+						<key>IsDefaultApplication</key>
+						<true/>
+						<key>MacroActionType</key>
+						<string>OpenURL</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>URL</key>
+						<string>warp://launch/list-macos-apps</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797597237.94598103</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/Applications/Warp.app</string>
+				<key>ModificationDate</key>
+				<real>797949484.53085196</real>
+				<key>Name</key>
+				<string>warp—py_quit</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>DAD9C8AC-BC91-488A-BF42-4382A0F1F496</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>798104537.79451597</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>4036</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteJavaScriptForAutomation</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>const se = Application("System Events");
+const frontProc = se.processes.whose({ frontmost: true })[0];
+
+if (!frontProc.exists()) {
+  throw new Error("No front app found");
+}
+
+const win = frontProc.windows[0];
+
+if (!win.exists()) {
+  throw new Error("No front window found");
+}
+
+const pos = win.position();
+const size = win.size();
+
+const leftInset = 40;
+const rightInset = 100;
+
+win.position = [pos[0] + leftInset, pos[1]];
+win.size = [size[0] - leftInset - rightInset, size[1]];
+</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseModernSyntax</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>795113871.13560605</real>
+				<key>CustomIconData</key>
+				<string>KMEP-MarkedBadge</string>
+				<key>ModificationDate</key>
+				<real>798764803.78282499</real>
+				<key>Name</key>
+				<string>window-inset (js)</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>D8898A0B-8CA6-4A5D-B3BD-0AEE1512B569</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TESTS</string>
+		<key>ToggleMacroUID</key>
+		<string>E41C4004-3EF5-4855-8E2F-A364AD01F95F</string>
+		<key>UID</key>
+		<string>86B59585-948C-4BA2-9BC3-3F7712BE95E7</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1632</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>cgshaq@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797084951.38818097</real>
+				<key>ModificationDate</key>
+				<real>797596921.33639002</real>
+				<key>Name</key>
+				<string>cgshaq</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>cgs </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>9676A9BC-3B2B-4FB4-828C-A44562E586C1</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>PercentEncodeForURL</string>
+						<key>ActionUID</key>
+						<integer>25</integer>
+						<key>Destination</key>
+						<string>Variable</string>
+						<key>DestinationVariable</key>
+						<string>Parameter</string>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>Clipboard</string>
+					</dict>
+					<dict>
+						<key>ActionUID</key>
+						<integer>26</integer>
+						<key>IsDefaultApplication</key>
+						<true/>
+						<key>MacroActionType</key>
+						<string>OpenURL</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>URL</key>
+						<string>https://translate.google.com/?hl=en&amp;tab=TT#view=home&amp;op=translate&amp;sl=auto&amp;tl=en&amp;text=%Variable%Parameter%</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>568086033.10108602</real>
+				<key>ModificationDate</key>
+				<real>572775732.24363995</real>
+				<key>Name</key>
+				<string>Translate</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>73429B62-A2A2-4FD5-A079-5211CD313BAA</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1633</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>tosifac@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797084951.38818097</real>
+				<key>ModificationDate</key>
+				<real>797596937.43538201</real>
+				<key>Name</key>
+				<string>tosifac</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>tos </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>8A6B818E-6C12-4370-9978-6D550BD31D8F</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>797084948.00893795</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>ByTyping</string>
+						<key>ActionUID</key>
+						<integer>1634</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>ProcessingMode</key>
+						<string>Nothing</string>
+						<key>TargetApplication</key>
+						<dict/>
+						<key>TargetingType</key>
+						<string>Front</string>
+						<key>Text</key>
+						<string>aazad.hoon2@gmail.com</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797084951.38818097</real>
+				<key>ModificationDate</key>
+				<real>797596951.78534198</real>
+				<key>Name</key>
+				<string>aazad.hoon2</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>TypedString</string>
+						<key>SimulateDeletes</key>
+						<true/>
+						<key>TypedString</key>
+						<string>aaz </string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>1EEA30AC-1FBA-4957-9859-DB2C69D563FB</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>TXT_Macros</string>
+		<key>ToggleMacroUID</key>
+		<string>D0C1167C-8C4D-4BFF-A3FC-83BBA6B097C0</string>
+		<key>UID</key>
+		<string>310758F5-2466-4406-94E2-B78BAB5A14D8</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>1635</integer>
+						<key>IsDefaultApplication</key>
+						<true/>
+						<key>MacroActionType</key>
+						<string>OpenURL</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>URL</key>
+						<string>warp://launch/test1</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>797597237.94598103</real>
+				<key>CustomIconData</key>
+				<string>KMEP-GenericApplication-/Applications/Warp.app</string>
+				<key>ModificationDate</key>
+				<real>797949488.20897102</real>
+				<key>Name</key>
+				<string>warp—test1</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>FFA97DFB-F851-4AA5-8DD8-46A12FA9CAA4</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>23</integer>
+						<key>Height</key>
+						<string>72</string>
+						<key>Left</key>
+						<string>100</string>
+						<key>MacroActionType</key>
+						<string>ResizeImage</string>
+						<key>ResizeAction</key>
+						<string>SetDPI</string>
+						<key>TargetUseTriggerClipboard</key>
+						<true/>
+						<key>Top</key>
+						<string>100</string>
+						<key>Width</key>
+						<string>72</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>530765640.33702302</real>
+				<key>ModificationDate</key>
+				<real>530765652.49417698</real>
+				<key>Name</key>
+				<string>Set DPI to Nominal</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>E1D893D1-3A7C-41C4-B815-C62091ED1C2A</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>10</integer>
+						<key>MacroActionType</key>
+						<string>TransformImage</string>
+						<key>Rotation</key>
+						<string>45</string>
+						<key>TransformAction</key>
+						<string>FlipHorizontal</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>565776478.13294196</real>
+				<key>ModificationDate</key>
+				<real>565776554.06807601</real>
+				<key>Name</key>
+				<string>Flip Horizontal</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>891551B6-7027-44FF-8A3E-5A68177C1C7B</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>21</integer>
+						<key>MacroActionType</key>
+						<string>TransformImage</string>
+						<key>Rotation</key>
+						<string>45</string>
+						<key>TransformAction</key>
+						<string>RotateCW</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>565776426.22995698</real>
+				<key>ModificationDate</key>
+				<real>565776453.139516</real>
+				<key>Name</key>
+				<string>Rotate Clockwise</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>AC4E4681-C808-4463-8CD8-B5D0AC37C04A</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>20</integer>
+						<key>MacroActionType</key>
+						<string>TransformImage</string>
+						<key>Rotation</key>
+						<string>45</string>
+						<key>TransformAction</key>
+						<string>Rotate180</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>565776470.18869805</real>
+				<key>ModificationDate</key>
+				<real>565776473.23094594</real>
+				<key>Name</key>
+				<string>Rotate 180°</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>FC41559C-2A91-4A52-A160-926280F43D0A</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>RemoveStyles</string>
+						<key>ActionUID</key>
+						<integer>19</integer>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>TriggerClipboard</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>510798491.77615601</real>
+				<key>ModificationDate</key>
+				<real>797596112.05222094</real>
+				<key>Name</key>
+				<string>—Remove Styles</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>B85756E7-8C76-494D-93FD-44E0499440FA</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>Lowercase</string>
+						<key>ActionUID</key>
+						<integer>13</integer>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>TriggerClipboard</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>454312565.08059901</real>
+				<key>ModificationDate</key>
+				<real>797596159.796857</real>
+				<key>Name</key>
+				<string>_Lowercase</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>AB128009-59B0-4965-BE49-141479D54E8A</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>TitleCase</string>
+						<key>ActionUID</key>
+						<integer>24</integer>
+						<key>MacroActionType</key>
+						<string>Filter</string>
+						<key>Source</key>
+						<string>Clipboard</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>454311011.63402998</real>
+				<key>ModificationDate</key>
+				<real>797596124.446787</real>
+				<key>Name</key>
+				<string>-Title Case</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>0BE34A18-DE7F-4532-B48B-702C35D587BA</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>Action</key>
+						<string>DisplayWindow</string>
+						<key>ActionUID</key>
+						<integer>9</integer>
+						<key>MacroActionType</key>
+						<string>InsertText</string>
+						<key>StyledText</key>
+						<data>
+						cnRmZAAAAAADAAAAAgAAAAcAAABU
+						WFQucnRmAQAAAC5fAQAAKwAAAAEA
+						AABXAQAAe1xydGYxXGFuc2lcYW5z
+						aWNwZzEyNTJcY29jb2FydGYxNTA0
+						XGNvY29hc3VicnRmODMwCntcZm9u
+						dHRibFxmMFxmbmlsXGZjaGFyc2V0
+						MCBIZWx2ZXRpY2FOZXVlO30Ke1xj
+						b2xvcnRibDtccmVkMjU1XGdyZWVu
+						MjU1XGJsdWUyNTU7XHJlZDBcZ3Jl
+						ZW4wXGJsdWUwO30Ke1wqXGV4cGFu
+						ZGVkY29sb3J0Ymw7O1xjc2dyYXlc
+						YzA7fQpccGFyZFx0eDU2MFx0eDEx
+						MjBcdHgxNjgwXHR4MjI0MFx0eDI4
+						MDBcdHgzMzYwXHR4MzkyMFx0eDQ0
+						ODBcdHg1MDQwXHR4NTYwMFx0eDYx
+						NjBcdHg2NzIwXHBhcmRpcm5hdHVy
+						YWxccGFydGlnaHRlbmZhY3RvcjAK
+						ClxmMFxmczI2IFxjZjIgJVRyaWdn
+						ZXJDbGlwYm9hcmQlfQEAAAAjAAAA
+						AQAAAAcAAABUWFQucnRmEAAAAOPU
+						ZVm2AQAAAAAAAAAAAAA=
+						</data>
+						<key>Text</key>
+						<string>%TriggerClipboard%</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>509947255.63380897</real>
+				<key>ModificationDate</key>
+				<real>797595204.724141</real>
+				<key>Name</key>
+				<string>Display as Text</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>6B922AAE-FC39-49E3-BA02-D29E92378B8A</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>795113845.93098497</real>
+		<key>CustomIconData</key>
+		<string>KMEP-Burning</string>
+		<key>DisplayInMenuBar</key>
+		<dict>
+			<key>Display</key>
+			<true/>
+			<key>IconType</key>
+			<string>MacroGroup</string>
+			<key>IncludeAllMacros</key>
+			<true/>
+			<key>IncludeMacroIcons</key>
+			<true/>
+			<key>TitleType</key>
+			<string>No</string>
+		</dict>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>846</integer>
+						<key>DisplayKind</key>
+						<string>None</string>
+						<key>HonourFailureSettings</key>
+						<true/>
+						<key>IncludeStdErr</key>
+						<false/>
+						<key>IncludedVariables</key>
+						<array>
+							<string>9999</string>
+						</array>
+						<key>MacroActionType</key>
+						<string>ExecuteSwift</string>
+						<key>Path</key>
+						<string></string>
+						<key>Text</key>
+						<string>import Foundation
+import Cocoa
+import ApplicationServices
+
+// ======================================================
+// SETTINGS
+// Edit only this section
+// ======================================================
+
+struct SingleWindowRule {
+    let appNames: [String]
+    let frame: CGRect
+    let label: String
+}
+
+struct IndexedWindowRule {
+    let appNames: [String]
+    let windowIndex: Int   // 0-based: 0 = first window, 1 = second window
+    let frame: CGRect
+    let label: String
+}
+
+// Apps that usually have one relevant window
+let singleWindowRules: [SingleWindowRule] = [
+    SingleWindowRule(
+        appNames: ["Keyboard Maestro", "Keyboard Maestro Editor"],
+        frame: CGRect(x: 210, y: 200, width: 1000, height: 650),
+        label: "Keyboard Maestro"
+    ),
+    SingleWindowRule(
+        appNames: ["Finder"],
+        frame: CGRect(x: 70, y: 100, width: 920, height: 580),
+        label: "Finder"
+    ),
+    SingleWindowRule(
+        appNames: ["Helium"],
+        frame: CGRect(x: 60, y: 60, width: 1200, height: 880),
+        label: "Helium"
+    ),
+    SingleWindowRule(
+        appNames: ["Zen", "Zen Browser"],
+        frame: CGRect(x: 63, y: 40, width: 1343, height: 908),
+        label: "Zen"
+    ),
+    SingleWindowRule(
+        appNames: ["Zed"],
+        frame: CGRect(x: 80, y: 70, width: 1200, height: 860),
+        label: "Zed"
+    )
+]
+
+// Apps where you want windows by order, not title
+let indexedWindowRules: [IndexedWindowRule] = [
+    IndexedWindowRule(
+        appNames: ["Cursor"],
+        windowIndex: 0,
+        frame: CGRect(x: 60, y: 40, width: 1250, height: 900),
+        label: "Cursor 1"
+    ),
+    IndexedWindowRule(
+        appNames: ["Cursor"],
+        windowIndex: 1,
+        frame: CGRect(x: 112, y: 77, width: 1263, height: 878),
+        label: "Cursor 2"
+    ),
+    IndexedWindowRule(
+        appNames: ["Google Chrome", "Chrome"],
+        windowIndex: 0,
+        frame: CGRect(x: 60, y: 40, width: 1250, height: 900),
+        label: "Chrome 1"
+    ),
+    IndexedWindowRule(
+        appNames: ["Google Chrome", "Chrome"],
+        windowIndex: 1,
+        frame: CGRect(x: 112, y: 77, width: 1263, height: 878),
+        label: "Chrome 2"
+    )
+]
+
+
+// ======================================================
+// HELPERS
+// ======================================================
+
+func copyAttribute(_ element: AXUIElement, _ name: String) -&gt; AnyObject? {
+    var value: CFTypeRef?
+    let result = AXUIElementCopyAttributeValue(element, name as CFString, &amp;value)
+    guard result == .success, let value else { return nil }
+    return value
+}
+
+func setAttribute(_ element: AXUIElement, _ name: String, _ value: CFTypeRef) -&gt; Bool {
+    AXUIElementSetAttributeValue(element, name as CFString, value) == .success
+}
+
+func makeAXValue(_ point: CGPoint) -&gt; AXValue {
+    var p = point
+    return AXValueCreate(.cgPoint, &amp;p)!
+}
+
+func makeAXValue(_ size: CGSize) -&gt; AXValue {
+    var s = size
+    return AXValueCreate(.cgSize, &amp;s)!
+}
+
+func isStandardWindow(_ window: AXUIElement) -&gt; Bool {
+    let role = copyAttribute(window, kAXRoleAttribute) as? String
+    let subrole = copyAttribute(window, kAXSubroleAttribute) as? String
+    return role == kAXWindowRole &amp;&amp; subrole == kAXStandardWindowSubrole
+}
+
+func isMinimized(_ window: AXUIElement) -&gt; Bool {
+    (copyAttribute(window, kAXMinimizedAttribute) as? Bool) ?? false
+}
+
+func windowTitle(_ window: AXUIElement) -&gt; String {
+    (copyAttribute(window, kAXTitleAttribute) as? String) ?? "(untitled)"
+}
+
+func setWindowFrame(_ window: AXUIElement, _ frame: CGRect) -&gt; Bool {
+    let okPos = setAttribute(window, kAXPositionAttribute, makeAXValue(frame.origin))
+    let okSize = setAttribute(window, kAXSizeAttribute, makeAXValue(frame.size))
+    return okPos &amp;&amp; okSize
+}
+
+func findRunningApp(namedAnyOf names: [String]) -&gt; NSRunningApplication? {
+    let apps = NSWorkspace.shared.runningApplications
+    for candidate in names {
+        if let app = apps.first(where: { $0.localizedName == candidate }) {
+            return app
+        }
+    }
+    return nil
+}
+
+func standardWindows(for app: NSRunningApplication) -&gt; [AXUIElement] {
+    let axApp = AXUIElementCreateApplication(app.processIdentifier)
+
+    guard let raw = copyAttribute(axApp, kAXWindowsAttribute) as? [AnyObject] else {
+        return []
+    }
+
+    return raw
+        .map { $0 as! AXUIElement }
+        .filter { isStandardWindow($0) &amp;&amp; !isMinimized($0) }
+}
+
+func firstWindow(forAppNames appNames: [String]) -&gt; AXUIElement? {
+    guard let app = findRunningApp(namedAnyOf: appNames) else { return nil }
+    let windows = standardWindows(for: app)
+    return windows.first
+}
+
+func indexedWindow(forAppNames appNames: [String], index: Int) -&gt; AXUIElement? {
+    guard let app = findRunningApp(namedAnyOf: appNames) else { return nil }
+    let windows = standardWindows(for: app)
+    guard index &gt;= 0 &amp;&amp; index &lt; windows.count else { return nil }
+    return windows[index]
+}
+
+func describeFrame(_ frame: CGRect) -&gt; String {
+    "\(Int(frame.origin.x)),\(Int(frame.origin.y)) \(Int(frame.size.width))x\(Int(frame.size.height))"
+}
+
+
+// ======================================================
+// MAIN
+// ======================================================
+
+guard AXIsProcessTrusted() else {
+    fputs("Accessibility permission is not enabled.\n", stderr)
+    exit(1)
+}
+
+var lines: [String] = []
+
+// Single-window apps
+for rule in singleWindowRules {
+    guard let win = firstWindow(forAppNames: rule.appNames) else {
+        lines.append("\(rule.label): window not found")
+        continue
+    }
+
+    let title = windowTitle(win)
+    let ok = setWindowFrame(win, rule.frame)
+
+    if ok {
+        lines.append("\(rule.label): resized → \(title) → \(describeFrame(rule.frame))")
+    } else {
+        lines.append("\(rule.label): failed → \(title)")
+    }
+}
+
+// Indexed windows
+for rule in indexedWindowRules {
+    guard let win = indexedWindow(forAppNames: rule.appNames, index: rule.windowIndex) else {
+        lines.append("\(rule.label): window not found")
+        continue
+    }
+
+    let title = windowTitle(win)
+    let ok = setWindowFrame(win, rule.frame)
+
+    if ok {
+        lines.append("\(rule.label): resized → \(title) → \(describeFrame(rule.frame))")
+    } else {
+        lines.append("\(rule.label): failed → \(title)")
+    }
+}
+
+print(lines.joined(separator: "\n"))</string>
+						<key>TimeOutAbortsMacro</key>
+						<true/>
+						<key>TrimResults</key>
+						<true/>
+						<key>TrimResultsNew</key>
+						<true/>
+						<key>UseText</key>
+						<true/>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>796432056.37381101</real>
+				<key>ModificationDate</key>
+				<real>796433639.55267894</real>
+				<key>Name</key>
+				<string>window-reSize-swift</string>
+				<key>Triggers</key>
+				<array/>
+				<key>UID</key>
+				<string>8C90F8A8-8B43-4AC2-8F9A-1708F88163DA</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>menubar_1</string>
+		<key>ToggleMacroUID</key>
+		<string>62A743D7-2B24-479E-9C47-E2ABF1D04552</string>
+		<key>UID</key>
+		<string>CC27FA33-4510-4612-B2FC-8BC0EA03212C</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>11</integer>
+						<key>MacroActionType</key>
+						<string>TransformImage</string>
+						<key>Rotation</key>
+						<string>45</string>
+						<key>TransformAction</key>
+						<string>FlipVertical</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>565776488.004017</real>
+				<key>ModificationDate</key>
+				<real>565776560.29822004</real>
+				<key>Name</key>
+				<string>Flip Vertical</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>999A8D1A-3568-4D13-BB3A-1330337088DA</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+	<dict>
+		<key>Activate</key>
+		<string>Normal</string>
+		<key>CreationDate</key>
+		<real>509610467.10374999</real>
+		<key>Macros</key>
+		<array>
+			<dict>
+				<key>Actions</key>
+				<array>
+					<dict>
+						<key>ActionUID</key>
+						<integer>12</integer>
+						<key>Height</key>
+						<string>IMAGE(Height)/2</string>
+						<key>Left</key>
+						<string>100</string>
+						<key>MacroActionType</key>
+						<string>ResizeImage</string>
+						<key>ResizeAction</key>
+						<string>ScaleTo</string>
+						<key>TargetUseTriggerClipboard</key>
+						<true/>
+						<key>Top</key>
+						<string>100</string>
+						<key>Width</key>
+						<string>IMAGE(Width)/2</string>
+					</dict>
+				</array>
+				<key>CreationDate</key>
+				<real>511340665.16981399</real>
+				<key>ModificationDate</key>
+				<real>511340714.652583</real>
+				<key>Name</key>
+				<string>Half Size Image</string>
+				<key>Triggers</key>
+				<array>
+					<dict>
+						<key>MacroTriggerType</key>
+						<string>ClipboardFilter</string>
+					</dict>
+				</array>
+				<key>UID</key>
+				<string>FD2C52E0-6CB1-4BDF-9F06-B231A548290A</string>
+			</dict>
+		</array>
+		<key>Name</key>
+		<string>Clipboard Filters v2</string>
+		<key>Theme</key>
+		<dict>
+			<key>UseDefaultInstead</key>
+			<false/>
+		</dict>
+		<key>ToggleMacroUID</key>
+		<string>17C19A01-9D69-420F-921A-585D915B4851</string>
+		<key>UID</key>
+		<string>52710DBC-9117-4AAC-B910-59C016C4BDEA</string>
+	</dict>
+</array>
+</plist>
