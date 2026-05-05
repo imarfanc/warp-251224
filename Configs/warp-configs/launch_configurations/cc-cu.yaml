@@ -1,0 +1,10 @@
+---
+name: cc-cu
+windows:
+  - tabs:
+      - title: cc-cu
+        color: blue
+        layout:
+          cwd: /Users/arfan/Developer/cc-cu
+          commands:
+            - exec: 'claude --model haiku "use computer use mcp to resolution to "default" in system settings. unless its already "default" in which case change it to "more space"."'

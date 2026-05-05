@@ -1,0 +1,19 @@
+---
+name: deno-markdown-browser
+windows:
+  - tabs:
+      - title: tab1
+        color: red
+        layout:
+          cwd: /Users
+          commands:
+            - exec: cd "$HOME/Developer/gh/web-apps/TOOLS/markdown-browser"
+            # - exec: claude --model haiku "list all open apps in a nice table"
+            - exec: deno task start
+      - title: tab2
+        color: green
+        layout:
+          cwd: /Users
+          commands:
+            - exec: cd "$HOME/Developer/gh/web-apps/TOOLS/markdown-browser"
+            - exec: deno task open
