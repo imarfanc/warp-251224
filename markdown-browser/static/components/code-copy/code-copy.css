@@ -72,8 +72,8 @@
     background: transparent;
 }
 
-/* highlight.js tokens inside fenced blocks */
-.code-block-wrap pre code.hljs {
+/* Prism.js tokens inside fenced blocks */
+.code-block-wrap pre code[class*="language-"] {
     display: block;
     overflow-x: auto;
     background: transparent !important;

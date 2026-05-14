@@ -1,8 +1,24 @@
+---
+title: "1"
+sort: 1
+category: "macOS reset"
+description: "the first file in the macOS reset project"
+date: 2026-5-1
+tags:
+  - macOS
+  - reset
+  - 1
+  - one
+  - first
+  - initial
+---
+
 # 1
 
 ## safari
 
 - open `safari`
+- [_arfan-vals-list.val.run_](https://arfan-vals-list.val.run)
 - get iPhone/iPad
 - sign into google
 
@@ -20,7 +36,8 @@
 ## terminal script to quit oepn apps (except terminal & finder)
 
 ```sh
-osascript -e 'tell application "System Events" to set quitApps to name of every process whose background only is false' \
+osascript -e 'tell application "System Events" to set quitApps to \'
+          -e '  name of every process whose background only is false' \
           -e 'set skipList to {"Finder", "Terminal"}' \
           -e 'repeat with appName in quitApps' \
           -e '  if appName is not in skipList then' \
@@ -29,19 +46,6 @@ osascript -e 'tell application "System Events" to set quitApps to name of every 
           -e '    end try' \
           -e '  end if' \
           -e 'end repeat'
-```
-
-## create some folders/files
-
-```sh
-mkdir -p Developer/macos-reset
-
-touch .zprofile
-touch .zshrc
-
-cat .zprofile222
-cat .zprofile
-cat .zshrc
 ```
 
 ## auto login

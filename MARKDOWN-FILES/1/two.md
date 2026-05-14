@@ -1,6 +1,25 @@
+---
+title: "2"
+sort: 2
+category: "macOS reset"
+description: "the second file in the macOS reset project"
+date: 2026-5-1
+tags:
+  - macOS
+  - reset
+  - 2
+  - two
+  - second
+  - second file
+---
+
 # two
 
+## delete files & dirs
+
 ```sh
+#sudo find ~/Movies ~/Music ~/Public ~/Downloads ~/Desktop ~/Documents ~/Pictures \
+
 bash <<'EOF'
 echo "deleting files & dirs..."
 file_count=0
@@ -14,7 +33,6 @@ while IFS= read -r -d '' f; do
     printf "\r  deleting file [%d] %s                    " "$file_count" "$f"
   fi
   sudo rm -rf -- "$f" 2>/dev/null
-#        sudo find ~/Movies ~/Music ~/Public ~/Downloads ~/Desktop ~/Documents ~/Pictures \
 done < <(sudo find ~/Movies ~/Music ~/Public ~/Downloads ~/Desktop ~/Documents \
   -mindepth 1 -print0 2>/dev/null)
 printf "\r  deleted %d dirs, %d files                    \n" "$dir_count" "$file_count"
@@ -29,4 +47,30 @@ done < <(sudo find ~ \
   -name ".DS_Store" -type f -print0 2>/dev/null)
 printf "\r  deleted %d .DS_Store files                    \n" "$ds_count"
 EOF
+```
+
+## create some folders/files
+
+### download warp-251224 repo
+
+- [https://github.com/imarfanc/warp-251224](https://github.com/imarfanc/warp-251224)
+- [https://github.com/imarfanc/warp-251224/archive/refs/heads/main.zip](https://github.com/imarfanc/warp-251224/archive/refs/heads/main.zip)
+
+```sh
+mkdir -p ~/Developer/macos-reset
+
+mkdir -p ~/Developer/gh
+cd ~/Developer/gh
+curl -fsSL \
+  https://github.com/imarfanc/warp-251224/archive/refs/heads/main.zip \
+  -o warp-251224.zip
+unzip warp-251224.zip
+rm warp-251224.zip
+
+touch .zprofile
+touch .zshrc
+
+cat .zprofile222
+cat .zprofile
+cat .zshrc
 ```

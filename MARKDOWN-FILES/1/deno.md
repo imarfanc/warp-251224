@@ -1,6 +1,25 @@
-# three
+---
+title: "deno"
+sort: 4
+category: "macOS reset"
+description: "install deno"
+date: 2026-5-1
+tags:
+  - macOS
+  - reset
+  - deno
+  - install
+---
 
-## install deno
+# install deno
+
+## using brew
+
+```sh
+brew install deno
+```
+
+## using curl
 
 ```sh
 curl -fsSL https://deno.land/install.sh | sh
@@ -9,38 +28,6 @@ curl -fsSL https://deno.land/install.sh | sh
 ## backup dir
 
 ```sh
-#sudo find ~/Movies ~/Music ~/Public ~/Downloads ~/Desktop ~/Documents ~/Pictures \
-
-bash <<'EOF'
-echo "deleting files & dirs..."
-file_count=0
-dir_count=0
-while IFS= read -r -d '' f; do
-  if [ -d "$f" ]; then
-    dir_count=$((dir_count + 1))
-    printf "\r  deleting dir [%d] %s                    " "$dir_count" "$f"
-  else
-    file_count=$((file_count + 1))
-    printf "\r  deleting file [%d] %s                    " "$file_count" "$f"
-  fi
-  sudo rm -rf -- "$f" 2>/dev/null
-done < <(sudo find ~/Movies ~/Music ~/Public ~/Downloads ~/Desktop ~/Documents \
-  -mindepth 1 -print0 2>/dev/null)
-printf "\r  deleted %d dirs, %d files                    \n" "$dir_count" "$file_count"
-
-echo "deleting .DS_Store..."
-ds_count=0
-while IFS= read -r -d '' f; do
-  ds_count=$((ds_count + 1))
-  printf "\r  deleting [%d] %s                    " "$ds_count" "$f"
-  sudo rm -f -- "$f" 2>/dev/null
-done < <(sudo find ~ \
-  -name ".DS_Store" -type f -print0 2>/dev/null)
-printf "\r  deleted %d .DS_Store files                    \n" "$ds_count"
-EOF
-
-mkdir -p Developer/macos-reset
-
 deno run --allow-read --allow-write --allow-env --allow-run - <<'TS'
 import * as path from "jsr:@std/path";
 

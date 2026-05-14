@@ -69,7 +69,7 @@ one concern and they communicate through a shared
   hardcoding.
 
 External runtime deps are loaded from CDNs in `index.html`: Tailwind (CDN
-script), highlight.js, and Iconify. TypeScript globals for Iconify and hljs live
+script), Prism.js, and Iconify. TypeScript globals for Iconify and Prism live
 in `*-global.d.ts` files.
 
 ### Conventions worth knowing

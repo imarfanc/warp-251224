@@ -1036,12 +1036,12 @@ function normalizeLanguageClass(code) {
   }
 }
 function applySyntaxHighlight(root) {
-  if (typeof hljs === "undefined" || !hljs.highlightElement) return;
+  if (typeof Prism === "undefined" || !Prism.highlightElement) return;
   for (const node of root.querySelectorAll("pre > code")) {
     if (!(node instanceof HTMLElement)) continue;
     normalizeLanguageClass(node);
     try {
-      hljs.highlightElement(node);
+      Prism.highlightElement(node);
     } catch {
     }
   }
