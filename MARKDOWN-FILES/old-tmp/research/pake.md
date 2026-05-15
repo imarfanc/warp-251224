@@ -1,5 +1,18 @@
 # pake
 
+## using pake 2
+
+- must be png format
+
+```sh
+pake --hide-title-bar \
+     --install \
+     --multi-window \
+     --name "md-vt2" \
+     --icon "$HOME/Downloads/icon.png" \
+       https://arfan-md.val.run/
+```
+
 ## using pake 1
 
 ```sh

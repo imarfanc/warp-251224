@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "Markdown Viewer",
+  "short_name": "MD Viewer",
+  "description": "Local markdown file browser and viewer",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "browser"],
+  "orientation": "any",
+  "background_color": "#f8fafb",
+  "theme_color": "#2f44ad",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
