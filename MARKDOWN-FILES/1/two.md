@@ -73,4 +73,6 @@ touch .zshrc
 cat .zprofile222
 cat .zprofile
 cat .zshrc
+
+open ~/Developer
 ```

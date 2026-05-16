@@ -36,6 +36,22 @@ tags:
 ## terminal script to quit oepn apps (except terminal & finder)
 
 ```sh
+osascript -e '
+tell application "System Events"
+  set quitApps to name of every process whose background only is false
+end tell
+set skipList to {"Finder", "Terminal"}
+repeat with appName in quitApps
+  if appName is not in skipList then
+    try
+      tell application appName to quit
+    end try
+  end if
+end repeat
+'
+```
+
+```sh
 osascript -e 'tell application "System Events" to set quitApps to \'
           -e '  name of every process whose background only is false' \
           -e 'set skipList to {"Finder", "Terminal"}' \

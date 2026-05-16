@@ -32,6 +32,7 @@ deno run --allow-read --allow-write --allow-env --allow-run - <<'TS'
 import * as path from "jsr:@std/path";
 
 const ROOT = ".";
+const OUTPUT_DIR = "/Users/arfan/Developer/macos-reset";   // can't use ~ or $HOME
 const SHOW_HIDDEN = true;
 const FOLLOW_SYMLINKS = false;
 const SCAN_EVERYTHING = false; // true = scan everything (cycle-safe), false = respect MAX_DEPTH
@@ -41,7 +42,6 @@ const TOP_N_FILES = 25;
 const TOP_N_DIRS = 50;
 
 const SAVE_OUTPUT = true;
-const OUTPUT_DIR = "/Users/arfan/Developer/macos-reset";   // no HOME/env needed
 const OUTPUT_BASENAME = "tree_output";
 const OUTPUT_EXT = ".txt";
 const APPEND_TIMESTAMP_SUFFIX = true;                      // tree-output-yy.m.d_h.mmam.txt
