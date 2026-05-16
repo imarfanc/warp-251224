@@ -1,0 +1,28 @@
+[
+  {
+    "BTTLastUpdatedAt" : 1778975420.51613,
+    "BTTTriggerType" : 0,
+    "BTTTriggerClass" : "BTTTriggerTypeKeyboardShortcut",
+    "BTTUUID" : "9EC24D6A-9D03-44D4-BE53-830922F1052F",
+    "BTTAdditionalConfiguration" : "0",
+    "BTTShortcutKeyboardType" : 1558,
+    "BTTTriggerOnDown" : 1,
+    "BTTLayoutIndependentChar" : "",
+    "BTTShortcutKeyCode" : 1004,
+    "BTTShortcutAdvancedModifierKeys" : "0",
+    "BTTShortcutModifierKeys" : 0,
+    "BTTOrder" : 0,
+    "BTTAutoAdaptToKeyboardLayout" : 0,
+    "BTTActionsToExecute" : [
+      {
+        "BTTLastUpdatedAt" : 1778975425.346972,
+        "BTTTriggerParentUUID" : "9EC24D6A-9D03-44D4-BE53-830922F1052F",
+        "BTTIsPureAction" : true,
+        "BTTUUID" : "A5026C8B-8AB3-4097-8107-8E4790013E89",
+        "BTTPredefinedActionType" : 293,
+        "BTTPredefinedActionName" : "Act as Hyper Key",
+        "BTTOrder" : 9
+      }
+    ]
+  }
+]
