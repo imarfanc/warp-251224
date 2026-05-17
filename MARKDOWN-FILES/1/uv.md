@@ -1,6 +1,6 @@
 ---
 title: "uv"
-sort: 5
+sort: 4
 category: "macOS reset"
 description: "install uv"
 date: 2026-5-1

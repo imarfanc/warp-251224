@@ -1,6 +1,6 @@
 ---
 title: "deno"
-sort: 4
+sort: 5
 category: "macOS reset"
 description: "install deno"
 date: 2026-5-1
@@ -548,7 +548,7 @@ mkdir -p Developer/gh
 mkdir -p Developer/tmp1
 mkdir -p Developer/local
 cd Developer/gh/
-curl -fsSL https://opencode.ai/install | bash
+
 mkdir -p "$HOME/Developer/macos-reset/bak1"
 cp "$HOME/.zprofile" "$HOME/Developer/macos-reset/bak1/zprofile.txt"
 cp "$HOME/.zshrc" "$HOME/Developer/macos-reset/bak1/zshrc.txt"
