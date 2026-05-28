@@ -1,0 +1,25 @@
+{
+  "hidden": ["default", "a1"],
+  "groups": [
+    {
+      "label": "Tools",
+      "color": "teal",
+      "recipes": ["folder-commander", "markdown-browser", "repo-sync"]
+    },
+    {
+      "label": "Calendar",
+      "color": "amber",
+      "recipes": ["calendar-today", "macos-calendar2"]
+    },
+    {
+      "label": "TTS",
+      "color": "violet",
+      "recipes": ["kokoro", "qwen3-tts", "voxcpm2"]
+    },
+    {
+      "label": "update port",
+      "color": "blue",
+      "recipes": ["voice-notes-browser", "web-terminal"]
+    }
+  ]
+}

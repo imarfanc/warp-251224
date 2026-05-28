@@ -5,4 +5,4 @@ default:
 
 # Launch the web-apps just-runner UI
 just-runner:
-    cd just-runner && ([ -d node_modules ] || npm install) && npm start
+    cd APPS/just-runner && ([ -d node_modules ] || npm install) && npm start

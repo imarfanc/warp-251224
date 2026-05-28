@@ -4,7 +4,7 @@ const { WebSocketServer } = require('ws');
 const { spawn, execFileSync } = require('child_process');
 const path = require('path');
 
-const WEB_APPS_DIR = process.env.WEB_APPS_DIR || '/Users/arfan2/Developer/gh/web-apps';
+const WEB_APPS_DIR = process.env.WEB_APPS_DIR || path.join(process.env.HOME, 'Developer/gh/web-apps');
 const PORT = process.env.PORT || 4500;
 const LOG_LIMIT = 500;
 
@@ -125,15 +125,7 @@ app.get('/api/recipes', (req, res) => {
     }
 });
 
-// Explicit routes for extension-less views
 app.use(express.static(path.join(__dirname, 'public')));
-app.get('/terminal', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'terminal.html'));
-});
-app.get('/sidebar', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'sidebar.html'));
-});
-
 // WebSocket
 wss.on('connection', (ws) => {
     // Send current state snapshot to newly connected client
@@ -157,15 +149,12 @@ wss.on('connection', (ws) => {
             startApp(msg.recipe);
         } else if (msg.type === 'stop' && msg.recipe) {
             stopApp(msg.recipe);
-        } else if (msg.type === 'startMany' && Array.isArray(msg.recipes)) {
-            msg.recipes.forEach(startApp);
         }
     });
 });
 
 server.listen(PORT, () => {
     console.log(`just-runner running at http://localhost:${PORT}`);
-    console.log(`  Panels view:   http://localhost:${PORT}/`);
-    console.log(`  Terminal view: http://localhost:${PORT}/terminal`);
+    console.log(`  http://localhost:${PORT}/`);
     console.log(`  Web-apps dir:  ${WEB_APPS_DIR}`);
 });

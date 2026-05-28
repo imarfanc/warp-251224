@@ -5,6 +5,7 @@ function stripAnsi(str) {
 
 let ws;
 let recipes = [];
+let cardGroups = { groups: [] };
 // appState: name → { status, url, logEl }
 const appState = new Map();
 
@@ -19,6 +20,15 @@ function sendMsg(obj) {
 
 function getCard(name) {
     return document.getElementById('card-' + name);
+}
+
+function portFromUrl(url) {
+    try {
+        const port = new URL(url).port;
+        return port ? ':' + port : '';
+    } catch {
+        return '';
+    }
 }
 
 function updateCard(name, status, url) {
@@ -38,18 +48,26 @@ function updateCard(name, status, url) {
     startBtn.disabled = st.status === 'running';
     stopBtn.disabled  = st.status !== 'running';
 
-    let openLink = card.querySelector('.open-link');
+    let openGroup = card.querySelector('.open-group');
     if (st.url) {
-        if (!openLink) {
-            openLink = document.createElement('a');
+        if (!openGroup) {
+            openGroup = document.createElement('span');
+            openGroup.className = 'open-group';
+            const openLink = document.createElement('a');
             openLink.className = 'open-link';
             openLink.target = '_blank';
             openLink.rel = 'noopener';
             openLink.textContent = 'Open';
-            card.querySelector('.card-controls').appendChild(openLink);
+            const portLabel = document.createElement('span');
+            portLabel.className = 'open-port';
+            openGroup.append(openLink, portLabel);
+            card.querySelector('.card-controls').appendChild(openGroup);
         }
+        const openLink = openGroup.querySelector('.open-link');
+        const portLabel = openGroup.querySelector('.open-port');
         openLink.href = st.url;
         openLink.title = st.url;
+        portLabel.textContent = portFromUrl(st.url);
     }
 }
 
@@ -92,10 +110,45 @@ function buildCard(recipe) {
 function renderCards() {
     const container = document.getElementById('cards');
     container.innerHTML = '';
-    recipes.forEach(r => {
-        container.appendChild(buildCard(r));
-        appState.set(r.name, { status: 'stopped', url: null });
-    });
+
+    const hidden = new Set(cardGroups.hidden || []);
+    const grouped = new Set();
+    for (const group of cardGroups.groups || []) {
+        for (const name of group.recipes || []) grouped.add(name);
+    }
+
+    for (const group of cardGroups.groups || []) {
+        const members = (group.recipes || [])
+            .map(name => recipes.find(r => r.name === name))
+            .filter(r => r && !hidden.has(r.name));
+        if (!members.length) continue;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card-group';
+        if (group.color && /^[a-z]+$/.test(group.color)) {
+            wrapper.classList.add('card-group--' + group.color);
+        }
+        if (group.label) {
+            const label = document.createElement('div');
+            label.className = 'card-group-label';
+            label.textContent = group.label;
+            wrapper.appendChild(label);
+        }
+        const inner = document.createElement('div');
+        inner.className = 'card-group-cards';
+        for (const recipe of members) {
+            inner.appendChild(buildCard(recipe));
+            appState.set(recipe.name, { status: 'stopped', url: null });
+        }
+        wrapper.appendChild(inner);
+        container.appendChild(wrapper);
+    }
+
+    for (const recipe of recipes) {
+        if (grouped.has(recipe.name) || hidden.has(recipe.name)) continue;
+        container.appendChild(buildCard(recipe));
+        appState.set(recipe.name, { status: 'stopped', url: null });
+    }
 }
 
 function applySnapshot(snapshotApps) {
@@ -133,10 +186,14 @@ function connect() {
     };
 }
 
-fetch('/api/recipes')
-    .then(r => r.json())
-    .then(({ recipes: r }) => {
-        recipes = r;
-        renderCards();
-        connect();
-    });
+Promise.all([
+    fetch('/api/recipes').then(r => r.json()),
+    fetch('/card-groups.json')
+        .then(r => (r.ok ? r.json() : { groups: [] }))
+        .catch(() => ({ groups: [] })),
+]).then(([{ recipes: r }, groups]) => {
+    recipes = r;
+    cardGroups = groups;
+    renderCards();
+    connect();
+});
