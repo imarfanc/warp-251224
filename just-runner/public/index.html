@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just Runner — Panels</title>
+    <link rel="icon" type="image/png" href="https://cdn.midjourney.com/b3b9a7a8-509f-48c5-98fd-48c4b15c8df6/0_2.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div id="app">
+    <div id="topbar">
+        <h1>Just Runner</h1>
+        <a href="/" class="nav-link active">Panels</a>
+        <a href="/terminal" class="nav-link">Terminal</a>
+        <a href="/sidebar" class="nav-link">Sidebar</a>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+            <div class="conn-dot" id="conn-dot"></div>
+            <span class="conn-label" id="conn-label">offline</span>
+        </div>
+    </div>
+    <div id="main">
+        <div id="cards"></div>
+    </div>
+</div>
+<script src="/panels.js"></script>
+</body>
+</html>

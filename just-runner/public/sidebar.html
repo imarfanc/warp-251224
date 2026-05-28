@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just Runner — Sidebar</title>
+    <link rel="icon" type="image/png" href="https://cdn.midjourney.com/b3b9a7a8-509f-48c5-98fd-48c4b15c8df6/0_2.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        #sb-layout {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        #sb-sidebar {
+            width: 200px;
+            flex-shrink: 0;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #sb-sidebar-header {
+            padding: 10px 12px 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        #sb-filter {
+            margin: 8px 10px;
+            padding: 4px 8px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: var(--font-ui);
+            font-size: 12px;
+            outline: none;
+            flex-shrink: 0;
+        }
+        #sb-filter:focus { border-color: var(--text-dim); }
+        #sb-filter::placeholder { color: var(--text-dim); }
+
+        #sb-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px 0 8px;
+        }
+
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-left: 2px solid transparent;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-dim);
+            transition: background 0.1s, color 0.1s;
+            user-select: none;
+        }
+        .sb-item:hover { background: var(--surface2); color: var(--text); }
+        .sb-item.active {
+            border-left-color: var(--accent);
+            color: var(--text);
+            background: var(--surface2);
+        }
+        .sb-item.running { color: var(--text); }
+        .sb-item .status-dot { flex-shrink: 0; }
+
+        #sb-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--bg);
+        }
+
+        #sb-detail-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        #sb-recipe-name {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        #sb-recipe-doc {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        #sb-log {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 14px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            line-height: 1.65;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background: #0d1117;
+            color: var(--text);
+        }
+
+        #sb-empty {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div id="topbar">
+        <h1>Just Runner</h1>
+        <a href="/" class="nav-link">Panels</a>
+        <a href="/terminal" class="nav-link">Terminal</a>
+        <a href="/sidebar" class="nav-link active">Sidebar</a>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+            <div class="conn-dot" id="conn-dot"></div>
+            <span class="conn-label" id="conn-label">offline</span>
+        </div>
+    </div>
+    <div id="sb-layout">
+        <div id="sb-sidebar">
+            <div id="sb-sidebar-header">Recipes</div>
+            <input id="sb-filter" type="search" placeholder="Filter…">
+            <div id="sb-list"></div>
+        </div>
+        <div id="sb-main">
+            <div id="sb-detail-head" class="hidden">
+                <div class="status-dot" id="sb-status-dot"></div>
+                <span id="sb-recipe-name"></span>
+                <span id="sb-recipe-doc"></span>
+                <button class="btn start" id="sb-start-btn">Start</button>
+                <button class="btn stop" id="sb-stop-btn" disabled>Stop</button>
+                <a class="open-link hidden" id="sb-open-link" target="_blank" rel="noopener">Open ↗</a>
+            </div>
+            <pre id="sb-log" class="hidden"></pre>
+            <div id="sb-empty">Select a recipe from the sidebar</div>
+        </div>
+    </div>
+</div>
+<script src="/sidebar.js"></script>
+</body>
+</html>
