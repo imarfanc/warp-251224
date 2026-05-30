@@ -2,9 +2,12 @@ const express = require('express');
 const http = require('http');
 const { WebSocketServer } = require('ws');
 const { spawn, execFileSync } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 
 const WEB_APPS_DIR = process.env.WEB_APPS_DIR || path.join(process.env.HOME, 'Developer/gh/web-apps');
+const REPO_ROOT = process.env.REPO_ROOT || path.join(__dirname, '../..');
+const LOCAL_CARDS_PATH = path.join(__dirname, 'public/local-cards.json');
 const PORT = process.env.PORT || 4500;
 const LOG_LIMIT = 500;
 
@@ -58,7 +61,65 @@ function detectUrl(text) {
     return null;
 }
 
+function loadLocalCards() {
+    try {
+        const data = JSON.parse(fs.readFileSync(LOCAL_CARDS_PATH, 'utf8'));
+        return data.cards || [];
+    } catch (err) {
+        console.error('Failed to load local cards:', err.message);
+        return [];
+    }
+}
+
+function getLocalCard(name) {
+    return loadLocalCards().find(c => c.name === name);
+}
+
+function spawnCommand(name, command, cwd) {
+    const entry = apps.get(name);
+    if (entry && entry.status === 'running') return;
+
+    const appEntry = { status: 'running', code: null, url: null, child: null, log: [] };
+    apps.set(name, appEntry);
+    broadcast({ type: 'status', recipe: name, status: 'running' });
+    broadcast({ type: 'output', recipe: name, data: `$ ${command}\n` });
+
+    const child = spawn('bash', ['-lc', command], {
+        cwd: cwd || REPO_ROOT,
+        env: { ...process.env, FORCE_COLOR: '1' },
+    });
+    appEntry.child = child;
+
+    function onData(data) {
+        const text = data.toString();
+        appendLog(name, text);
+        broadcast({ type: 'output', recipe: name, data: text });
+    }
+
+    child.stdout.on('data', onData);
+    child.stderr.on('data', onData);
+
+    child.on('error', (err) => {
+        const msg = `\nError: ${err.message}\n`;
+        appendLog(name, msg);
+        broadcast({ type: 'output', recipe: name, data: msg });
+    });
+
+    child.on('close', (code) => {
+        appEntry.status = 'exited';
+        appEntry.code = code;
+        appEntry.child = null;
+        broadcast({ type: 'status', recipe: name, status: 'exited', code });
+    });
+}
+
 function startApp(name) {
+    const local = getLocalCard(name);
+    if (local) {
+        spawnCommand(name, local.command, local.cwd);
+        return;
+    }
+
     const entry = apps.get(name);
     if (entry && entry.status === 'running') return;
 
@@ -105,8 +166,13 @@ function startApp(name) {
 function stopApp(name) {
     const entry = apps.get(name);
     if (!entry || entry.status !== 'running' || !entry.child) return;
+    const isLocal = Boolean(getLocalCard(name));
     try {
-        process.kill(-entry.child.pid, 'SIGINT');
+        if (isLocal) {
+            entry.child.kill('SIGINT');
+        } else {
+            process.kill(-entry.child.pid, 'SIGINT');
+        }
     } catch {
         try { entry.child.kill('SIGINT'); } catch {}
     }
@@ -118,7 +184,7 @@ function stopApp(name) {
 // REST
 app.get('/api/recipes', (req, res) => {
     try {
-        res.json({ recipes: loadRecipes() });
+        res.json({ recipes: loadRecipes(), localCards: loadLocalCards() });
     } catch (err) {
         console.error('Error loading recipes:', err.message);
         res.status(500).json({ error: 'Failed to load recipes' });
@@ -154,7 +220,10 @@ wss.on('connection', (ws) => {
 });
 
 server.listen(PORT, () => {
+    const locals = loadLocalCards().map(c => c.name);
     console.log(`just-runner running at http://localhost:${PORT}`);
     console.log(`  http://localhost:${PORT}/`);
     console.log(`  Web-apps dir:  ${WEB_APPS_DIR}`);
+    console.log(`  Repo root:     ${REPO_ROOT}`);
+    console.log(`  Local cards:   ${locals.join(', ') || '(none)'}`);
 });

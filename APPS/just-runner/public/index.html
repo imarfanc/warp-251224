@@ -17,9 +17,15 @@
             <h1>justfile Runner</h1>
             <p class="topbar-tagline">Run Just recipes in web-apps</p>
         </div>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-            <div class="conn-dot" id="conn-dot"></div>
-            <span class="conn-label" id="conn-label">offline</span>
+        <div class="topbar-actions">
+            <label class="topbar-option" title="Open the app URL in a new tab when it appears in the log">
+                <input type="checkbox" id="open-on-start" checked>
+                <span>Open link on start</span>
+            </label>
+            <div class="topbar-conn">
+                <div class="conn-dot" id="conn-dot"></div>
+                <span class="conn-label" id="conn-label">offline</span>
+            </div>
         </div>
     </div>
     <div id="main">

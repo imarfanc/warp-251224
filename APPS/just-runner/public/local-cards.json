@@ -1,0 +1,19 @@
+{
+  "cards": [
+    {
+      "name": "clean-ds-store",
+      "doc": "Remove .DS_Store files under APPS/markdown-browser",
+      "command": "uv run --with rich python APPS/just-runner/scripts/clean-ds-store.py APPS/markdown-browser"
+    },
+    {
+      "name": "port-listeners",
+      "doc": "Inspect TCP listeners on dev ports (zones 1–3)",
+      "command": "JUST_RUNNER_LOG_WIDTH=52 uv run --with rich python APPS/just-runner/scripts/port-listeners.py"
+    },
+    {
+      "name": "close-listeners",
+      "doc": "SIGTERM listeners on dev ports (zones 1–3)",
+      "command": "FORCE_COLOR=1 uv run --with rich python APPS/just-runner/scripts/close-listeners.py"
+    }
+  ]
+}

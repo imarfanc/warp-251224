@@ -7,6 +7,11 @@
       "recipes": ["folder-commander", "markdown-browser", "repo-sync"]
     },
     {
+      "label": "cleanup",
+      "color": "teal",
+      "local": ["port-listeners", "close-listeners", "clean-ds-store"]
+    },
+    {
       "label": "Calendar",
       "color": "amber",
       "recipes": ["calendar-today", "macos-calendar2"]
