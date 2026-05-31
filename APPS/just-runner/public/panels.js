@@ -89,6 +89,58 @@ function clearLogEl(log) {
 
 const OPEN_ON_START_KEY = 'just-runner.openOnStart';
 
+const CARD_STORAGE_MIGRATIONS = {
+    'seminar-port-listeners': 'port-listeners',
+    'seminar-close-listeners': 'close-listeners',
+};
+
+function pathStorageKey(cardName) {
+    return `just-runner.path.${cardName}`;
+}
+
+function portsStorageKey(cardName) {
+    return `just-runner.ports.${cardName}`;
+}
+
+function migrateCardStorage(cardName, storageKeyFn) {
+    const fromName = CARD_STORAGE_MIGRATIONS[cardName];
+    if (!fromName) return;
+    const toKey = storageKeyFn(cardName);
+    const fromKey = storageKeyFn(fromName);
+    if (localStorage.getItem(toKey) === null && localStorage.getItem(fromKey) !== null) {
+        localStorage.setItem(toKey, localStorage.getItem(fromKey));
+    }
+}
+
+function loadStoredValue(card, storageKeyFn, configKey) {
+    migrateCardStorage(card.name, storageKeyFn);
+    const stored = localStorage.getItem(storageKeyFn(card.name));
+    if (stored !== null) return stored;
+    return card[configKey]?.default ?? '';
+}
+
+function loadStoredPath(card) {
+    return loadStoredValue(card, pathStorageKey, 'pathInput');
+}
+
+function loadStoredPorts(card) {
+    return loadStoredValue(card, portsStorageKey, 'portsInput');
+}
+
+function saveStoredPath(cardName, value) {
+    localStorage.setItem(pathStorageKey(cardName), value);
+}
+
+function saveStoredPorts(cardName, value) {
+    localStorage.setItem(portsStorageKey(cardName), value);
+}
+
+function wirePersistedInput(input, cardName, saveFn) {
+    const persist = () => saveFn(cardName, input.value);
+    input.addEventListener('input', persist);
+    input.addEventListener('change', persist);
+}
+
 let ws;
 let recipes = [];
 let localCards = [];
@@ -156,8 +208,12 @@ function updateCard(name, status, url) {
 
     const startBtn = card.querySelector('.btn.start');
     const stopBtn = card.querySelector('.btn.stop');
-    startBtn.disabled = st.status === 'running';
-    stopBtn.disabled  = st.status !== 'running';
+    const running = st.status === 'running';
+    startBtn.disabled = running;
+    if (stopBtn) stopBtn.disabled = st.status !== 'running';
+    card.querySelectorAll('.card-path-input, .card-ports-input, .btn.path-pick').forEach(el => {
+        el.disabled = running;
+    });
 
     let openGroup = card.querySelector('.open-group');
     if (st.url) {
@@ -194,10 +250,45 @@ function appendOutput(name, data) {
     }
 }
 
+async function pickFolderForCard(cardName, pathInput) {
+    try {
+        const res = await fetch('/api/pick-folder');
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            if (data.error !== 'Cancelled') {
+                appendOutput(cardName, `\nFolder picker: ${data.error || res.statusText}\n`);
+            }
+            return;
+        }
+        pathInput.value = data.path;
+        saveStoredPath(cardName, data.path);
+        pathInput.focus();
+    } catch (err) {
+        appendOutput(cardName, `\nFolder picker: ${err.message}\n`);
+    }
+}
+
 function buildCard(card) {
     const el = document.createElement('div');
     el.className = 'card';
     el.id = 'card-' + card.name;
+
+    const pathBlock = card.pathInput ? `
+        <div class="card-path">
+            <input type="text" class="card-path-input" spellcheck="false"
+                placeholder="${escapeHtml(card.pathInput.placeholder || 'Path')}"
+                autocomplete="off">
+            <button type="button" class="btn path-pick" title="Choose folder (macOS)">Pick…</button>
+        </div>
+    ` : '';
+
+    const portsBlock = card.portsInput ? `
+        <div class="card-path">
+            <input type="text" class="card-ports-input" spellcheck="false" inputmode="numeric"
+                placeholder="${escapeHtml(card.portsInput.placeholder || 'Ports')}"
+                autocomplete="off">
+        </div>
+    ` : '';
 
     el.innerHTML = `
         <div class="card-head">
@@ -205,19 +296,58 @@ function buildCard(card) {
             <div class="card-name">${card.name}</div>
         </div>
         ${card.doc ? `<div class="card-doc">${card.doc}</div>` : ''}
+        ${pathBlock}
+        ${portsBlock}
         <div class="card-controls">
             <button class="btn start" title="Start ${card.name}">Start</button>
-            <button class="btn stop" title="Stop ${card.name}" disabled>Stop</button>
+            ${card.noStop ? '' : `<button class="btn stop" title="Stop ${card.name}" disabled>Stop</button>`}
         </div>
         <pre class="card-log"></pre>
     `;
 
+    const pathInput = el.querySelector('.card-path-input');
+    const portsInput = el.querySelector('.card-ports-input');
+
+    function wireEnterToStart(input) {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                el.querySelector('.btn.start').click();
+            }
+        });
+    }
+
+    if (pathInput) {
+        pathInput.value = loadStoredPath(card);
+        wirePersistedInput(pathInput, card.name, saveStoredPath);
+        wireEnterToStart(pathInput);
+        el.querySelector('.btn.path-pick').addEventListener('click', () => pickFolderForCard(card.name, pathInput));
+    }
+
+    if (portsInput) {
+        portsInput.value = loadStoredPorts(card);
+        wirePersistedInput(portsInput, card.name, saveStoredPorts);
+        wireEnterToStart(portsInput);
+    }
+
     el.querySelector('.btn.start').addEventListener('click', () => {
         if (card.local) clearLogEl(el.querySelector('.card-log'));
         autoOpenPending.add(card.name);
-        sendMsg({ type: 'start', recipe: card.name });
+        const msg = { type: 'start', recipe: card.name };
+        if (pathInput) {
+            const path = pathInput.value.trim();
+            saveStoredPath(card.name, path);
+            msg.path = path;
+        }
+        if (portsInput) {
+            const ports = portsInput.value.trim();
+            saveStoredPorts(card.name, ports);
+            msg.ports = ports;
+        }
+        sendMsg(msg);
     });
-    el.querySelector('.btn.stop').addEventListener('click', () => sendMsg({ type: 'stop', recipe: card.name }));
+    const stopBtn = el.querySelector('.btn.stop');
+    if (stopBtn) stopBtn.addEventListener('click', () => sendMsg({ type: 'stop', recipe: card.name }));
 
     return el;
 }

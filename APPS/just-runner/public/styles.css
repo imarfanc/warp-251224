@@ -320,6 +320,44 @@ html, body {
     font-style: italic;
 }
 
+/* ── Path input (local cards) ── */
+.card-path {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px 0;
+}
+.card-path-input,
+.card-ports-input {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font);
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: var(--radius);
+    border: 1px dotted var(--line);
+    background: var(--field);
+    color: var(--text);
+}
+.card-path-input:focus,
+.card-ports-input:focus {
+    outline: none;
+    border-color: var(--line-strong);
+}
+.card-path-input:disabled,
+.card-ports-input:disabled {
+    color: var(--faint);
+    cursor: not-allowed;
+}
+.btn.path-pick {
+    flex-shrink: 0;
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+}
+.btn.path-pick:hover:not(:disabled) {
+    border-color: var(--accent);
+}
+
 /* ── Controls ── */
 .card-controls {
     display: flex;

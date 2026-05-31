@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import os
 import subprocess
+import sys
+
+from seminar_port_utils import parse_ports_list
 from rich import box
 from rich.console import Console
 from rich.panel import Panel
@@ -153,8 +156,12 @@ def run_investigation(zone_label: str, target_ports, style: str = "green"):
 
 
 if __name__ == "__main__":
-    run_investigation("Zone 1 · primary", [3000, 3001, 8000], "bright_green")
-    console.print()
-    run_investigation("Zone 2 · secondary", [4000, 4237, 4050, 4500], "yellow")
-    console.print()
-    run_investigation("Zone 3 · tertiary", [8002, 8011, 8087, 8978, 8999], "magenta")
+    custom = parse_ports_list(sys.argv[1]) if len(sys.argv) > 1 else []
+    if custom:
+        run_investigation("Custom ports", custom, "bright_cyan")
+    else:
+        run_investigation("Zone 1 · primary", [2000, 3000, 3001, 8000], "bright_green")
+        console.print()
+        run_investigation("Zone 2 · secondary", [4000, 4237, 4050, 4500], "yellow")
+        console.print()
+        run_investigation("Zone 3 · tertiary", [8002, 8011, 8087, 8978, 8999], "magenta")

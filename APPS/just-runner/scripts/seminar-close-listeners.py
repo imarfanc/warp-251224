@@ -2,6 +2,9 @@
 import os
 import signal
 import subprocess
+import sys
+
+from seminar_port_utils import parse_ports_list
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -95,14 +98,15 @@ def close_zone(zone_name, target_ports, border_style):
 
 
 if __name__ == "__main__":
-    TARGET_PORTS_1 = [3000, 3001, 8000]
-    TARGET_PORTS_2 = [4000, 4237, 4050]
-    TARGET_PORTS_3 = [8002, 8011, 8087, 8978, 8999]
+    custom = parse_ports_list(sys.argv[1]) if len(sys.argv) > 1 else []
 
     console.print("[bold cyan]Initiating Graceful Shutdown Sequence...[/bold cyan]\n")
 
-    close_zone("Zone 1: Primary Servers", TARGET_PORTS_1, "bright_green")
-    close_zone("Zone 2: Secondary Servers", TARGET_PORTS_2, "yellow")
-    close_zone("Zone 3: Tertiary Servers", TARGET_PORTS_3, "magenta")
+    if custom:
+        close_zone("Custom ports", custom, "bright_cyan")
+    else:
+        close_zone("Zone 1: Primary Servers", [2000, 3000, 3001, 8000], "bright_green")
+        close_zone("Zone 2: Secondary Servers", [4000, 4237, 4050], "yellow")
+        close_zone("Zone 3: Tertiary Servers", [8002, 8011, 8087, 8978, 8999], "magenta")
 
     console.print(Panel("[bold green]Shutdown sequence complete.[/bold green]", border_style="green", expand=False))

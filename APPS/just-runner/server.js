@@ -8,7 +8,7 @@ const path = require('path');
 const WEB_APPS_DIR = process.env.WEB_APPS_DIR || path.join(process.env.HOME, 'Developer/gh/web-apps');
 const REPO_ROOT = process.env.REPO_ROOT || path.join(__dirname, '../..');
 const LOCAL_CARDS_PATH = path.join(__dirname, 'public/local-cards.json');
-const PORT = process.env.PORT || 4500;
+const PORT = process.env.PORT || 2000;
 const LOG_LIMIT = 500;
 
 const app = express();
@@ -75,6 +75,47 @@ function getLocalCard(name) {
     return loadLocalCards().find(c => c.name === name);
 }
 
+function shellQuote(s) {
+    return `'${String(s).replace(/'/g, `'\\''`)}'`;
+}
+
+function resolveTargetPath(inputPath) {
+    const trimmed = String(inputPath || '').trim();
+    if (!trimmed) return null;
+    if (path.isAbsolute(trimmed)) return path.resolve(trimmed);
+    return path.resolve(REPO_ROOT, trimmed);
+}
+
+function buildLocalCommand(local, opts = {}) {
+    let command = local.command;
+    const extras = [];
+
+    if (local.pathInput) {
+        const pathArg = opts.path !== undefined && opts.path !== null
+            ? opts.path
+            : (local.pathInput.default || '');
+        const resolved = resolveTargetPath(pathArg);
+        if (!resolved) {
+            throw new Error('Path is required');
+        }
+        extras.push(shellQuote(resolved));
+    }
+
+    if (local.portsInput) {
+        const portsArg = opts.ports !== undefined && opts.ports !== null
+            ? opts.ports
+            : (local.portsInput.default || '');
+        if (String(portsArg).trim()) {
+            extras.push(shellQuote(String(portsArg).trim()));
+        }
+    }
+
+    if (extras.length) {
+        command += ` ${extras.join(' ')}`;
+    }
+    return command;
+}
+
 function spawnCommand(name, command, cwd) {
     const entry = apps.get(name);
     if (entry && entry.status === 'running') return;
@@ -113,10 +154,24 @@ function spawnCommand(name, command, cwd) {
     });
 }
 
-function startApp(name) {
+function startApp(name, opts = {}) {
     const local = getLocalCard(name);
     if (local) {
-        spawnCommand(name, local.command, local.cwd);
+        let command;
+        try {
+            command = buildLocalCommand(local, opts);
+        } catch (err) {
+            const entry = apps.get(name) || { log: [] };
+            apps.set(name, entry);
+            const msg = `\nError: ${err.message}\n`;
+            entry.log = entry.log || [];
+            entry.log.push(msg);
+            entry.status = 'exited';
+            broadcast({ type: 'output', recipe: name, data: msg });
+            broadcast({ type: 'status', recipe: name, status: 'exited', code: 1 });
+            return;
+        }
+        spawnCommand(name, command, local.cwd);
         return;
     }
 
@@ -182,6 +237,27 @@ function stopApp(name) {
 }
 
 // REST
+app.get('/api/pick-folder', (req, res) => {
+    if (process.platform !== 'darwin') {
+        res.status(501).json({ error: 'Folder picker is only available on macOS' });
+        return;
+    }
+    try {
+        const chosen = execFileSync('osascript', [
+            '-e',
+            'POSIX path of (choose folder with prompt "Select folder")',
+        ], { encoding: 'utf8' }).trim();
+        if (!chosen) {
+            res.status(400).json({ error: 'No folder selected' });
+            return;
+        }
+        res.json({ path: chosen });
+    } catch (err) {
+        const cancelled = /User canceled|User cancelled|-128/.test(String(err.message || err.stderr || ''));
+        res.status(400).json({ error: cancelled ? 'Cancelled' : (err.message || 'Failed to pick folder') });
+    }
+});
+
 app.get('/api/recipes', (req, res) => {
     try {
         res.json({ recipes: loadRecipes(), localCards: loadLocalCards() });
@@ -212,7 +288,7 @@ wss.on('connection', (ws) => {
         try { msg = JSON.parse(raw.toString()); } catch { return; }
 
         if (msg.type === 'start' && msg.recipe) {
-            startApp(msg.recipe);
+            startApp(msg.recipe, { path: msg.path, ports: msg.ports });
         } else if (msg.type === 'stop' && msg.recipe) {
             stopApp(msg.recipe);
         }

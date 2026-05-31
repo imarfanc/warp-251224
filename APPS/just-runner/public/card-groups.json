@@ -9,7 +9,7 @@
     {
       "label": "cleanup",
       "color": "teal",
-      "local": ["port-listeners", "close-listeners", "clean-ds-store"]
+      "local": ["seminar-port-listeners", "seminar-close-listeners", "clean-ds-store"]
     },
     {
       "label": "Calendar",

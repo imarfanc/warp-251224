@@ -2,18 +2,39 @@
   "cards": [
     {
       "name": "clean-ds-store",
-      "doc": "Remove .DS_Store files under APPS/markdown-browser",
-      "command": "uv run --with rich python APPS/just-runner/scripts/clean-ds-store.py APPS/markdown-browser"
+      "doc": "Remove .DS_Store files under a folder",
+      "command": "uv run --with rich python APPS/just-runner/scripts/clean-ds-store.py",
+      "pathInput": {
+        "default": "APPS/markdown-browser",
+        "placeholder": "Repo-relative or absolute path"
+      },
+      "noStop": true
     },
     {
-      "name": "port-listeners",
+      "name": "seminar-port-listeners",
       "doc": "Inspect TCP listeners on dev ports (zones 1–3)",
-      "command": "JUST_RUNNER_LOG_WIDTH=52 uv run --with rich python APPS/just-runner/scripts/port-listeners.py"
+      "command": "JUST_RUNNER_LOG_WIDTH=52 uv run --with rich python APPS/just-runner/scripts/seminar-port-listeners.py",
+      "portsInput": {
+        "default": "",
+        "placeholder": "Custom ports, e.g. 5173, 3000 (empty = zones 1–3)"
+      },
+      "noStop": true
     },
     {
-      "name": "close-listeners",
+      "name": "seminar-close-listeners",
       "doc": "SIGTERM listeners on dev ports (zones 1–3)",
-      "command": "FORCE_COLOR=1 uv run --with rich python APPS/just-runner/scripts/close-listeners.py"
+      "command": "FORCE_COLOR=1 uv run --with rich python APPS/just-runner/scripts/seminar-close-listeners.py",
+      "portsInput": {
+        "default": "",
+        "placeholder": "Custom ports, e.g. 5173, 3000 (empty = zones 1–3)"
+      },
+      "noStop": true
+    },
+    {
+      "name": "codex-opencode",
+      "doc": "Opens interactive Codex in Terminal (computer-use + opencode; gpt-5.4-mini)",
+      "command": "bash APPS/just-runner/scripts/launch-codex-opencode.sh",
+      "noStop": true
     }
   ]
 }
