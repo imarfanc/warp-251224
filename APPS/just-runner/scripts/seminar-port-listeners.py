@@ -160,8 +160,8 @@ if __name__ == "__main__":
     if custom:
         run_investigation("Custom ports", custom, "bright_cyan")
     else:
-        run_investigation("Zone 1 · primary", [2000, 3000, 3001, 8000], "bright_green")
+        run_investigation("Zone 1 · other", [2000, 3000, 3001, 3456, 4000, 8080, 8743, 8787], "bright_green")
         console.print()
-        run_investigation("Zone 2 · secondary", [4000, 4237, 4050, 4500], "yellow")
+        run_investigation("Zone 2 · deno browsers", [8000, 8001, 8002, 8003, 8004, 8005], "yellow")
         console.print()
-        run_investigation("Zone 3 · tertiary", [8002, 8011, 8087, 8978, 8999], "magenta")
+        run_investigation("Zone 3 · calendar & reminders", [8010, 8011, 8012, 8013, 8014, 8015], "magenta")

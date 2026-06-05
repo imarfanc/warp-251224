@@ -105,8 +105,8 @@ if __name__ == "__main__":
     if custom:
         close_zone("Custom ports", custom, "bright_cyan")
     else:
-        close_zone("Zone 1: Primary Servers", [2000, 3000, 3001, 8000], "bright_green")
-        close_zone("Zone 2: Secondary Servers", [4000, 4237, 4050], "yellow")
-        close_zone("Zone 3: Tertiary Servers", [8002, 8011, 8087, 8978, 8999], "magenta")
+        close_zone("Zone 1: Other Servers", [3000, 3001, 3456, 4000, 8080, 8743, 8787], "bright_green")
+        close_zone("Zone 2: Deno Browser Apps", [8000, 8001, 8002, 8003, 8004, 8005], "yellow")
+        close_zone("Zone 3: Calendar & Reminders", [8010, 8011, 8012, 8013, 8014, 8015], "magenta")
 
     console.print(Panel("[bold green]Shutdown sequence complete.[/bold green]", border_style="green", expand=False))

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sync-warp-launch-configs</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    color-scheme: light;
+
+    --page-bg: #e8e8ed;
+    --page-bg-accent: #d4d4da;
+
+    --window-ring: rgba(0, 0, 0, 0.18);
+    --window-shadow-1: rgba(0, 0, 0, 0.12);
+    --window-shadow-2: rgba(0, 0, 0, 0.22);
+    --window-shadow-3: rgba(0, 0, 0, 0.08);
+
+    --surface: #1e1e1e;
+    --titlebar: linear-gradient(180deg, #3a3a3a 0%, #2d2d2d 100%);
+    --titlebar-solid: #2d2d2d;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: #3a3a3a;
+    --text: #d4d4d4;
+    --title-text: #a8a8a8;
+    --muted: #6e6e6e;
+
+    --dot-red:    #ff5f57;
+    --dot-yellow: #febc2e;
+    --dot-green:  #28c840;
+    --dot-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.25);
+
+    --btn-fg: #a8a8a8;
+    --btn-bg: rgba(255, 255, 255, 0.07);
+    --btn-border: rgba(255, 255, 255, 0.12);
+    --btn-hover-fg: #e8e8e8;
+    --btn-hover-bg: rgba(255, 255, 255, 0.12);
+    --btn-hover-border: rgba(255, 255, 255, 0.2);
+
+    --kw:  #cf8eef;
+    --fn:  #dcdcaa;
+    --cl:  #4ec9b0;
+    --st:  #ce9178;
+    --cm:  #6a9955;
+    --nm:  #b5cea8;
+    --op:  #808080;
+    --sh:  #569cd6;
+
+    --scrollbar-thumb: rgba(255, 255, 255, 0.18);
+    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.28);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+
+      --page-bg: #1c1c1e;
+      --page-bg-accent: #2c2c2e;
+
+      --window-ring: rgba(255, 255, 255, 0.1);
+      --window-shadow-1: rgba(0, 0, 0, 0.55);
+      --window-shadow-2: rgba(0, 0, 0, 0.75);
+      --window-shadow-3: rgba(0, 0, 0, 0.35);
+
+      --surface: #161616;
+      --titlebar: linear-gradient(180deg, #323232 0%, #252525 100%);
+      --titlebar-solid: #252525;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-strong: #333;
+      --text: #e0e0e0;
+      --title-text: #b0b0b0;
+      --muted: #7a7a7a;
+
+      --btn-fg: #b0b0b0;
+      --btn-bg: rgba(255, 255, 255, 0.06);
+      --btn-border: rgba(255, 255, 255, 0.1);
+      --btn-hover-fg: #f0f0f0;
+      --btn-hover-bg: rgba(255, 255, 255, 0.1);
+      --btn-hover-border: rgba(255, 255, 255, 0.18);
+
+      --scrollbar-thumb: rgba(255, 255, 255, 0.14);
+      --scrollbar-thumb-hover: rgba(255, 255, 255, 0.22);
+    }
+  }
+
+  html {
+    overflow-x: clip;
+  }
+
+  html, body {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, var(--page-bg-accent) 0%, transparent 70%),
+      var(--page-bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    transition: background 0.25s ease;
+  }
+
+  body {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 3vw, 1.5rem);
+    overflow-x: clip;
+  }
+
+  .window {
+    width: min(860px, 100%);
+    flex-shrink: 0;
+    margin-inline: auto;
+    border-radius: 12px;
+    overflow: clip;
+    background: var(--titlebar-solid);
+    border: 1px solid var(--window-ring);
+    box-shadow:
+      0 0 0 0.5px var(--window-ring),
+      0 1px 2px var(--window-shadow-3),
+      0 8px 24px var(--window-shadow-1),
+      0 24px 48px var(--window-shadow-2);
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  /* ── title bar ── */
+  .titlebar {
+    background: var(--titlebar);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0 1rem;
+    height: 40px;
+    border-bottom: 1px solid var(--border-strong);
+    position: relative;
+    z-index: 1;
+  }
+
+  .traffic {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: var(--dot-shadow);
+  }
+  .dot-red    { background: var(--dot-red); }
+  .dot-yellow { background: var(--dot-yellow); }
+  .dot-green  { background: var(--dot-green); }
+
+  .title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100% - 9rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.78rem;
+    color: var(--title-text);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .copy-btn {
+    margin-left: auto;
+    position: relative;
+    z-index: 1;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--btn-fg);
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    border-radius: 6px;
+    padding: 0.25rem 0.7rem;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    user-select: none;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+
+  .copy-btn:hover {
+    color: var(--btn-hover-fg);
+    background: var(--btn-hover-bg);
+    border-color: var(--btn-hover-border);
+  }
+
+  .copy-btn:focus-visible {
+    outline: 2px solid var(--sh);
+    outline-offset: 2px;
+  }
+
+  .copy-btn.ok {
+    color: var(--dot-green);
+    background: rgba(40, 200, 64, 0.12);
+    border-color: rgba(40, 200, 64, 0.35);
+  }
+
+  /* ── code area ── */
+  .code-wrap {
+    background: var(--surface);
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+    transition: background 0.25s ease;
+  }
+
+  .code-wrap::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .code-wrap::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .code-wrap::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+  }
+
+  .code-wrap::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+
+  pre {
+    padding: 1.15rem 1.4rem 1.35rem;
+    font-family: "SF Mono", "Menlo", "Monaco", "Consolas", monospace;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre;
+    width: max-content;
+    min-width: 100%;
+    tab-size: 4;
+  }
+
+  /* tokens */
+  .kw { color: var(--kw); }
+  .fn { color: var(--fn); }
+  .cl { color: var(--cl); }
+  .st { color: var(--st); }
+  .cm { color: var(--cm); }
+  .nm { color: var(--nm); }
+  .op { color: var(--op); }
+  .sh { color: var(--sh); }
+  .df { color: var(--text); }
+
+  /* ── footer ── */
+  .footer {
+    background: var(--titlebar);
+    border-top: 1px solid var(--border-strong);
+    padding: 0.5rem 1.4rem;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+    transition: color 0.25s ease;
+  }
+</style>
+</head>
+<body>
+
+<div class="window">
+  <div class="titlebar">
+    <div class="traffic">
+      <div class="dot dot-red"></div>
+      <div class="dot dot-yellow"></div>
+      <div class="dot dot-green"></div>
+    </div>
+    <span class="title">sync-warp-launch-configs · python · uv</span>
+    <button class="copy-btn" id="copyBtn">Copy</button>
+  </div>
+
+  <div class="code-wrap">
+    <pre><span class="sh">uv run --with rich python &lt;&lt;'PY'</span>
+<span class="kw">import</span> <span class="df">shutil</span>
+<span class="kw">import</span> <span class="df">sys</span>
+<span class="kw">from</span> <span class="df">pathlib</span> <span class="kw">import</span> <span class="cl">Path</span>
+<span class="kw">from</span> <span class="df">rich.console</span> <span class="kw">import</span> <span class="cl">Console</span>
+<span class="kw">from</span> <span class="df">rich.panel</span> <span class="kw">import</span> <span class="cl">Panel</span>
+<span class="kw">from</span> <span class="df">rich.prompt</span> <span class="kw">import</span> <span class="cl">Confirm</span>
+
+<span class="df">console</span> <span class="op">=</span> <span class="cl">Console</span><span class="op">()</span>
+
+<span class="kw">def</span> <span class="fn">prompt_overwrite</span><span class="op">(</span><span class="df">message</span><span class="op">:</span> <span class="df">str</span><span class="op">)</span> <span class="op">-></span> <span class="df">bool</span><span class="op">:</span>
+    <span class="cm"># heredoc feeds script via stdin — read prompts from the terminal instead</span>
+    <span class="kw">if</span> <span class="df">sys</span><span class="op">.</span><span class="df">stdin</span><span class="op">.</span><span class="fn">isatty</span><span class="op">():</span>
+        <span class="kw">return</span> <span class="cl">Confirm</span><span class="op">.</span><span class="fn">ask</span><span class="op">(</span><span class="df">message</span><span class="op">)</span>
+    <span class="kw">try</span><span class="op">:</span>
+        <span class="kw">with</span> <span class="fn">open</span><span class="op">(</span><span class="st">"/dev/tty"</span><span class="op">,</span> <span class="st">"r"</span><span class="op">)</span> <span class="kw">as</span> <span class="df">tty</span><span class="op">:</span>
+            <span class="kw">return</span> <span class="cl">Confirm</span><span class="op">.</span><span class="fn">ask</span><span class="op">(</span><span class="df">message</span><span class="op">,</span> <span class="df">stream</span><span class="op">=</span><span class="df">tty</span><span class="op">)</span>
+    <span class="kw">except</span> <span class="cl">OSError</span><span class="op">:</span>
+        <span class="df">console</span><span class="op">.</span><span class="fn">print</span><span class="op">(</span><span class="st">"[yellow]Non-interactive — overwriting destination.[/yellow]"</span><span class="op">)</span>
+        <span class="kw">return</span> <span class="kw">True</span>
+
+<span class="cm"># Define the realm of ideas (source) and the realm of execution (destination)</span>
+<span class="df">src</span> <span class="op">=</span> <span class="cl">Path</span><span class="op">(</span><span class="st">"~/Developer/gh/web-apps/Configs/warp/launch_configurations"</span><span class="op">).</span><span class="fn">expanduser</span><span class="op">()</span>
+<span class="df">dst_base</span> <span class="op">=</span> <span class="cl">Path</span><span class="op">(</span><span class="st">"~/.warp"</span><span class="op">).</span><span class="fn">expanduser</span><span class="op">()</span>
+
+<span class="cm"># If ~/.warp exists as a directory, nest the configurations inside it</span>
+<span class="kw">if</span> <span class="df">dst_base</span><span class="op">.</span><span class="fn">is_dir</span><span class="op">()</span> <span class="kw">and</span> <span class="df">src</span><span class="op">.</span><span class="df">name</span> <span class="op">!=</span> <span class="df">dst_base</span><span class="op">.</span><span class="df">name</span><span class="op">:</span>
+    <span class="df">dst</span> <span class="op">=</span> <span class="df">dst_base</span> <span class="op">/</span> <span class="df">src</span><span class="op">.</span><span class="df">name</span>
+<span class="kw">else</span><span class="op">:</span>
+    <span class="df">dst</span> <span class="op">=</span> <span class="df">dst_base</span>
+
+<span class="df">console</span><span class="op">.</span><span class="fn">print</span><span class="op">(</span><span class="cl">Panel</span><span class="op">(</span>
+    <span class="st">f"[bold cyan]Source (Ideal):[/bold cyan] {src}\n"</span>
+    <span class="st">f"[bold magenta]Destination (Real):[/bold magenta] {dst}"</span><span class="op">,</span>
+    <span class="df">title</span><span class="op">=</span><span class="st">"[bold]Configuration Transfer[/bold]"</span><span class="op">,</span>
+    <span class="df">expand</span><span class="op">=</span><span class="kw">False</span>
+<span class="op">))</span>
+
+<span class="kw">if not</span> <span class="df">src</span><span class="op">.</span><span class="fn">exists</span><span class="op">():</span>
+    <span class="df">console</span><span class="op">.</span><span class="fn">print</span><span class="op">(</span><span class="st">"[bold red]Error:[/bold red] The source of truth does not exist. Cannot manifest what is not there."</span><span class="op">)</span>
+    <span class="df">sys</span><span class="op">.</span><span class="fn">exit</span><span class="op">(</span><span class="nm">1</span><span class="op">)</span>
+
+<span class="kw">if</span> <span class="df">dst</span><span class="op">.</span><span class="fn">exists</span><span class="op">():</span>
+    <span class="df">overwrite</span> <span class="op">=</span> <span class="fn">prompt_overwrite</span><span class="op">(</span><span class="st">"[yellow]The destination already exists. Overwrite the current state?[/yellow]"</span><span class="op">)</span>
+    <span class="kw">if not</span> <span class="df">overwrite</span><span class="op">:</span>
+        <span class="df">console</span><span class="op">.</span><span class="fn">print</span><span class="op">(</span><span class="st">"[bold blue]Aborted.[/bold blue] The current state remains untouched."</span><span class="op">)</span>
+        <span class="df">sys</span><span class="op">.</span><span class="fn">exit</span><span class="op">(</span><span class="nm">0</span><span class="op">)</span>
+    <span class="kw">if</span> <span class="df">dst</span><span class="op">.</span><span class="fn">is_dir</span><span class="op">():</span>
+        <span class="df">shutil</span><span class="op">.</span><span class="fn">rmtree</span><span class="op">(</span><span class="df">dst</span><span class="op">)</span>
+
+<span class="kw">try</span><span class="op">:</span>
+    <span class="kw">if</span> <span class="df">src</span><span class="op">.</span><span class="fn">is_dir</span><span class="op">():</span>
+        <span class="df">shutil</span><span class="op">.</span><span class="fn">copytree</span><span class="op">(</span><span class="df">src</span><span class="op">,</span> <span class="df">dst</span><span class="op">)</span>
+    <span class="kw">else</span><span class="op">:</span>
+        <span class="df">dst</span><span class="op">.</span><span class="df">parent</span><span class="op">.</span><span class="fn">mkdir</span><span class="op">(</span><span class="df">parents</span><span class="op">=</span><span class="kw">True</span><span class="op">,</span> <span class="df">exist_ok</span><span class="op">=</span><span class="kw">True</span><span class="op">)</span>
+        <span class="df">shutil</span><span class="op">.</span><span class="fn">copy2</span><span class="op">(</span><span class="df">src</span><span class="op">,</span> <span class="df">dst</span><span class="op">)</span>
+    <span class="df">console</span><span class="op">.</span><span class="fn">print</span><span class="op">(</span><span class="st">"[bold green]Success:[/bold green] The ideal has been manifested in the runtime."</span><span class="op">,</span> <span class="df">style</span><span class="op">=</span><span class="st">"green"</span><span class="op">)</span>
+<span class="kw">except</span> <span class="cl">Exception</span> <span class="kw">as</span> <span class="df">e</span><span class="op">:</span>
+    <span class="df">console</span><span class="op">.</span><span class="fn">print</span><span class="op">(</span><span class="st">f"[bold red]Failure:[/bold red] The transfer was interrupted: {e}"</span><span class="op">)</span>
+    <span class="df">sys</span><span class="op">.</span><span class="fn">exit</span><span class="op">(</span><span class="nm">1</span><span class="op">)</span>
+<span class="sh">PY</span></pre>
+  </div>
+
+  <div class="footer">copies launch_configurations → ~/.warp &nbsp;·&nbsp; heredoc-safe confirm via /dev/tty</div>
+</div>
+
+<textarea id="raw" style="position:absolute;left:-9999px;top:-9999px;opacity:0" aria-hidden="true">uv run --with rich python <<'PY'
+import shutil
+import sys
+from pathlib import Path
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Confirm
+
+console = Console()
+
+def prompt_overwrite(message: str) -> bool:
+    # heredoc feeds script via stdin — read prompts from the terminal instead
+    if sys.stdin.isatty():
+        return Confirm.ask(message)
+    try:
+        with open("/dev/tty", "r") as tty:
+            return Confirm.ask(message, stream=tty)
+    except OSError:
+        console.print("[yellow]Non-interactive — overwriting destination.[/yellow]")
+        return True
+
+# Define the realm of ideas (source) and the realm of execution (destination)
+src = Path("~/Developer/gh/web-apps/Configs/warp/launch_configurations").expanduser()
+dst_base = Path("~/.warp").expanduser()
+
+# If ~/.warp exists as a directory, nest the configurations inside it
+if dst_base.is_dir() and src.name != dst_base.name:
+    dst = dst_base / src.name
+else:
+    dst = dst_base
+
+console.print(Panel(
+    f"[bold cyan]Source (Ideal):[/bold cyan] {src}\n"
+    f"[bold magenta]Destination (Real):[/bold magenta] {dst}",
+    title="[bold]Configuration Transfer[/bold]",
+    expand=False
+))
+
+if not src.exists():
+    console.print("[bold red]Error:[/bold red] The source of truth does not exist. Cannot manifest what is not there.")
+    sys.exit(1)
+
+# Handle the friction of existing state
+if dst.exists():
+    overwrite = prompt_overwrite("[yellow]The destination already exists. Overwrite the current state?[/yellow]")
+    if not overwrite:
+        console.print("[bold blue]Aborted.[/bold blue] The current state remains untouched.")
+        sys.exit(0)
+    if dst.is_dir():
+        shutil.rmtree(dst)
+
+# Execute the transfer based on the nature of the artifact
+try:
+    if src.is_dir():
+        shutil.copytree(src, dst)
+    else:
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst)
+
+    console.print("[bold green]Success:[/bold green] The ideal has been manifested in the runtime.", style="green")
+except Exception as e:
+    console.print(f"[bold red]Failure:[/bold red] The transfer was interrupted: {e}")
+    sys.exit(1)
+PY</textarea>
+
+<script>
+  document.getElementById('copyBtn').addEventListener('click', async function () {
+    const btn = this;
+    const text = document.getElementById('raw').value;
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = 'Copied!';
+      btn.classList.add('ok');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('ok');
+      }, 2000);
+    } catch {
+      // fallback
+      const ta = document.getElementById('raw');
+      ta.style.position = 'fixed';
+      ta.select();
+      document.execCommand('copy');
+      ta.style.position = 'absolute';
+      btn.textContent = 'Copied!';
+      btn.classList.add('ok');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('ok'); }, 2000);
+    }
+  });
+</script>
+
+</body>
+</html>

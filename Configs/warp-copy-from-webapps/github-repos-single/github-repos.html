@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GitHub Repos</title>
+  <link rel="stylesheet" href="https://unpkg.com/missing.css@1.2.0">
+  <style>
+@font-face {
+  font-family: 'iA Writer Quattro';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url(https://cdn.jsdelivr.net/npm/@fontsource/ia-writer-quattro@5.2.5/files/ia-writer-quattro-latin-400-normal.woff2) format('woff2');
+}
+
+body {
+  font-family: 'iA Writer Quattro', monospace;
+  padding: 1.5rem;
+}
+
+main {
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  /* Space above missing’s header bottom rule so the toolbar isn’t flush against it */
+  padding-block-end: 0.65rem;
+}
+
+h1 {
+  margin: 0;
+}
+
+.repo-toolbar {
+  align-items: center;
+  padding-block: 0.15rem 0;
+}
+
+.repo-toolbar hr[aria-orientation='vertical'] {
+  align-self: stretch;
+  margin-block: 0.25rem;
+}
+
+.view-toggle {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: calc(var(--gap, 1rem) / 4);
+}
+
+.back-link {
+  font-size: 0.9rem;
+}
+
+.repos-controls {
+  margin-block-end: 1rem;
+  padding: 0.65rem 1rem;
+}
+
+.repos-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+
+.warp-check-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.warp-check-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.warp-check-row .app-link-cursor-only {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: 0.15rem;
+  color: var(--app-color, var(--accent));
+  text-decoration: none;
+  vertical-align: baseline;
+}
+
+.warp-check-row .app-link-cursor-only:hover {
+  opacity: 0.88;
+}
+
+.warp-check-row .app-link-cursor-only .app-link-cursor,
+.warp-check-row .app-km-tooltip-wrap .app-link-cursor-only .app-link-cursor {
+  flex-shrink: 0;
+  font-size: 1em;
+  color: currentColor;
+  filter: none;
+}
+
+.warp-check-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: var(--fg);
+}
+
+.warp-check-link .warp-check-icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.warp-check-link:hover {
+  text-decoration: underline;
+}
+
+.warp-check-link:hover .warp-check-icon {
+  text-decoration: none;
+}
+
+.sort-toggle {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--gap, 1rem) / 4);
+}
+
+.sort-toggle-label {
+  font-size: 0.85rem;
+  color: var(--muted-fg);
+  margin-inline-end: 0.15rem;
+}
+
+.sort-toggle-btn {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.25em 0.65em;
+  border-radius: var(--interactive-border-radius, 4px);
+  cursor: pointer;
+}
+
+.sort-toggle-btn[aria-pressed='true'] {
+  font-weight: 600;
+}
+
+.repos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap, 1rem);
+}
+
+/* Author `display:*` beats the `hidden` attribute unless we force it (see HTML hidden + .repos-grid / .box). */
+.repos-grid[hidden],
+#repos-list-shell[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 600px) {
+  .repos-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.repo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.repo-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.repo-title a {
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.repo-title a:hover {
+  text-decoration: underline;
+}
+
+.repo-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 0.15em 0.55em;
+  border-radius: 999px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.repo-desc {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted-fg);
+}
+
+.repo-meta {
+  font-size: 0.8rem;
+  color: var(--muted-fg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.lang-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 3px;
+  vertical-align: middle;
+}
+
+.repo-actions {
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.repo-actions-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.repo-actions a {
+  font-size: inherit;
+  text-decoration: none;
+  color: var(--muted-fg);
+}
+
+.repo-actions a:hover {
+  color: var(--fg);
+  text-decoration: underline;
+}
+
+.repos-list {
+  list-style: none;
+  padding: 0;
+}
+
+.repo-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  border-block-end: 1px solid var(--muted-fg);
+}
+
+.repo-list-item:last-child {
+  border-block-end: none;
+}
+
+.repo-list-name {
+  font-weight: 600;
+  text-decoration: none;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.repo-list-name:hover {
+  text-decoration: underline;
+}
+
+.repo-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.repo-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  border-radius: var(--interactive-border-radius, 4px);
+  text-decoration: none;
+  color: var(--muted-fg);
+  line-height: 0;
+}
+
+.repo-icon-link:hover {
+  color: var(--fg);
+  filter: brightness(1.08);
+}
+
+.repo-icon-link:focus-visible {
+  outline: 0.2em solid var(--fg);
+  outline-offset: 2px;
+}
+
+.repo-icon-link .iconify {
+  display: block;
+}
+
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>GitHub Repos</h1>
+      <section class="tool-bar repo-toolbar" role="toolbar" aria-label="Page actions">
+        <div class="view-toggle" role="group" aria-label="View layout">
+          <button type="button" class="view-toggle-btn" data-view="grid" aria-pressed="false">Cards</button>
+          <button type="button" class="view-toggle-btn" data-view="list" aria-pressed="true">List</button>
+        </div>
+      </section>
+    </header>
+    <div class="box repos-controls" id="repos-controls">
+      <div class="repos-controls-row">
+        <div class="warp-check-links" id="warp-check-links"></div>
+        <div class="sort-toggle" role="group" aria-label="Sort repositories">
+          <span class="sort-toggle-label">Sort:</span>
+          <button type="button" class="sort-toggle-btn" data-sort="default" aria-pressed="true">Default</button>
+          <button type="button" class="sort-toggle-btn" data-sort="name" aria-pressed="false">Name</button>
+        </div>
+      </div>
+    </div>
+    <section class="box repos-list-shell" id="repos-list-shell" aria-label="Repositories">
+      <ul class="repos-list" id="repos-list"></ul>
+    </section>
+    <div class="repos-grid" id="repos-grid" hidden></div>
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/iconify/3.1.1/iconify.min.js"></script>
+  <script>
+const CONFIG = {
+  cursorCli: '/opt/homebrew/bin/cursor',
+  kmMacro: 'run_web_command-26.4',
+  homeDir: '/Users/arfan2',
+  statusChecks: [
+    {
+      id: 'gh',
+      label: 'Check gh status',
+      warpLaunch: 'check_gh_status',
+      command:
+        'cd $HOME/Developer/gh\nsleep .25\nuv run --with rich $HOME/Developer/gh/web-apps/SCRIPTS/py/gh-status-script/gh_status_table.py',
+      kmAriaLabel:
+        'Run Keyboard Maestro run_web_command-26.4: gh status table script (Mac)',
+    },
+    {
+      id: 'git',
+      label: 'Check git status',
+      warpLaunch: 'check_git_status',
+      command:
+        'cd $HOME/Developer/gh\nsleep .25\nuv run --with rich $HOME/Developer/gh/web-apps/SCRIPTS/py/git-status-script/git_status_table.py',
+      kmAriaLabel:
+        'Run Keyboard Maestro run_web_command-26.4: git status table script (Mac)',
+    },
+  ],
+};
+  </script>
+  <script id="repos-data" type="application/json">
+[
+  {
+    "name": "vt",
+    "full_name": "imarfanc/vt",
+    "private": true,
+    "html_url": "https://github.com/imarfanc/vt",
+    "github_desktop_url": "x-github-client://openRepo/https://github.com/imarfanc/vt",
+    "repo_local_path": "$HOME/Developer/gh/vt",
+    "description": "my vals",
+    "language": "TypeScript",
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "updated_at": "2026-04-15T12:11:10Z",
+    "topics": []
+  },
+  {
+    "name": "vt2",
+    "full_name": "imarfanc/vt2",
+    "private": true,
+    "html_url": "https://github.com/imarfanc/vt2",
+    "github_desktop_url": "x-github-client://openRepo/https://github.com/imarfanc/vt2",
+    "repo_local_path": "$HOME/Developer/gh/vt2",
+    "description": "Vals (vt2 workspace)",
+    "language": "TypeScript",
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "updated_at": "2026-05-05T00:00:00Z",
+    "topics": []
+  },
+  {
+    "name": "web-apps",
+    "full_name": "imarfanc/web-apps",
+    "private": true,
+    "html_url": "https://github.com/imarfanc/web-apps",
+    "github_desktop_url": "x-github-client://openRepo/https://github.com/imarfanc/web-apps",
+    "repo_local_path": "$HOME/Developer/gh/web-apps",
+    "description": null,
+    "language": "HTML",
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "updated_at": "2026-04-15T00:01:06Z",
+    "topics": []
+  },
+  {
+    "name": "warp-251224",
+    "full_name": "imarfanc/warp-251224",
+    "private": false,
+    "html_url": "https://github.com/imarfanc/warp-251224",
+    "github_desktop_url": "x-github-client://openRepo/https://github.com/imarfanc/warp-251224",
+    "repo_local_path": "$HOME/Developer/gh/warp-251224",
+    "description": null,
+    "language": "TypeScript",
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "updated_at": "2026-04-14T22:17:15Z",
+    "topics": []
+  },
+  {
+    "name": "work-26",
+    "full_name": "imarfanc/work-26",
+    "private": true,
+    "html_url": "https://github.com/imarfanc/work-26",
+    "github_desktop_url": "x-github-client://openRepo/https://github.com/imarfanc/work-26",
+    "repo_local_path": "$HOME/Developer/gh/work-26",
+    "description": null,
+    "language": "HTML",
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "updated_at": "2026-04-14T22:15:33Z",
+    "topics": []
+  },
+  {
+    "name": "skills-26.4",
+    "full_name": "imarfanc/skills-26.4",
+    "private": true,
+    "html_url": "https://github.com/imarfanc/skills-26.4",
+    "github_desktop_url": "x-github-client://openRepo/https://github.com/imarfanc/skills-26.4",
+    "repo_local_path": "$HOME/Developer/gh/skills-26.4",
+    "description": "Agent skills and configuration setup",
+    "language": "Python",
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "updated_at": "2026-04-14T16:42:29Z",
+    "topics": []
+  },
+  {
+    "name": "vaults",
+    "full_name": "imarfanc/vaults",
+    "private": true,
+    "html_url": "https://github.com/imarfanc/vaults",
+    "github_desktop_url": "x-github-client://openRepo/https://github.com/imarfanc/vaults",
+    "repo_local_path": "$HOME/Developer/gh/vaults",
+    "description": null,
+    "language": "HTML",
+    "stargazers_count": 0,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "updated_at": "2026-04-14T15:47:16Z",
+    "topics": []
+  }
+]
+  </script>
+  <script>
+const LANG_COLORS = {
+  TypeScript: '#3178c6',
+  JavaScript: '#f1e05a',
+  Python: '#3572A5',
+  HTML: '#e34c26',
+  CSS: '#563d7c',
+};
+
+const ICON = {
+  githubDesktop: 'mdi:github',
+  cursor: 'simple-icons:cursor',
+  newWindow: 'ph:app-window-thin',
+};
+
+const SORT_STORAGE_KEY = 'githubReposSort';
+
+/** @type {Record<string, unknown>[]} */
+let reposOriginal = [];
+
+function getSortMode() {
+  const v = localStorage.getItem(SORT_STORAGE_KEY);
+  if (v === 'name' || v === 'default') return v;
+  return 'default';
+}
+
+function compareRepoName(a, b) {
+  return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+}
+
+function orderedRepos(sortMode) {
+  if (sortMode === 'name') return [...reposOriginal].sort(compareRepoName);
+  return [...reposOriginal];
+}
+
+function updateSortButtons(sortMode) {
+  document.querySelectorAll('.sort-toggle-btn').forEach((btn) => {
+    const active = btn.dataset.sort === sortMode;
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+}
+
+function applySortAndRender() {
+  const sortMode = getSortMode();
+  const repos = orderedRepos(sortMode);
+  renderGrid(repos);
+  renderList(repos);
+  updateSortButtons(sortMode);
+}
+
+function initSortToggle() {
+  document.querySelector('.sort-toggle')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('.sort-toggle-btn');
+    if (!btn?.dataset.sort) return;
+    localStorage.setItem(SORT_STORAGE_KEY, btn.dataset.sort);
+    applySortAndRender();
+  });
+}
+
+function relativeTime(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d ago`;
+  const months = Math.floor(days / 30);
+  return `${months}mo ago`;
+}
+
+function iconMarkup(icon) {
+  return `<span class="iconify" data-icon="${icon}" data-width="22" data-height="22" aria-hidden="true"></span>`;
+}
+
+function scanIconify(root) {
+  if (typeof Iconify !== 'undefined' && typeof Iconify.scan === 'function') {
+    Iconify.scan(root);
+  }
+}
+
+function cursorFileUrl(repo) {
+  if (!repo.repo_local_path) return null;
+  const path = repo.repo_local_path.replace('$HOME', CONFIG.homeDir);
+  return `cursor://file/${path}`;
+}
+
+function kmNewWindowUrl(repo) {
+  if (!repo.repo_local_path) return null;
+  const value = `${CONFIG.cursorCli} --new-window ${repo.repo_local_path}`;
+  return `kmtrigger://macro=${CONFIG.kmMacro}&value=${encodeURIComponent(value)}`;
+}
+
+function renderGrid(repos) {
+  const grid = document.getElementById('repos-grid');
+  grid.textContent = '';
+  repos.forEach(repo => {
+    const card = document.createElement('article');
+    card.className = 'box repo-card';
+
+    const langColor = LANG_COLORS[repo.language] || '#888';
+    const langDot = repo.language
+      ? `<span class="lang-dot" style="background:${langColor}"></span>${repo.language}`
+      : '';
+
+    const cursorUrl = cursorFileUrl(repo);
+    const kmUrl = kmNewWindowUrl(repo);
+
+    card.innerHTML = `
+      <div class="repo-title">
+        <a href="${repo.html_url}" target="_blank" rel="noopener">${repo.name}</a>
+        <span class="repo-badge ${repo.private ? 'warn' : 'ok'} bg color">${repo.private ? 'private' : 'public'}</span>
+      </div>
+      <p class="repo-desc">${repo.description ?? '—'}</p>
+      <div class="repo-meta">
+        ${langDot ? `<span>${langDot}</span>` : ''}
+        <span>⭐ ${repo.stargazers_count}</span>
+        <span>🍴 ${repo.forks_count}</span>
+        <span>🐛 ${repo.open_issues_count}</span>
+        <span>Updated ${relativeTime(repo.updated_at)}</span>
+      </div>
+      <div class="repo-actions">
+        <small class="repo-actions-inner">
+          <a href="${repo.github_desktop_url}">Open in GitHub Desktop →</a>
+          ${cursorUrl ? `<a href="${cursorUrl}">Open in Cursor →</a>` : ''}
+          ${kmUrl ? `<a href="${kmUrl}">New Cursor Window →</a>` : ''}
+        </small>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+function renderList(repos) {
+  const list = document.getElementById('repos-list');
+  list.textContent = '';
+  repos.forEach(repo => {
+    const li = document.createElement('li');
+    li.className = 'repo-list-item';
+
+    const cursorUrl = cursorFileUrl(repo);
+    const kmUrl = kmNewWindowUrl(repo);
+
+    const actions = [
+      `<a class="repo-icon-link" href="${repo.github_desktop_url}" aria-label="Open in GitHub Desktop" title="GitHub Desktop">${iconMarkup(ICON.githubDesktop)}</a>`,
+    ];
+    if (cursorUrl) {
+      actions.push(
+        `<a class="repo-icon-link" href="${cursorUrl}" aria-label="Open in Cursor" title="Open in Cursor">${iconMarkup(ICON.cursor)}</a>`,
+      );
+    }
+    if (kmUrl) {
+      actions.push(
+        `<a class="repo-icon-link" href="${kmUrl}" aria-label="New Cursor window" title="New Cursor window">${iconMarkup(ICON.newWindow)}</a>`,
+      );
+    }
+
+    li.innerHTML = `
+      <a class="repo-list-name" href="${repo.html_url}" target="_blank" rel="noopener">${repo.name}</a>
+      <div class="repo-list-actions">${actions.join('')}</div>
+    `;
+    list.appendChild(li);
+  });
+  scanIconify(list);
+}
+
+function setView(view) {
+  const grid = document.getElementById('repos-grid');
+  const listShell = document.getElementById('repos-list-shell');
+  const isList = view === 'list';
+
+  grid.hidden = isList;
+  listShell.hidden = !isList;
+
+  document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+    const active = btn.dataset.view === view;
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+}
+
+function initViewToggle() {
+  document.querySelector('.view-toggle')?.addEventListener('click', e => {
+    const btn = e.target.closest('.view-toggle-btn');
+    if (!btn || !btn.dataset.view) return;
+    setView(btn.dataset.view);
+  });
+}
+
+function kmStatusUrl(command) {
+  return `kmtrigger://macro=${CONFIG.kmMacro}&value=${encodeURIComponent(command)}`;
+}
+
+function initStatusLinks() {
+  const container = document.getElementById('warp-check-links');
+  if (!container || !Array.isArray(CONFIG.statusChecks)) return;
+
+  container.textContent = '';
+  CONFIG.statusChecks.forEach((check) => {
+    const row = document.createElement('span');
+    row.className = 'warp-check-row';
+    row.style.setProperty('--app-color', '#0969da');
+
+    const warpLink = document.createElement('a');
+    warpLink.className = 'warp-check-link';
+    warpLink.href = `warp://launch/${check.warpLaunch}`;
+    warpLink.innerHTML =
+      '<span class="iconify warp-check-icon" data-icon="material-icon-theme:warp" data-width="20" data-height="20" aria-hidden="true"></span>' +
+      `${check.label} (Warp)`;
+
+    const kmLink = document.createElement('a');
+    kmLink.className = 'app-link-cursor-only';
+    kmLink.href = kmStatusUrl(check.command);
+    kmLink.rel = 'noreferrer';
+    kmLink.setAttribute('aria-label', check.kmAriaLabel);
+    kmLink.innerHTML =
+      '<span class="iconify app-link-cursor" data-icon="mynaui:terminal-solid" aria-hidden="true"></span>';
+
+    row.append(warpLink, kmLink);
+    container.appendChild(row);
+  });
+
+  scanIconify(container);
+}
+
+const reposControls = document.getElementById('repos-controls');
+if (reposControls) scanIconify(reposControls);
+initStatusLinks();
+
+function loadRepos() {
+  const el = document.getElementById('repos-data');
+  reposOriginal = JSON.parse(el.textContent);
+  initSortToggle();
+  applySortAndRender();
+  initViewToggle();
+  setView('list');
+}
+
+loadRepos();
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GitHub Repos</title>
+  <link rel="stylesheet" href="https://unpkg.com/missing.css@1.2.0">
+  <link rel="stylesheet" href="/FRONTEND/app-meta-tooltip.css">
+  <link rel="stylesheet" href="/THE-SIMPLE-APPS/developer/github-repos/github-repos.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>GitHub Repos</h1>
+      <section class="tool-bar repo-toolbar" role="toolbar" aria-label="Page actions">
+        <div class="view-toggle" role="group" aria-label="View layout">
+          <button type="button" class="view-toggle-btn" data-view="grid" aria-pressed="false">Cards</button>
+          <button type="button" class="view-toggle-btn" data-view="list" aria-pressed="true">List</button>
+        </div>
+        <hr aria-orientation="vertical">
+        <a class="back-link" href="/">← Back to Simple Tests</a>
+      </section>
+    </header>
+    <div class="box repos-controls" id="repos-controls">
+      <div class="repos-controls-row">
+        <div class="warp-check-links" id="warp-check-links"></div>
+        <div class="sort-toggle" role="group" aria-label="Sort repositories">
+          <span class="sort-toggle-label">Sort:</span>
+          <button type="button" class="sort-toggle-btn" data-sort="default" aria-pressed="true">Default</button>
+          <button type="button" class="sort-toggle-btn" data-sort="name" aria-pressed="false">Name</button>
+        </div>
+      </div>
+    </div>
+    <section class="box repos-list-shell" id="repos-list-shell" aria-label="Repositories">
+      <ul class="repos-list" id="repos-list"></ul>
+    </section>
+    <div class="repos-grid" id="repos-grid" hidden></div>
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/iconify/3.1.1/iconify.min.js"></script>
+  <script src="/FRONTEND/app-meta-tooltip.js"></script>
+  <script src="/THE-SIMPLE-APPS/developer/github-repos/config.js"></script>
+  <script src="/THE-SIMPLE-APPS/developer/github-repos/github-repos.js"></script>
+</body>
+</html>

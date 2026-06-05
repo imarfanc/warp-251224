@@ -1,0 +1,11 @@
+---
+name: just_web_apps
+windows:
+  - tabs:
+      - title: tab1
+        layout:
+          cwd: /
+          commands:
+            - exec: cd "$HOME/Developer/gh/warp-251224"
+            - exec: open "http://localhost:2000/"
+            - exec: just just-runner
