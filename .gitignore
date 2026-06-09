@@ -1,5 +1,6 @@
 # added by me
 .DS_Store
+.warp-go-server
 Thumbs.db
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,node,go,deno,rust,swift,zsh

@@ -22,7 +22,7 @@
     // "tradesdontlie.pinescript-v6-vscode",
     // "coderabbit.coderabbit-vscode",
     // "shd101wyy.markdown-preview-enhanced",
-    "palaso.just-files",
-    "bungcip.better-toml"
+    // "palaso.just-files",
+    "tamasfe.even-better-toml"
   ]
 }

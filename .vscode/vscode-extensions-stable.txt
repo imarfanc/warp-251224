@@ -11,3 +11,4 @@ ms-python.vscode-pylance@2025.7.1
 ms-python.vscode-python-envs@1.2.0
 openai.chatgpt@0.3.3
 pkief.material-icon-theme@5.26.0
+tamasfe.even-better-toml
