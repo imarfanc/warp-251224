@@ -121,6 +121,7 @@ html, body {
 
 /* ── Topbar ── */
 #topbar {
+    container-type: inline-size;
     display: flex;
     align-items: center;
     gap: 16px;
@@ -128,6 +129,19 @@ html, body {
     height: 42px;
     border-bottom: var(--border);
     flex-shrink: 0;
+}
+
+.topbar-title-short { display: none; }
+
+@container (max-width: 520px) {
+    .topbar-tagline,
+    .topbar-option,
+    .topbar-title-full {
+        display: none;
+    }
+    .topbar-title-short {
+        display: inline;
+    }
 }
 
 .topbar-brand {
@@ -176,6 +190,13 @@ html, body {
     display: flex;
     align-items: center;
     gap: 6px;
+}
+.topbar-conn.connected {
+    cursor: pointer;
+    user-select: none;
+}
+.topbar-conn.connected:hover .conn-label {
+    color: var(--text);
 }
 
 .conn-dot {

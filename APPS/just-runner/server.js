@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { WebSocketServer } = require('ws');
-const { spawn, execFileSync } = require('child_process');
+const { spawn, execFileSync, spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -11,12 +11,97 @@ const LOCAL_CARDS_PATH = path.join(__dirname, 'public/local-cards.json');
 const PORT = process.env.PORT || 2000;
 const LOG_LIMIT = 500;
 
+// ---------- pretty console logging ----------
+
+const useColor = process.stdout.isTTY && !process.env.NO_COLOR;
+const c = (code, s) => (useColor ? `\x1b[${code}m${s}\x1b[0m` : s);
+const dim = (s) => c(2, s);
+const bold = (s) => c(1, s);
+const green = (s) => c(32, s);
+const yellow = (s) => c(33, s);
+const red = (s) => c(31, s);
+const cyan = (s) => c(36, s);
+
+const ts = () => dim(new Date().toLocaleTimeString('en-GB'));
+
+const hasGum = (() => {
+    try {
+        return spawnSync('gum', ['--version'], { stdio: 'ignore' }).status === 0;
+    } catch {
+        return false;
+    }
+})();
+
+function gum(args) {
+    const r = spawnSync('gum', args, {
+        encoding: 'utf8',
+        env: { ...process.env, CLICOLOR_FORCE: '1' },
+    });
+    return r.status === 0 ? r.stdout.replace(/\n$/, '') : null;
+}
+
+function gumLog(level, msg, kv = {}) {
+    const args = ['log', '--time', 'kitchen', '--level', level, '--structured', msg];
+    for (const [k, v] of Object.entries(kv)) args.push(k, String(v));
+    const r = spawnSync('gum', args, {
+        stdio: ['ignore', 'inherit', 'inherit'],
+        env: { ...process.env, CLICOLOR_FORCE: '1' },
+    });
+    return r.status === 0;
+}
+
+function logEvent(level, msg, kv = {}) {
+    if (hasGum && gumLog(level, msg, kv)) return;
+    const colorFor = { info: cyan, warn: yellow, error: red, debug: dim };
+    const pairs = Object.entries(kv).map(([k, v]) => dim(`${k}=`) + v).join(' ');
+    console.log(`${ts()} ${(colorFor[level] || ((s) => s))(level.toUpperCase().padEnd(5))} ${msg}${pairs ? ' ' + pairs : ''}`);
+}
+
+function printStartupBanner() {
+    const base = `http://localhost:${PORT}`;
+    const locals = loadLocalCards().map(c => c.name);
+    const cols = process.stdout.columns || 80;
+    const boxWidth = Math.max(40, Math.min(cols - 2, 120));
+    const lines = [
+        `just-runner  ${base}/`,
+        '',
+        `Web-apps dir:  ${WEB_APPS_DIR}`,
+        `Repo root:     ${REPO_ROOT}`,
+        `Local cards:   ${locals.join(', ') || '(none)'}`,
+        '',
+        'press Ctrl+D (or Ctrl+C) to stop',
+    ];
+
+    if (hasGum && boxWidth >= 40) {
+        const banner = gum([
+            'style',
+            '--border', 'rounded',
+            '--border-foreground', '212',
+            '--padding', '0 2',
+            '--margin', '1 0',
+            '--width', String(boxWidth),
+            ...lines,
+        ]);
+        if (banner) {
+            console.log(banner);
+            return;
+        }
+    }
+
+    console.log(`${bold('just-runner')} ${green(`${base}/`)}`);
+    console.log(`  ${dim('Web-apps dir:')}  ${WEB_APPS_DIR}`);
+    console.log(`  ${dim('Repo root:')}     ${REPO_ROOT}`);
+    console.log(`  ${dim('Local cards:')}   ${locals.join(', ') || '(none)'}`);
+    console.log(dim('  press Ctrl+D (or Ctrl+C) to stop'));
+}
+
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
 // Process registry: recipe name → { status, code, url, child, log[] }
 const apps = new Map();
+const runningChildren = new Set();
 
 function loadRecipes() {
     const out = execFileSync('just', ['--dump-format', 'json', '--dump'], {
@@ -66,7 +151,7 @@ function loadLocalCards() {
         const data = JSON.parse(fs.readFileSync(LOCAL_CARDS_PATH, 'utf8'));
         return data.cards || [];
     } catch (err) {
-        console.error('Failed to load local cards:', err.message);
+        logEvent('error', 'failed to load local cards', { error: err.message });
         return [];
     }
 }
@@ -130,6 +215,8 @@ function spawnCommand(name, command, cwd) {
         env: { ...process.env, FORCE_COLOR: '1' },
     });
     appEntry.child = child;
+    runningChildren.add(child);
+    logEvent('info', 'start', { recipe: name, cmd: command });
 
     function onData(data) {
         const text = data.toString();
@@ -147,9 +234,11 @@ function spawnCommand(name, command, cwd) {
     });
 
     child.on('close', (code) => {
+        runningChildren.delete(child);
         appEntry.status = 'exited';
         appEntry.code = code;
         appEntry.child = null;
+        logEvent(code === 0 ? 'info' : 'error', code === 0 ? 'exited' : 'failed', { recipe: name, code });
         broadcast({ type: 'status', recipe: name, status: 'exited', code });
     });
 }
@@ -186,6 +275,8 @@ function startApp(name, opts = {}) {
 
     const appEntry = { status: 'running', code: null, url: null, child, log: [] };
     apps.set(name, appEntry);
+    runningChildren.add(child);
+    logEvent('info', 'start', { recipe: name, cmd: `just ${name}` });
     broadcast({ type: 'status', recipe: name, status: 'running' });
 
     function onData(data) {
@@ -211,9 +302,11 @@ function startApp(name, opts = {}) {
     });
 
     child.on('close', (code) => {
+        runningChildren.delete(child);
         appEntry.status = 'exited';
         appEntry.code = code;
         appEntry.child = null;
+        logEvent(code === 0 ? 'info' : 'error', code === 0 ? 'exited' : 'failed', { recipe: name, code });
         broadcast({ type: 'status', recipe: name, status: 'exited', code });
     });
 }
@@ -262,9 +355,14 @@ app.get('/api/recipes', (req, res) => {
     try {
         res.json({ recipes: loadRecipes(), localCards: loadLocalCards() });
     } catch (err) {
-        console.error('Error loading recipes:', err.message);
+        logEvent('error', 'failed to load recipes', { error: err.message });
         res.status(500).json({ error: 'Failed to load recipes' });
     }
+});
+
+app.post('/api/shutdown', (req, res) => {
+    res.json({ ok: true });
+    setImmediate(() => shutdown('UI'));
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -291,15 +389,80 @@ wss.on('connection', (ws) => {
             startApp(msg.recipe, { path: msg.path, ports: msg.ports });
         } else if (msg.type === 'stop' && msg.recipe) {
             stopApp(msg.recipe);
+        } else if (msg.type === 'shutdown') {
+            shutdown('UI');
         }
     });
 });
 
 server.listen(PORT, () => {
-    const locals = loadLocalCards().map(c => c.name);
-    console.log(`just-runner running at http://localhost:${PORT}`);
-    console.log(`  http://localhost:${PORT}/`);
-    console.log(`  Web-apps dir:  ${WEB_APPS_DIR}`);
-    console.log(`  Repo root:     ${REPO_ROOT}`);
-    console.log(`  Local cards:   ${locals.join(', ') || '(none)'}`);
+    printStartupBanner();
 });
+
+// ---------- graceful shutdown ----------
+
+let shuttingDown = false;
+
+function killAppChild(name, entry) {
+    if (!entry.child) return;
+    const isLocal = Boolean(getLocalCard(name));
+    try {
+        if (isLocal) {
+            entry.child.kill('SIGTERM');
+        } else {
+            process.kill(-entry.child.pid, 'SIGTERM');
+        }
+    } catch {
+        try { entry.child.kill('SIGTERM'); } catch {}
+    }
+    runningChildren.delete(entry.child);
+}
+
+function shutdown(reason) {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log('');
+    logEvent('warn', 'shutting down', { reason });
+
+    for (const [name, entry] of apps) {
+        if (entry.status === 'running' && entry.child) {
+            logEvent('warn', 'killing child', { recipe: name, pid: entry.child.pid });
+            killAppChild(name, entry);
+        }
+    }
+    for (const child of runningChildren) {
+        logEvent('warn', 'killing child', { pid: child.pid });
+        child.kill('SIGTERM');
+    }
+
+    let exited = false;
+    const done = () => {
+        if (exited) return;
+        exited = true;
+        logEvent('info', 'bye 👋');
+        process.exit(0);
+    };
+
+    for (const client of wss.clients) {
+        client.terminate();
+    }
+
+    const closeHttp = () => {
+        server.closeAllConnections?.();
+        server.closeIdleConnections?.();
+        server.close(done);
+    };
+
+    wss.close(closeHttp);
+
+    // User-initiated shutdown — exit 0 even if sockets linger briefly
+    setTimeout(done, 2000).unref();
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+
+if (process.stdin.isTTY) {
+    process.stdin.resume();
+    process.stdin.on('end', () => shutdown('Ctrl+D'));
+}

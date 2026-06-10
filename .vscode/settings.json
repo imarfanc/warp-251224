@@ -43,10 +43,13 @@
   "deno.format": true,
 
   // ╭──────────────────────── Terminal Configuration ────────────────────╮
-  "terminal.integrated.lineHeight": 1.5,
+  // "terminal.integrated.lineHeight": 1.5,
+  "terminal.integrated.lineHeight": 1,
   // "terminal.integrated.fontSize": 14
   "terminal.integrated.fontSize": 16,
   "terminal.integrated.cursorStyle": "line",
+  "terminal.integrated.tabs.location": "left",
+  "terminal.integrated.tabs.hideCondition": "never",
   "terminal.integrated.fontFamily": "Hack Nerd Font Mono",
 
   // ╭──────────────────────── Language & Tools ────────────────────╮
@@ -173,7 +176,9 @@
     "**/Thumbs.db": true,
     ".yoyo": true
   },
-  "workbench.colorTheme": "Default High Contrast",
+  "workbench.preferredDarkColorTheme": "Default High Contrast",
+  "workbench.preferredLightColorTheme": "Default High Contrast",
+  // "workbench.colorTheme": "Default High Contrast",
   // "workbench.colorTheme": "Red",
   // "workbench.colorTheme": "Kimbie Dark",
   "prettier.bracketSameLine": true,

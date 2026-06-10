@@ -172,10 +172,30 @@ function maybeAutoOpenLink(name, url) {
 
 initTopbarOptions();
 
+let wsConnected = false;
+let shuttingDown = false;
+
 function setConnected(yes) {
+    wsConnected = yes;
     document.getElementById('conn-dot').classList.toggle('connected', yes);
+    const conn = document.getElementById('topbar-conn');
+    if (conn) conn.classList.toggle('connected', yes);
     document.getElementById('conn-label').textContent = yes ? 'connected' : 'offline';
 }
+
+async function requestShutdown() {
+    if (!wsConnected || shuttingDown) return;
+    if (!confirm('Stop just-runner? Running recipes will be stopped.')) return;
+    shuttingDown = true;
+    document.getElementById('conn-label').textContent = 'stopping…';
+    try {
+        await fetch('/api/shutdown', { method: 'POST' });
+    } catch {
+        sendMsg({ type: 'shutdown' });
+    }
+}
+
+document.getElementById('topbar-conn')?.addEventListener('click', requestShutdown);
 
 function sendMsg(obj) {
     if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
@@ -443,7 +463,7 @@ function connect() {
 
     ws.onclose = () => {
         setConnected(false);
-        setTimeout(connect, 2000);
+        if (!shuttingDown) setTimeout(connect, 2000);
     };
 }
 

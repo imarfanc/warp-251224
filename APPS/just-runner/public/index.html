@@ -14,7 +14,7 @@
 <div id="app">
     <div id="topbar">
         <div class="topbar-brand">
-            <h1>justfile Runner</h1>
+            <h1><span class="topbar-title-full">justfile Runner</span><span class="topbar-title-short">justfile</span></h1>
             <p class="topbar-tagline">Run Just recipes in web-apps</p>
         </div>
         <div class="topbar-actions">
@@ -22,7 +22,7 @@
                 <input type="checkbox" id="open-on-start" checked>
                 <span>Open link on start</span>
             </label>
-            <div class="topbar-conn">
+            <div class="topbar-conn" id="topbar-conn" title="Click to stop server">
                 <div class="conn-dot" id="conn-dot"></div>
                 <span class="conn-label" id="conn-label">offline</span>
             </div>
